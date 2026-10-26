@@ -13,5 +13,13 @@ test('restricted worker startup falls back to actual parser',async()=>{const old
 test('M3U media headers are separate from URL',()=>{const c=parseM3U('#EXTM3U\n#EXTINF:-1,Film\n#EXTVLCOPT:http-referrer=https://p.test/\nhttps://p.test/movie/1.mp4|User-Agent=Player').channels[0];assert.equal(c.type,'movie');assert.equal(c.url,'https://p.test/movie/1.mp4');assert.equal(c.userAgent,'Player');assert.equal(c.referer,'https://p.test/');});
 test('series preserves explicit season and episode',()=>{const show=xtreamSeries({series_id:1,name:'Show'},{server:'https://p.test',username:'u',password:'p'});const episodes=xtreamEpisodes({episodes:{3:[{id:2,title:'Title',episode_num:7}]}},show);const c=seriesCatalog(episodes)[0].episodes[0];assert.equal(c.season,3);assert.equal(c.episode,7);});
 test('probe follows redirect to final refusal and forwards headers',async()=>{const server=createServer((req,res)=>{if(req.url==='/start'){res.writeHead(302,{location:'/movie'});res.end();}else{assert.equal(req.headers['user-agent'],'Player');assert.equal(req.headers.referer,'https://p.test/');res.writeHead(403);res.end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));try{const result=await createSourceAPI()('probeMedia',{url:'http://127.0.0.1:'+server.address().port+'/start',userAgent:'Player',referer:'https://p.test/'},'com.tiviloom.app');assert.equal(result.status,403);assert.equal(result.redirects,1);}finally{await new Promise(r=>server.close(r));}});
-test('release manifests agree at reconstructed version',async()=>{for(const file of ['package.json','app/appinfo.json','service/package.json'])assert.equal(JSON.parse(await readFile(new URL('../'+file,import.meta.url))).version,'0.6.4');});
+test('release manifests agree at the package version',async()=>{
+ const version=JSON.parse(await readFile(new URL('../package.json',import.meta.url))).version;
+ for(const file of ['app/appinfo.json','service/package.json']){
+  assert.equal(JSON.parse(await readFile(new URL('../'+file,import.meta.url))).version,version,file+' version mismatch');
+ }
+ const android=await readFile(new URL('../android/app/build.gradle',import.meta.url),'utf8');
+ assert.match(android,/versionName\\s+['"]([^'"]+)['"]/);
+ assert.equal(android.match(/versionName\\s+['"]([^'"]+)['"]/)[1],version,'Android version mismatch');
+});
 test('required PNG dimensions and transparent wordmark',async()=>{for(const n of [80,130,400,1024]){const b=await readFile(new URL(`../branding/icon-${n}.png`,import.meta.url));assert.equal(b.readUInt32BE(16),n);assert.equal(b.readUInt32BE(20),n);}const b=await readFile(new URL('../branding/splash-1920x1080.png',import.meta.url));assert.equal(b.readUInt32BE(16),1920);assert.equal(b.readUInt32BE(20),1080);const logo=await readFile(new URL('../branding/logo-master-transparent.png',import.meta.url));assert.equal(logo[25],6);});
