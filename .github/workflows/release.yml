@@ -82,7 +82,8 @@ jobs:
           test -s "release/TiviLoom-${VERSION}-lg-webos.ipk"
       - name: Release package metadata
         run: |
-          printf 'TiviLoom %s\nCommit: %s\nAndroid: debug-signed APK (not suitable for stable production upgrades)\nLG: development IPK\nPhysical device tests: NOT RUN in CI\n' "$(node -p \"require('./package.json').version\")" "$GITHUB_SHA" > release/BUILD-INFO.txt
+          VERSION=$(node -p "require('./package.json').version")
+          printf 'TiviLoom %s\nCommit: %s\nAndroid: debug-signed APK (not suitable for stable production upgrades)\nLG: development IPK\nPhysical device tests: NOT RUN in CI\n' "$VERSION" "$GITHUB_SHA" > release/BUILD-INFO.txt
       - uses: actions/upload-artifact@v4
         with:
           name: TiviLoom-Android-Mobile-and-LG-webOS
