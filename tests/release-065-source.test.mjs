@@ -7,11 +7,11 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=rel=>readFile(path.join(root,rel),'utf8');
 test('release version is consistent across webOS and Android Gradle metadata',async()=>{
  const version=await read('src/version.mjs'); const pkg=JSON.parse(await read('package.json')); const info=JSON.parse(await read('app/appinfo.json')); const gradle=await read('android/app/build.gradle');
- assert.equal(version.trim(), 'export const VERSION="0.6.6";');
- assert.equal(pkg.version,'0.6.6');
- assert.equal(info.version,'0.6.6');
- assert.match(gradle,/versionCode 66/);
- assert.ok(gradle.includes("versionName '0.6.6'"));
+ assert.equal(version.trim(), 'export const VERSION="0.6.7";');
+ assert.equal(pkg.version,'0.6.7');
+ assert.equal(info.version,'0.6.7');
+ assert.match(gradle,/versionCode 67/);
+ assert.ok(gradle.includes("versionName '0.6.7'"));
 });
 test('playlist wizard updates validation state on input without Enter or blur',async()=>{
  const ui=await read('src/tv-ui.mjs');

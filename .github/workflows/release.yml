@@ -3,8 +3,6 @@ name: TiviLoom Dual-Platform Build
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
 

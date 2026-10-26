@@ -45,3 +45,8 @@ An optional user-owned HTTPS Worker is included at cloudflare/worker.mjs; bind a
 Retained 3D PNG logo masters were recovered and exported into the application; no new flat replacement was drawn. PNG logo, icons in 80/130/400/1024 and static Full HD splash are included under branding. The original designer's layered source is not supplied. Catch-up needs an explicit provider template and available EPG; Recently Added needs timestamps; M3U series grouping needs recognisable episode metadata. Audio/subtitles require exposed tracks.
 
 No physical Android phone, LG TV or usable simulator/emulator was available for acceptance testing. Package build/signature verification and automated DOM/service tests do not establish smooth video decoding, exact screen geometry or every-device compatibility.
+
+
+## LG-only maintenance (0.6.7)
+
+The LG webOS release workflow builds and tests only the IPK. Android APK builds are paused. The app icon references use versioned filenames to help refresh launcher metadata after an update; existing branding and splash artwork remain unchanged. On LG webOS, direct inbound HTTP servers are unsupported, so phone-to-TV QR pairing needs a user-controlled HTTPS Cloudflare Worker (computer-free) or LAN relay (PC/NAS). Do not claim QR transfer works without configuring a relay. Keep the old installed app and settings; do not uninstall before upgrading unless data is backed up.

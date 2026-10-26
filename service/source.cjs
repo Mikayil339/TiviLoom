@@ -22,7 +22,7 @@ function download(value,options) {
     function get(value,redirects){
       var url;try{url=validURL(value);}catch(e){finish(e);return;}
       var transport=url.protocol==='https:'?https:http;
-      request=transport.get(url,{headers:{'User-Agent':options.userAgent||'TiviLoom-webOS/0.6.4','Accept-Encoding':'gzip, deflate'}},function(response){
+      request=transport.get(url,{headers:{'User-Agent':options.userAgent||'TiviLoom-webOS/0.6.7','Accept-Encoding':'gzip, deflate'}},function(response){
         if([301,302,303,307,308].indexOf(response.statusCode)!==-1&&response.headers.location){
           response.resume();if(redirects>=5)return finish(Error('Too many redirects.'));
           try{get(new URL(response.headers.location,url).href,redirects+1);}catch(e){finish(e);}return;
@@ -77,7 +77,7 @@ function createSourceAPI(options){
       if(cached){imageBytes-=cached.data.length;images.delete(payload.url);}while(images.size&&(imageBytes+data.length>16*1024*1024||images.size>=200)){var key=images.keys().next().value;imageBytes-=images.get(key).data.length;images.delete(key);}
       images.set(payload.url,{data:data,time:now()});imageBytes+=data.length;return imageTicket(data);
     }
-    if(method==='ping')return {returnValue:true,version:'0.6.4',chunkSize:CHUNK};
+    if(method==='ping')return {returnValue:true,version:require('./package.json').version,chunkSize:CHUNK};
     if(method==='fetchSource'){
       if(active>=2)throw Error('Another source is loading. Try again shortly.');
       active++;

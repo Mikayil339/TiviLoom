@@ -1,0 +1,64 @@
+name: TiviLoom LG webOS IPK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: webos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lg-ipk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Compile webOS assets and refresh versioned app icons
+        run: npm run build
+      - name: Run automated regression tests
+        run: npm test
+      - name: Validate icon dimensions, version and service alignment
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const pkg=JSON.parse(fs.readFileSync('package.json'));
+          const app=JSON.parse(fs.readFileSync('app/appinfo.json'));
+          const service=JSON.parse(fs.readFileSync('service/package.json'));
+          assert.equal(pkg.version,app.version);
+          assert.equal(pkg.version,service.version);
+          for(const [key,width] of [['icon',80],['largeIcon',130],['storeIcon',400]]){
+            const file='app/'+app[key];
+            const b=fs.readFileSync(file);
+            assert.equal(b.subarray(1,4).toString('ascii'),'PNG');
+            assert.equal(b.readUInt32BE(16),width);
+            assert.equal(b.readUInt32BE(20),width);
+          }
+          console.log('webOS manifest + versioned PNG icons validated');
+          NODE
+      - name: Build LG webOS IPK
+        run: |
+          mkdir -p ipk release
+          npm run package
+          IPK=$(find ipk -maxdepth 1 -type f -name '*.ipk' -print -quit)
+          test -n "$IPK" && test -s "$IPK"
+          VERSION=$(node -p "require('./package.json').version")
+          cp "$IPK" "release/TiviLoom-${VERSION}-LG-webOS.ipk"
+          (cd release && sha256sum *.ipk > SHA256SUMS.txt)
+          printf 'TiviLoom %s\nCommit: %s\nLG webOS IPK only\nAndroid APK intentionally paused\nPhone pairing requires configured user-owned HTTPS or LAN relay\nPhysical LG TV acceptance: not tested in CI\n' "$VERSION" "$GITHUB_SHA" > release/INSTALL-NOTES.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TiviLoom-LG-webOS-IPK
+          path: release/
+          if-no-files-found: error
