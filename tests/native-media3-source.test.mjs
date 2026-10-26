@@ -5,7 +5,8 @@ const read = p => readFileSync(new URL(p, import.meta.url), 'utf8');
 test('Android Gradle project declares Media3 ExoPlayer, HLS and UI modules',()=>{
  const g=read('../android/app/build.gradle');
  for(const dep of ['media3-exoplayer:1.5.1','media3-exoplayer-hls:1.5.1','media3-ui:1.5.1']) assert.ok(g.includes(dep),dep);
- assert.match(g,/versionName '0\.6\.6'/);
+ const pkg=JSON.parse(read('../package.json'));
+ assert.ok(g.includes("versionName '"+pkg.version+"'"));
 });
 test('native player accepts provider headers and has bounded startup buffering',()=>{
  const j=read('../android/app/src/main/java/com/tiviloom/mobile/NativePlaybackActivity.java');
