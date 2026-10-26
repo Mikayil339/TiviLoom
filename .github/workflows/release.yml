@@ -1,0 +1,75 @@
+name: TiviLoom Dual-Platform Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Install Android SDK packages
+        run: sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Install JavaScript dependencies
+        run: npm ci
+      - name: Check version alignment
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const pkg=JSON.parse(readFileSync('package.json','utf8'));
+          const webos=JSON.parse(readFileSync('app/appinfo.json','utf8'));
+          const gradle=readFileSync('android/app/build.gradle','utf8');
+          const android=gradle.match(/versionName\s+['"]([^'"]+)['"]/);
+          if (!android || pkg.version!==webos.version || pkg.version!==android[1]) {
+            throw new Error('Version mismatch: npm='+pkg.version+', webOS='+webos.version+', Android='+android?.[1]);
+          }
+          if (process.env.GITHUB_REF_TYPE==='tag' && process.env.GITHUB_REF_NAME!=='v'+pkg.version)
+            throw new Error('Git tag does not match app version');
+          NODE
+      - name: Run automated tests
+        run: npm test
+      - name: Build web bundle
+        run: npm run build
+      - name: Build Android mobile APK
+        working-directory: android
+        run: gradle --no-daemon assembleDebug
+      - name: Package LG webOS IPK
+        run: |
+          mkdir -p ipk
+          rm -f ipk/*.ipk
+          npm run package
+      - name: Collect both artifacts and checksums
+        run: |
+          set -eu
+          VERSION=$(node -p "require('./package.json').version")
+          mkdir -p release
+          cp android/app/build/outputs/apk/debug/app-debug.apk "release/TiviLoom-${VERSION}-android-mobile-debug.apk"
+          IPK=$(find ipk -maxdepth 1 -type f -name '*.ipk' -print -quit)
+          test -n "$IPK"
+          cp "$IPK" "release/TiviLoom-${VERSION}-lg-webos.ipk"
+          (cd release && sha256sum *.apk *.ipk > SHA256SUMS.txt)
+          test -s "release/TiviLoom-${VERSION}-android-mobile-debug.apk"
+          test -s "release/TiviLoom-${VERSION}-lg-webos.ipk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TiviLoom-Android-Mobile-and-LG-webOS
+          path: release/
+          if-no-files-found: error
