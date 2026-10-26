@@ -3,6 +3,8 @@ name: TiviLoom Dual-Platform Build
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 
@@ -36,15 +38,18 @@ jobs:
           "$SDKMANAGER" --install 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
       - name: Install JavaScript dependencies
         run: npm ci
+      - name: Build web bundle
+        run: npm run build
       - name: Check version alignment
         run: |
           node --input-type=module <<'NODE'
           import {readFileSync} from 'node:fs';
           const pkg=JSON.parse(readFileSync('package.json','utf8'));
           const webos=JSON.parse(readFileSync('app/appinfo.json','utf8'));
+          const svc=JSON.parse(readFileSync('service/package.json','utf8'));
           const gradle=readFileSync('android/app/build.gradle','utf8');
           const android=gradle.match(/versionName\s+['"]([^'"]+)['"]/);
-          if (!android || pkg.version!==webos.version || pkg.version!==android[1]) {
+          if (!android || pkg.version!==webos.version || pkg.version!==svc.version || pkg.version!==android[1]) {
             throw new Error('Version mismatch: npm='+pkg.version+', webOS='+webos.version+', Android='+android?.[1]);
           }
           if (process.env.GITHUB_REF_TYPE==='tag' && process.env.GITHUB_REF_NAME!=='v'+pkg.version)
@@ -52,11 +57,12 @@ jobs:
           NODE
       - name: Run automated tests
         run: npm test
-      - name: Build web bundle
-        run: npm run build
       - name: Build Android mobile APK
         working-directory: android
         run: gradle --no-daemon assembleDebug
+      - name: Verify Android APK signature
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose android/app/build/outputs/apk/debug/app-debug.apk
       - name: Package LG webOS IPK
         run: |
           mkdir -p ipk
@@ -74,6 +80,9 @@ jobs:
           (cd release && sha256sum *.apk *.ipk > SHA256SUMS.txt)
           test -s "release/TiviLoom-${VERSION}-android-mobile-debug.apk"
           test -s "release/TiviLoom-${VERSION}-lg-webos.ipk"
+      - name: Release package metadata
+        run: |
+          printf 'TiviLoom %s\nCommit: %s\nAndroid: debug-signed APK (not suitable for stable production upgrades)\nLG: development IPK\nPhysical device tests: NOT RUN in CI\n' "$(node -p \"require('./package.json').version\")" "$GITHUB_SHA" > release/BUILD-INFO.txt
       - uses: actions/upload-artifact@v4
         with:
           name: TiviLoom-Android-Mobile-and-LG-webOS
