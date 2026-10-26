@@ -86,7 +86,7 @@ public final class NativePlaybackActivity extends Activity {
             }
             @Override public void onPlayerError(PlaybackException error) {
                 status.setVisibility(View.VISIBLE);
-                status.setText("Oynatma xətası: " + error.errorCodeName + " — " + safe(error));
+                status.setText("Oynatma xətası: " + error.getErrorCodeName() + " — " + safe(error));
             }
         });
         player.addAnalyticsListener(new AnalyticsListener() {
