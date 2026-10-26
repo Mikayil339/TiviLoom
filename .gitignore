@@ -2,6 +2,13 @@ node_modules/
 android/.gradle/
 android/build/
 android/app/build/
+release/
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# Keep device-signing material and packaged binaries out of public source control
 android/signing/
 *.jks
 *.keystore
@@ -11,13 +18,7 @@ android/signing/
 .env
 .env.*
 !.env.example
-release/
-apk/
 ipk/
-*.log
-*.map
-.DS_Store
-.idea/
-.vscode/
+*.ipk
+*.apk
 work/
-*.local

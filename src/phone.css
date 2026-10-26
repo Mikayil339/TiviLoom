@@ -1,0 +1,268 @@
+/* Phone layout is activated by the Android host, independent of the TV canvas. */
+.phone [data-adv="phone"],.phone [data-action="phone"],.phone [data-action="backup"],.phone [data-action="restore"]{display:none!important}
+html.phone{--bg:#0d1319;--panel:#17212b;--fg:#f5f7fa;--muted:#94a5b5;--accent:#7ed7cf;--row:76px;color-scheme:dark}
+.phone body{font-family:Roboto,system-ui,sans-serif;font-size:16px;margin:0;background:var(--bg);overflow:hidden;-webkit-tap-highlight-color:transparent}
+.phone *{box-sizing:border-box;touch-action:manipulation}
+.phone button,.phone input,.phone select{font-family:Roboto,system-ui,sans-serif;font-size:16px;min-height:48px}
+.phone button:focus-visible,.phone input:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.phone #tv-screen{position:fixed;top:0;right:0;bottom:0;left:0;inset:0;transform:none;width:100%;height:100dvh;overflow:hidden;background:var(--bg)}
+.phone #app{position:absolute;top:0;right:0;bottom:0;left:0;inset:0;width:100%;height:100%;background:var(--bg)}
+.phone .workspace{position:static;width:100%;height:100%;display:block}
+.phone #mobile-header{position:absolute;top:0;right:0;bottom:auto;left:0;inset:0 0 auto;height:64px;padding:8px 12px;display:flex;align-items:center;gap:8px;background:var(--bg);z-index:12;border-bottom:1px solid #ffffff0c}
+.phone #mobile-header>button{height:48px;min-width:48px;padding:10px;border-radius:12px;color:#dce7ef;background:transparent}
+.phone #mobile-header svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7}
+.phone #mobile-header .mobile-brand{flex:1;display:flex;justify-content:center;align-items:center;gap:8px;font-size:20px;font-weight:600;letter-spacing:-.5px}
+.phone .mobile-brand img{width:30px;height:30px;object-fit:contain}
+.phone .rail,.phone #app[data-nav] .rail{position:absolute;top:auto;right:0;bottom:0;left:0;inset:auto 0 0;height:72px;width:100%;padding:4px 8px 8px;transform:none;display:flex;flex-direction:row;gap:4px;background:#131e28;border-top:1px solid #ffffff0f;z-index:16}
+.phone .rail button,.phone #app[data-nav] .rail button{display:flex;flex:1;flex-direction:column;justify-content:center;align-items:center;padding:6px 3px;gap:5px;min-width:0;height:60px;border-radius:12px;color:#92a4b3;background:transparent}
+.phone .rail button span,.phone #app[data-nav] .rail button span{display:block;font-size:11px;line-height:14px;white-space:nowrap}
+.phone .rail button svg{width:23px;height:23px;flex:none}
+.phone .rail button.active{color:#9fe4dc;background:#20403f}
+.phone .edge-menu,.phone .topbar,.phone footer{display:none}
+.phone #main,.phone #app[data-nav] #main{position:absolute;top:64px;right:0;bottom:72px;left:0;inset:64px 0 72px;width:100%;height:auto;transform:none!important;display:flex;flex-direction:column;transition:none;background:var(--bg)}
+.phone .hero{height:auto;aspect-ratio:16/9;width:100%;margin:0;flex:none;background:#000;overflow:hidden}
+.phone #preview{position:absolute;top:0;right:0;bottom:0;left:0;inset:0;width:100%;height:100%;border-radius:0;aspect-ratio:16/9;background:#000}
+.phone .program-info{display:none}
+.phone #content{min-height:0;flex:1;overflow:auto;padding:0;background:var(--bg)}
+.phone .guide-wrap{height:100%;width:100%;display:flex;flex-direction:column}
+.phone .timeline{height:46px;min-height:46px;display:flex;align-items:center;padding:0 16px;background:#101a23;border-bottom:1px solid #ffffff0b}
+.phone .guide-date{position:static;width:auto;height:44px;min-height:44px;font-size:12px;line-height:18px;color:#9fb4c4;text-align:left}
+.phone .time-slots,.phone .now-head,.phone .now-line{display:none}
+.phone .guide-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0;overscroll-behavior:contain}
+.phone .guide-row{height:76px;min-height:76px;border-bottom:1px solid #ffffff0a;overflow:hidden;background:var(--bg)}
+.phone .channel-name{width:100%;height:76px;display:grid;grid-template-columns:24px 42px minmax(0,1fr) 24px;gap:8px;padding:10px 16px 10px 10px;background:transparent;color:var(--fg);border-radius:0}
+.phone .channel-name .num{font:11px/14px Roboto;color:#7f94a4;align-self:center;padding:0;width:auto}
+.phone .channel-name .channel-logo{width:42px;height:36px;min-width:42px;border-radius:6px;grid-row:auto;background:#ffffff08}
+.phone .channel-name .label{align-self:start;margin-top:3px;font:500 15px/21px Roboto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phone .channel-name.is-selected{background:#172c34;color:#c2f4ed}
+.phone .channel-name.is-tuned:before{width:3px;border-radius:0;background:var(--accent)}
+.phone .channel-name .channel-status{padding:0;width:24px;display:flex;align-items:center;justify-content:center}
+.phone .channel-status>svg{display:none}
+.phone .channel-status .playback-indicator{margin:0;font-size:14px;color:var(--accent)}
+.phone .guide-row .programs{position:absolute;left:92px;top:41px;right:18px;height:20px;width:auto;overflow:hidden;pointer-events:none}
+.phone .programme,.phone .programme.current,.phone .programme.selected{position:absolute!important;top:0!important;right:0!important;bottom:0!important;left:0!important;inset:0!important;width:100%!important;height:20px!important;min-height:0!important;border:0!important;background:transparent!important;color:#92a9b9!important;padding:0!important;font:12px/18px Roboto!important;border-radius:0;box-shadow:none!important;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;text-align:left}
+.phone .programme:not(.current){display:none}
+.phone .programme span{font:inherit;padding:0;white-space:nowrap}
+.phone .groups,.phone #app[data-nav="2"] .groups{position:absolute;top:64px;bottom:72px;left:0;width:min(88vw,360px);height:auto;padding:12px;z-index:20;background:#15212c;box-shadow:16px 0 45px #0007;transform:translateX(-110%);transition:transform .18s ease}
+.phone #app[data-nav="1"] .groups,.phone #app[data-nav="2"] .groups{transform:translateX(0)}
+.phone .group-button{width:100%;height:auto;min-height:52px;padding:12px 14px;font:15px/22px Roboto;border-radius:10px;margin-bottom:4px}
+.phone .group-button.active{background:#28433f;color:#b5eee6}
+.phone .playlist-selector{min-height:60px;margin-bottom:12px;color:#a8ded8;border:1px solid #ffffff14;border-radius:12px}
+.phone .channel-logo img{width:100%;height:100%;object-fit:contain}
+.phone #playback-identity{left:12px;right:12px;bottom:10px;padding:8px 10px;gap:10px;min-height:48px;max-width:none;max-height:72px;border-radius:10px;background:#0e1722d9}
+.phone #playback-identity .channel-logo{width:36px;height:28px;min-width:36px}
+.phone #playback-identity strong{font:500 13px/18px Roboto}
+.phone #playback-identity small{font:11px/16px Roboto}
+.phone #toast{position:fixed;left:16px;right:16px;bottom:86px;top:auto;max-width:600px;transform:none;margin:auto;padding:14px 16px;border-radius:12px;font:14px/21px Roboto;z-index:100;white-space:normal;background:#253844;box-shadow:0 8px 30px #0008}
+.phone #welcome{position:fixed;top:0;right:0;bottom:0;left:0;inset:0;padding:28px 22px;z-index:40;display:flex;flex-direction:column;justify-content:center;background:radial-gradient(ellipse at top,#163136,#0d1319 65%)}
+.phone .welcome-mark{position:static;display:flex;justify-content:center;align-items:center;gap:10px;margin:0 0 48px}
+.phone .welcome-mark img{width:52px;height:52px}
+.phone .welcome-mark span{font:500 30px Roboto;letter-spacing:-1px}
+.phone .welcome-copy{position:static;text-align:center;max-width:480px;width:100%;margin:0 auto}
+.phone .welcome-copy h1{font:500 27px/35px Roboto;margin:0 0 14px}
+.phone .welcome-copy p{font:15px/24px Roboto;color:#93aab8;margin:0 0 28px}
+.phone .welcome-actions{display:flex;flex-direction:column;gap:10px;align-items:stretch;margin:0}
+.phone .welcome-actions button{width:100%;height:auto;min-height:52px;margin:0;border:1px solid #ffffff18;border-radius:12px;font:500 15px/21px Roboto;padding:14px;background:#182b35;color:#e8f8f6}
+.phone .welcome-actions button:first-child{background:#83d9c9;color:#07221d;border:0}
+.phone .welcome-actions [data-action="phone"]{display:none}
+.phone #boot{position:fixed;top:0;right:0;bottom:0;left:0;inset:0;width:100%;height:100%;background:var(--bg)}
+.phone .wizard{position:fixed;top:0;right:0;bottom:0;left:0;inset:0;display:flex;flex-direction:column;overflow-y:auto;z-index:50;padding:24px 20px;background:var(--bg)}
+.phone .wizard-left{width:100%;height:auto;min-height:90px;flex:none;background:transparent;display:flex;align-items:center;gap:16px;padding:8px 0 24px}
+.phone .wizard-icon{position:static;width:44px;height:44px;flex:none}
+.phone .wizard-icon svg,.phone .wizard-icon img,.phone .wizard-material-icon,.phone .wizard-icon .wiz-logo{position:static;width:44px!important;height:44px!important}
+.phone .wizard-heading{position:static;min-width:0;flex:1}
+.phone .wizard-heading h1{font:500 25px/32px Roboto;margin:0}
+.phone .wizard-heading p{font:14px/21px Roboto;margin:8px 0 0;color:#98adbb;overflow-wrap:anywhere}
+.phone .wizard-center{width:100%;height:auto;min-height:0;flex:1;overflow:visible}
+.phone .wizard-options,.phone .wizard-options.url-options,.phone .wizard-options.processed-options,.phone .wizard-options.epg-options,.phone .wizard-options.form-options{position:static;max-height:none;width:100%;overflow:visible}
+.phone .wizard-option{width:100%;min-height:56px;margin:0 0 10px;padding:14px 16px;border:1px solid #ffffff16;border-radius:12px;background:#172631;font:15px/23px Roboto}
+.phone .wizard-option.double{min-height:66px}
+.phone .wizard-option small{font:12px/18px Roboto;max-height:none;overflow-wrap:anywhere;word-break:break-word}
+.phone .wizard-input-row{min-height:90px;padding:10px 0 18px;font:14px/22px Roboto}
+.phone .wizard-input-row input{width:100%;max-width:100%;padding:12px;font:16px/24px Roboto;border:1px solid #3b5060;border-radius:10px;background:#172631;margin:8px 0 0}
+.phone .wizard-side{width:100%;height:auto;flex:none;border:0;margin-top:20px;padding-bottom:12px}
+.phone .wizard-controls{position:static;display:flex;gap:12px;flex-wrap:wrap}
+.phone .wizard-controls button{width:auto;flex:1;min-width:100px;height:52px;margin:0;padding:14px 16px;font:500 15px Roboto;border-radius:12px;background:#20333e}
+.phone .wizard-controls [data-tv="wizard-next"]{background:#83d9c9;color:#07221d}
+.phone .wizard-status{position:static;padding:12px 0;font:13px/20px Roboto}
+.phone #modal-root{position:fixed;top:0;right:0;bottom:0;left:0;inset:0;pointer-events:none;z-index:60}
+.phone #modal-root>.overlay,.phone #modal-root>.settings-overlay,.phone #modal-root>.context-overlay,.phone #modal-root>.program-overlay{position:fixed;top:0;right:0;bottom:0;left:0;inset:0;display:flex;justify-content:center;align-items:flex-end;padding:12px 0 0;background:#03090fc2;pointer-events:auto}
+.phone .dialog,.phone .settings-panel,.phone .context-dialog,.phone .program-dialog{position:relative;top:auto;right:auto;bottom:auto;left:auto;inset:auto;width:100%;max-width:600px;height:auto;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);display:flex;flex-direction:column;border-radius:20px 20px 0 0;background:#17232e;box-shadow:0 -12px 60px #0007;overflow:hidden}
+.phone .dialog-header,.phone .settings-header{display:flex;align-items:center;min-height:68px;padding:10px 16px;gap:10px;border-bottom:1px solid #ffffff0e}
+.phone .dialog-header h2,.phone .settings-header h2{font:500 21px/28px Roboto;margin:0;flex:1}
+.phone .dialog-header button,.phone .settings-header button{width:48px;height:48px;flex:none;margin:0;font:27px Roboto}
+.phone .dialog-body,.phone .settings-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;max-height:calc(100vh - 105px);max-height:calc(100dvh - 105px)}
+.phone .settings-body>form{padding:8px 20px 24px}
+.phone .settings-body>form>label{font:13px/20px Roboto;margin:16px 0 20px}
+.phone .settings-body>form input:not([type=checkbox]),.phone .settings-body>form select{font:16px/24px Roboto;min-height:50px;border-radius:10px;padding:12px;margin-top:8px;max-width:100%}
+.phone .setting-row{width:100%;min-height:62px;height:auto;display:flex;align-items:center;gap:12px;padding:14px 20px;margin:0;border-radius:0;font:15px/22px Roboto;white-space:normal;border-bottom:1px solid #ffffff08}
+.phone .setting-row small,.phone .setting-subtitle{font:12px/18px Roboto;overflow-wrap:anywhere;word-break:break-word}
+.phone .setting-leading{width:22px;height:22px;flex:none}
+.phone .settings-section-title,.phone .menu-section{padding:18px 20px 8px;font:500 12px/18px Roboto;color:#88bcb7}
+.phone .dialog-actions{display:flex;flex-wrap:wrap;gap:10px;padding:12px 20px 20px}
+.phone .dialog-actions button{min-height:48px;border-radius:10px;padding:12px 16px;font:500 14px Roboto}
+.phone .menu-list>button{min-height:56px;height:auto;padding:15px 20px;gap:12px;font:15px/22px Roboto;white-space:normal}
+.phone .menu-list>button small{font:12px/18px Roboto}
+.phone .panel-note,.phone .settings-note{padding:12px 20px;font:14px/21px Roboto}
+.phone .search-view #content,.phone .movie-view #content,.phone .mylist-view #content{padding:16px}
+.phone .search-bar{position:static;display:flex;gap:8px;margin:0 0 16px;padding:0;width:100%;height:auto}
+.phone .search-bar input{width:100%;min-width:0;flex:1;border:1px solid #344b5b;border-radius:12px;min-height:50px;padding:12px;background:#172631;font:16px Roboto}
+.phone .voice-search{display:none}
+.phone .search-settings{width:48px;min-width:48px;height:50px;padding:10px}
+.phone .search-results,.phone .result-list{position:static;width:100%;padding:0;margin:0;max-height:none}
+.phone .result{width:100%;padding:12px;min-height:68px;border-radius:12px;margin-bottom:8px;font:14px/21px Roboto;background:#172631}
+.phone .search-section{padding:8px 0 14px;font:13px/20px Roboto}
+.phone .card-grid{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px;padding:0;overflow:visible}
+.phone .movie-view .hero{display:none}
+.phone .content-header{height:auto;padding:0 0 18px;display:flex;justify-content:space-between;align-items:center;font:14px Roboto}
+.phone .content-header h2{font:500 21px/28px Roboto;margin:0}
+.phone .movie-card{width:100%;padding:0;display:block;border-radius:10px;overflow:hidden}
+.phone .movie-card .poster{width:100%;height:auto;aspect-ratio:2/3;border-radius:10px}
+.phone .movie-card img{width:100%;height:100%;object-fit:cover}
+.phone .movie-card strong{display:block;font:500 13px/19px Roboto;padding:9px 2px 4px;white-space:normal}
+.phone .player{position:fixed;top:0;right:0;bottom:0;left:0;inset:0;width:100%;height:100dvh;z-index:30;background:transparent}
+.phone .player-top{top:10px;left:12px;right:12px;gap:8px;font:14px/20px Roboto;align-items:center}
+.phone .player-top img{width:24px;height:24px}
+.phone .player-top strong{display:none}
+.phone .player-top #player-channel{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.phone .player-top button{margin-left:auto;min-height:48px;font:13px Roboto}
+.phone .player-info .player-bottom,.phone .player-tools .player-bottom,.phone .player-bottom{padding:30px 12px 14px;max-height:65vh;max-height:65dvh;overflow-y:auto}
+.phone .player-program h2{font:500 18px/25px Roboto;margin:0 0 8px}
+.phone .player-program-meta{font:12px/18px Roboto;flex-wrap:wrap;gap:8px}
+.phone .player-program-meta strong{font:13px/18px Roboto}
+.phone #player-now>.channel-logo{width:40px;height:32px;flex:none}
+.phone #player-now{gap:12px;min-height:0}
+.phone .player-program p{font:12px/18px Roboto;margin-top:6px}
+.phone #player-recents{display:flex;overflow-x:auto;gap:10px;margin-top:16px;padding-bottom:4px;max-width:100%}
+.phone .recent-channel{width:112px;min-width:112px;max-width:112px;padding:10px;border-radius:10px}
+.phone .recent-channel span,.phone .recent-channel small{font:11px/16px Roboto}
+.phone .recent-command{width:74px;min-width:74px;padding:10px;font:11px/16px Roboto}
+.phone .player-buttons{gap:8px;overflow-x:auto}
+.phone .player-buttons button{min-width:64px;width:64px;height:64px;min-height:64px;padding:8px;border-radius:12px}
+.phone .player-buttons .tool-label{font:10px/13px Roboto;white-space:normal}
+.phone .player-buttons svg{width:23px;height:23px}
+.phone .player-seek{font:11px/17px Roboto;gap:8px}
+.phone #number-hud{position:fixed;top:12px;right:12px;max-width:calc(100vw - 24px);padding:12px;font:15px Roboto}
+.phone .favorite-entry{grid-template-columns:minmax(0,1fr) 62px 42px 42px;column-gap:6px;padding:10px 16px}
+.phone .favorite-entry .channel-logo{width:30px;min-width:30px;height:26px}
+.phone .favorite-entry>button.favorite-channel{padding:8px 0;gap:8px;font:13px/19px Roboto;min-width:0}
+.phone .favorite-entry input{width:62px;min-width:0;min-height:48px;font:16px Roboto}
+.phone .favorite-entry>button.favorite-reorder{width:42px;height:48px;min-width:42px;font-size:20px}
+.phone [data-action="phone"],.phone [data-adv="phone"]{display:none}
+@media (min-aspect-ratio:6/5){
+ .phone #main{display:grid;grid-template-columns:40% minmax(0,1fr);gap:0}
+ .phone .hero{align-self:start;margin-top:16px}
+ .phone #content{height:100%;overflow:auto}
+ .phone .movie-view #main,.phone .search-view #main,.phone .mylist-view #main{display:flex}
+ .phone .card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .phone .welcome-mark{margin-bottom:16px}
+ .phone .welcome-copy h1{font-size:23px;line-height:29px}
+ .phone .welcome-copy p{margin-bottom:16px}
+ .phone .welcome-actions{display:grid;grid-template-columns:1fr 1fr}
+ .phone #welcome{padding:16px 24px;overflow:auto}
+}
+@media (prefers-reduced-motion:reduce){.phone *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.phone .dialog-header button[data-action="modal-back"]{order:-1}
+.phone .setting-row:focus{background:#233743;color:#f5f7fa}
+.phone .wizard-option:focus{background:#25423f;color:#e0fff8}
+
+.phone .phone-row-menu{position:absolute;right:8px;top:14px;width:44px;height:48px;min-height:48px;padding:0;z-index:2;background:transparent;font:26px Roboto;color:#b1c6d2}
+.phone .channel-name{padding-right:60px}
+
+.phone .phone-empty{padding:40px 24px;text-align:center;color:#9bb0be;font:14px/22px Roboto}.phone .phone-empty h2{font:500 21px/28px Roboto;color:#e1f0f5;margin:0 0 12px}.phone .phone-empty p{margin:0 0 22px}.phone .phone-empty button{padding:14px 18px;border-radius:12px;background:#20403f;color:#b5eee6;font:500 14px Roboto}
+
+.phone .movie-detail{position:fixed;top:0;right:0;bottom:0;left:0;inset:0;width:100%;height:100dvh;padding:72px 20px 28px;overflow-y:auto;background:#0d1319}
+.phone .movie-detail-backdrop{position:static;width:200px;height:300px;margin:0 auto 24px;opacity:1;mask-image:none;-webkit-mask-image:none;border-radius:12px;overflow:hidden}
+.phone .movie-detail-backdrop img{width:100%;height:100%;object-fit:cover;filter:none}
+.phone .movie-detail h1{position:static;margin:0 0 14px;font:500 26px/34px Roboto}
+.phone .movie-description{position:static;margin:0;color:#9bb0be;font:14px/22px Roboto}.phone .movie-description:empty{display:none}
+.phone .movie-detail-actions{position:static;display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.phone .movie-detail-actions button{height:auto;min-height:54px;padding:13px 16px;border-radius:12px;font:500 14px/20px Roboto;justify-content:center;gap:8px;background:#20333e;white-space:normal}
+.phone .movie-detail-actions button:first-child{background:#83d9c9;color:#07221d}.phone .movie-detail-actions button:disabled{display:none}
+.phone .mobile-detail-back{position:fixed;top:12px;left:16px;z-index:2;width:48px;height:48px;min-height:48px;padding:0;border-radius:12px;background:#1c303b;color:#e4f4f5;font:32px Roboto}
+.phone .player-top time{display:none}.phone .player-top .mobile-player-tools{width:48px;height:48px;min-height:48px;min-width:48px;padding:0;margin:0;font:26px Roboto;background:#14232c99;border-radius:12px}
+.phone #player-recents>button{width:112px;min-width:112px;max-width:112px;height:84px;font:12px/17px Roboto;border-radius:10px}
+.phone #player-recents>.recent-command{width:74px;min-width:74px;max-width:74px;padding:10px}
+.phone #player-recents .recent-command svg{width:24px;height:24px}
+.phone #player-recents .recent-channel .channel-logo{width:80px;height:36px}
+.phone #player-recents .recent-channel>span:not(.channel-logo){font:11px/16px Roboto}
+.phone #video-surface.full-surface .video-error,.phone #video-surface .video-error{padding:24px;font:14px/22px Roboto}
+@media (min-aspect-ratio:6/5){.phone .movie-detail{display:grid;grid-template-columns:160px minmax(0,1fr);grid-template-rows:auto 1fr auto;gap:12px 20px}.phone .movie-detail-backdrop{grid-column:1;grid-row:1/4;width:160px;height:240px;margin:0}.phone .movie-detail h1{grid-column:2;grid-row:1}.phone .movie-description{grid-column:2;grid-row:2}.phone .movie-detail-actions{grid-column:2;grid-row:3;margin:0}}
+
+.phone .player-top button{display:flex;align-items:center;justify-content:center}
+.phone #player-channel{font:500 15px/21px Roboto}
+.phone .movie-view .card-grid{height:auto;min-height:0;align-items:start;grid-auto-rows:auto;flex:none}
+.phone .movie-card{height:auto;min-height:0}
+.phone .movie-card .poster{position:relative;aspect-ratio:2/3;height:auto}
+.phone .movie-card .poster img{position:absolute;top:0;right:0;bottom:0;left:0;inset:0;width:100%;height:100%}
+.phone .movie-card strong{height:auto;min-height:42px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.phone .player-top button{position:static;top:auto;right:auto;bottom:auto;left:auto;inset:auto;flex:0 0 auto;margin:0;opacity:1}
+.phone .player-top button[data-action="exit-player"]{order:-1;width:48px;min-width:48px;height:48px;font-size:0;padding:0}
+.phone .player-top button[data-action="exit-player"]:before{content:'‹';font:32px/40px Roboto}
+.phone .player-top>img{display:none}
+@media (min-aspect-ratio:6/5){
+ .phone #main,.phone #app[data-nav] #main{display:grid;grid-template-columns:40% minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:0}
+ .phone .movie-view #main,.phone .movie-view #app[data-nav] #main,.phone .search-view #main,.phone .search-view #app[data-nav] #main,.phone .mylist-view #main,.phone .mylist-view #app[data-nav] #main{display:flex}
+}
+/* Rebuilt phone bounds and viewport fixes. */
+.phone body{width:100%;height:100%;overscroll-behavior:none}
+.phone #tv-screen,.phone .player,.phone .movie-detail{height:100vh;height:100dvh;max-width:100vw}
+.phone #main,.phone #content,.phone .dialog-body,.phone .settings-body,.phone .wizard-heading,.phone .setting-text,.phone .result>span{min-width:0}
+.phone #content{overflow-x:hidden}
+.phone .rail button{min-width:0;flex:1 1 0;max-width:25%}
+.phone .rail button span{font-size:10px!important;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.phone .mobile-brand img{width:min(42vw,180px)!important;height:42px!important;object-fit:contain}
+.phone .channel-name .label{max-width:none;min-width:0}.phone .channel-name .channel-logo{margin:0}.phone .channel-name .channel-status{position:static;right:auto}
+.phone .content-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding-bottom:14px}
+.phone .content-header h2{font-size:19px;line-height:25px;overflow-wrap:anywhere}.phone .content-header .right{font-size:12px;margin:0;white-space:nowrap}
+.phone .content-header button{width:100%;min-width:0;padding:8px;min-height:44px;font-size:13px;background:#1c303c;border-radius:10px}.phone .content-header button:disabled{opacity:.35}
+.phone .movie-description{width:100%;max-width:100%;overflow-wrap:anywhere}.phone .movie-detail-actions button{min-width:0;overflow-wrap:anywhere}.phone .movie-detail-actions svg{flex-shrink:0;width:20px;height:20px}
+.phone .dialog input,.phone .dialog textarea,.phone .dialog select,.phone .settings-panel input:not([type=checkbox]),.phone .settings-panel select{width:100%;max-width:100%;min-width:0}
+.phone .dialog label,.phone .settings-panel label{max-width:100%;overflow-wrap:anywhere}.phone .setting-row select{flex:0 1 45%;max-width:48%}.phone .setting-row input[type=checkbox]{width:24px;min-width:24px;min-height:24px;margin-left:auto}
+.phone .setting-text,.phone .playlist-row .setting-text{min-width:0;white-space:normal;overflow-wrap:anywhere}.phone .dialog-header h2,.phone .settings-header h2{min-width:0;overflow-wrap:anywhere;font-size:19px}
+.phone .wizard{max-width:100vw;overflow-x:hidden;overflow-y:auto;padding:20px 16px}.phone .wizard-option,.phone .wizard-status{max-width:100%;overflow-wrap:anywhere}
+.phone #boot.boot{background:#031029 url('assets/logo.png') center / min(88vw,640px) auto no-repeat!important}.phone #welcome .welcome-mark{opacity:1!important}
+.phone #mini-player{width:min(360px,calc(100vw - 24px));height:auto;right:12px;bottom:86px}.phone #mini-video-host{height:auto;aspect-ratio:16/9}.phone #mini-player .mini-actions{min-height:44px;height:auto;font-size:11px}.phone #mini-player button{min-height:40px;font-size:12px}
+.phone .card-grid{gap:16px 12px;contain:layout style}.phone .player-buttons{max-width:100%;flex-wrap:nowrap}
+@media(max-width:359px){.phone .movie-view #content,.phone .search-view #content{padding:12px}.phone .movie-detail{padding-left:14px;padding-right:14px}.phone .movie-detail-actions{gap:8px}.phone .movie-detail-actions button{padding:10px;font-size:12px}}
+@media(min-width:600px) and (max-aspect-ratio:6/5){.phone .card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* 0.6.4: explicit expansion and predictable touch navigation. */
+.phone #preview-play{position:absolute;top:auto;right:10px;bottom:10px;left:auto;inset:auto 10px 10px auto;width:44px;height:44px;min-width:44px;min-height:44px;z-index:4;opacity:1!important;display:flex;align-items:center;justify-content:center;font:26px/1 Roboto;background:#132330df!important;color:#fff;border-radius:10px}
+.phone #preview-play:after{display:none!important}
+.phone #phone-group-scrim{position:absolute;top:64px;right:0;bottom:72px;left:0;inset:64px 0 72px;background:#0008;z-index:18;border:0;padding:0}
+.phone #phone-group-scrim[hidden]{display:none!important}
+.phone body.hidden-groups .groups{display:block}
+.phone .hero{height:calc(100vw * .5625);max-height:40vh}
+.phone .wizard{height:100vh;height:100dvh}
+.phone #mini-video-host{height:180px}
+@supports(aspect-ratio:16/9){.phone .hero{height:auto}.phone #mini-video-host{height:auto}}
+@supports not (aspect-ratio:2/3){.phone .movie-card .poster{height:0!important;padding-top:150%}}
+@media(min-aspect-ratio:6/5){.phone .hero{height:calc(40vw * .5625);max-height:100%}}
+/* Reset TV absolute search coordinates for the phone's flex form. */
+.phone .search-bar input,.phone .search-settings{position:static;top:auto;right:auto;bottom:auto;left:auto;height:auto}
+.phone .search-cards{display:flex;flex-direction:column;gap:8px;overflow:visible;padding:0}
+.phone .result.search-card{display:grid;grid-template-columns:48px minmax(0,1fr);grid-template-rows:auto auto;gap:2px 10px;width:100%;height:auto;min-height:68px;padding:12px}
+.phone .search-card .channel-logo{grid-row:1/3;width:48px;height:40px;min-width:48px}
+.phone .search-card>span:not(.channel-logo),.phone .search-card small{grid-column:2;width:auto;min-width:0;font-size:14px;line-height:20px}
+.phone #phone-group-scrim{width:100%;height:calc(100% - 136px)}
+.phone .search-bar{min-height:50px;flex:none}
+.phone .search-empty{position:static;min-height:120px;height:auto;padding:24px 0}
+.phone .search-bar input{color:var(--fg);caret-color:var(--accent)}
+/* Explicit spacing also works before flex-gap support in old WebViews. */
+.phone .setting-row{gap:0}
+.phone .setting-row>.setting-leading{margin-right:12px}
+
+/* 0.6.5 responsive touch and safe-area refinements */
+.phone .rail,.phone #app[data-nav] .rail{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));padding-bottom:max(8px,env(safe-area-inset-bottom));}
+.phone .rail button,.phone #app[data-nav] .rail button{flex:1 1 0;width:0;min-width:0;max-width:none;}
+.phone .mini-actions button{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;padding:0;}
+.phone .mini-actions [data-tv="mini-expand"]{display:inline-flex;align-items:center;justify-content:center;text-align:center;}
+.phone .player-buttons{align-items:stretch;justify-content:flex-start;gap:8px;padding-bottom:max(8px,env(safe-area-inset-bottom));}
+.phone .player-buttons button{flex:0 0 64px;display:flex;align-items:center;justify-content:flex-start;text-align:center;}
+.phone .player-buttons button .tool-icon{display:flex;align-items:center;justify-content:center;margin-left:auto;margin-right:auto;}
+.phone .settings-panel .setting-row{display:flex;align-items:center;gap:14px;}
+.phone .settings-panel .setting-row>svg{width:22px;height:22px;flex:0 0 22px;stroke:currentColor;fill:none;stroke-width:1.7;}
+.phone .setting-text{min-width:0;flex:1;}
+.phone .setting-chevron{flex:none;margin-left:12px;}
+@media(max-width:360px){.phone .rail{gap:2px;padding-left:4px;padding-right:4px}.phone .rail button span{font-size:10px}.phone .rail button svg{width:21px;height:21px}}

@@ -1,0 +1,31 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.tiviloom.mobile'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.tiviloom.mobile'
+        minSdk 26
+        targetSdk 35
+        versionCode 66
+        versionName '0.6.6'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation 'androidx.media3:media3-exoplayer:1.5.1'
+    implementation 'androidx.media3:media3-exoplayer-hls:1.5.1'
+    implementation 'androidx.media3:media3-ui:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+}
+
+// Rebuild the embedded WebView bundle from the authoritative app/ tree on every build.
+tasks.register('syncWebAssets', Copy) {
+    from("${projectDir}/../../app")
+    into("${projectDir}/src/main/assets/web")
+}
+tasks.named('preBuild').configure { dependsOn(tasks.named('syncWebAssets')) }

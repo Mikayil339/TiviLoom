@@ -1,0 +1,19 @@
+{
+  "id": "com.tiviloom.app",
+  "version": "0.6.6",
+  "vendor": "TiviLoom",
+  "type": "web",
+  "main": "index.html",
+  "title": "TiviLoom",
+  "appDescription": "TV playlists and programme guide",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "iconColor": "#031029",
+  "bgColor": "#031029",
+  "resolution": "1920x1080",
+  "disableBackHistoryAPI": true,
+  "requiredACG": [
+    "activity.operation"
+  ],
+  "handlesRelaunch": false
+}

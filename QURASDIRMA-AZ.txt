@@ -1,0 +1,15 @@
+TiviLoom 0.6.3 — yenidən hazırlanmış paket
+
+TELEFON: apk/TiviLoom-0.6.3-android.apk faylını telefona endirin və açın.
+Android 8.0+, yenilənmiş Android System WebView lazımdır.
+
+LG TV: ipk/com.tiviloom.app_0.6.3_all.ipk.
+ZIP-i tam çıxarın. Windows-da “TV-ye qurasdir.cmd” faylını açın.
+TV məlumatlarını qorumaq üçün əvvəlcə tətbiqi silməyin.
+
+Bu, itirilmiş 0.6.2 faylının eyni nüsxəsi deyil, bərpa olunan mənbədən yeni yığımdır.
+Android imza açarı yenidir. Əvvəlki APK artıq quraşdırılıbsa, birbaşa yeniləmə imza səbəbindən qəbul edilməyə bilər; məlumatlarınızı əvvəlcə qoruyun.
+
+95 avtomatlaşdırılmış test keçib. APK imzası yoxlanılıb.
+Fiziki telefon / LG TV üzərində oynatma və ekran yoxlaması aparılmayıb.
+Tam kod, PNG loqolar, test hesabatı və yığım skriptləri paketdədir.
