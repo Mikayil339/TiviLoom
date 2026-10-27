@@ -1,4 +1,5 @@
-import {VERSION} from './version.mjs';
+import {VERSION as WEB_VERSION} from './version.mjs';
+const VERSION=window.TiviLoomNative?.appVersion?.()||WEB_VERSION;
 import {createLibraryStore} from './library-store.mjs';
 import {parsePlaylist} from './parse-playlist.mjs';
 import {seriesCatalog,resumeOffset,canSeek,nextEpisode} from './media-library.mjs';
@@ -111,18 +112,18 @@ function showVideoError(message){setPlaybackPhase('error');if(state.full)$('#pla
   $('#video-error').textContent=message+' · Reconnecting '+reconnectAttempts+'/3…';reconnectTimer=setTimeout(()=>{reconnectTimer=null;if(state.playing===channel&&!document.hidden)play(state.channels.find(c=>c.id===channel),state.full,true);},delay);
 }
 async function playableStart(promise){if(!promise||typeof promise.then!=='function')return;let timer;try{return await Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Playback response timed out after 18 seconds.')),18000);})]);}finally{clearTimeout(timer);}}
-async function play(c,fullscreen=false,automatic=false){if(!c)return;
+async function play(c,fullscreen=false,automatic=false){if(!c)return;if(advanced.guardGroup(c.group,()=>play(c,fullscreen,automatic)))return;if(advanced.guard('channel',()=>play(c,fullscreen,automatic),c))return;
   // Explicit fullscreen playback on Android uses the native Media3 activity. The
   // ordinary channel tap remains in the existing preview/player UX.
   if(window.TiviLoomNative?.openNativePlayer && fullscreen && !c.demo){
     try{
       const url=await mediaURL(c);
-      const payload=JSON.stringify({url,userAgent:c.userAgent||state.userAgent||'TiviLoom-Android/0.6.6',referer:c.referer||''});
-      if(!window.TiviLoomNative.openNativePlayer(payload))throw Error('Native player could not be opened.');
-      state.channel=c.id;state.playing=c.id;state.full=true;state.playbackPhase='playing';
+      const payload=JSON.stringify({url,name:c.name,muted:!!state.prefs.muted,autoReconnect:state.prefs.autoReconnect!==false,fit:state.prefs.fit||'contain',userAgent:c.userAgent||state.userAgent||'TiviLoom-Android/0.6.9',referer:c.referer||''});
+      video.pause();if(hls){hls.destroy();hls=null;}video.removeAttribute('src');video.load();if(!window.TiviLoomNative.openNativePlayer(payload))throw Error('Native player could not be opened.');
+      state.channel=c.id;state.playing=c.id;state.full=true;state.playbackPhase='loading';
       state.history=[c.id,...state.history.filter(id=>id!==c.id)].slice(0,60);save('history');persistResume();
       $('#player-channel').textContent=c.name;$('#player-info').textContent=c.name;$('#preview-status').textContent=c.name;renderInfo();return;
-    }catch(error){toast('Native playback: '+error.message);return;}
+    }catch(error){state.playing=null;state.full=false;delete video.dataset.tiviSource;setPlaybackPhase('idle');toast('Native playback: '+error.message);return;}
   }
 if(c.type!=='series')state.nextEpisodes=null;if(advanced.guardGroup(c.group,()=>play(c,fullscreen,automatic)))return;if(advanced.guard('channel',()=>play(c,fullscreen),c))return;if(!automatic){clearTimeout(reconnectTimer);reconnectTimer=null;reconnectAttempts=0;}if(state.channel!==c.id)state.selected=null;state.channel=c.id;const retry=!$('#video-error').hidden||!!video.error;const generation=++playGeneration;const valid=()=>generation===playGeneration;let failed=false;$('#video-error').hidden=true;$('#preview-status').textContent=c.demo?'YERLİ NÜMUNƏ VİDEO':'YAYIM AÇILIR';if(state.playing!==c.id||retry||video.dataset.tiviSource!==c.url){if(hls){hls.destroy();hls=null;}video.pause();video.removeAttribute('src');video.load();state.playing=c.id;video.dataset.tiviSource=c.url;setPlaybackPhase('loading');if(fullscreen&&!state.full){state.full=true;$('#player').hidden=false;videoSurface.place($('#player'),true);$('#player-info').textContent='Loading: '+c.name;}persistResume();try{const instance=await attachVideo(video,c,false,valid);if(!valid()){instance?.destroy();return;}hls=instance;try{await playableStart(video.play());}catch(error){
     // An unlabelled endpoint or an overclaimed native MIME capability can fail.
@@ -156,7 +157,7 @@ function favoriteFolders(){const folders=['All',...new Set(Object.values(state.f
 function folderPick(c){if(!c)return;const names=[...new Set(Object.values(state.favCollections||{}).filter(Boolean))];const current=state.favCollections[c.id]||'Unsorted';modal('Favorite folder',`<p>${esc(c.name)}</p><p>Current folder: ${esc(current)}</p><form id="folder-form"><label>Folder name<input id="folder-name" maxlength="32" value="${esc(current==='Unsorted'?'':current)}" placeholder="Sports, News, Kids…"></label><button class="primary" type="submit">Save folder</button></form><p>${names.length?'Existing: '+esc(names.join(' · ')):''}</p>`,'<button data-action="close" class="secondary">Close</button>');}
 document.addEventListener('submit',event=>{if(event.target.id!=='folder-form')return;event.preventDefault();const c=currentChannel();if(!c)return;const folder=$('#folder-name')?.value.trim();if(!folder){delete state.favCollections[c.id];save('favCollections');closeModal();return toast('Folder assignment removed');}if(!state.favorites.includes(c.id))favorite(c);state.favCollections[c.id]=folder;save('favCollections');closeModal();toast('Saved to '+folder);});
 
-function enterPlayer(){state.full=true;$('#player').hidden=false;videoSurface.place($('#player'),true);showControls('info');if(state.playing&&video.paused&&!video.error)video.play().catch(()=>{});}
+function enterPlayer(){const c=state.channels.find(c=>c.id===state.playing)||currentChannel();if(window.TiviLoomNative?.openNativePlayer&&c&&!c.demo)return play(c,true);state.full=true;$('#player').hidden=false;videoSurface.place($('#player'),true);showControls('info');if(state.playing&&video.paused&&!video.error)video.play().catch(()=>{});}
 function exitPlayer(){persistResume();state.full=false;$('#player').hidden=true;videoSurface.place($('#preview'));if(state.view==='guide')renderGuide();}
 
 function showControls(){state.controls=true;$('#player-controls').classList.remove('hidden-controls');clearTimeout(controlTimer);controlTimer=setTimeout(()=>{if(state.full&&!$('#modal-root').children.length){state.controls=false;$('#player-controls').classList.add('hidden-controls');}},6000);}
@@ -289,6 +290,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('beforeunload',()=>{persistResume();hls?.destroy();multis.forEach(x=>x.h?.destroy());});
 
 for(const event of ['stalled','waiting'])video.addEventListener(event,()=>{if(state.playing&&!video.paused&&state.playbackPhase==='playing')setPlaybackPhase('buffering');clearTimeout(stallTimer);stallTimer=setTimeout(()=>{if(state.playing&&!video.paused&&!document.hidden)showVideoError('Yayım bağlantısı dayandı.');},20000);});
+window.addEventListener('TiviLoomNativePlayerError',()=>{state.playing=null;state.full=false;delete video.dataset.tiviSource;setPlaybackPhase('idle');$('#player').hidden=true;videoSurface.place($('#preview'));toast('Player açıla bilmədi. Kanalı yenidən seçin.');});
 let suspended=false;
 function tvSuspend(){if($('#mini-player')&&!$('#mini-player').hidden)toggleMini(true);advanced.suspend();clearTimeout(reconnectTimer);clearTimeout(stallTimer);reconnectTimer=null;if(suspended)return;suspended=true;persistResume();++playGeneration;hls?.destroy();hls=null;video.pause();video.removeAttribute('src');video.load();state.playing=null;delete video.dataset.tiviSource;setPlaybackPhase('idle');$('#preview-play').classList.remove('playing');$('#preview-play').textContent='▶';$('#video-error').hidden=true;}
 function tvResume(){if(!suspended)return;suspended=false;closeModal();tvUI.resetTransient();if(state.full)exitPlayer();const plan=resumePlan(state.channels,resumeState,state.prefs,state.favorites,state.history);Object.assign(state,{channel:plan.channel,group:state.groupPins?.[plan.group]?'Hamısı':plan.group,view:plan.view,window:plan.window,selected:null});render();tvUI.ready();if(plan.autoplay&&(state.imported||localStorage.getItem('tl-tv-ready')==='true'))play(currentChannel(),true);}

@@ -266,3 +266,11 @@ html.phone{--bg:#0d1319;--panel:#17212b;--fg:#f5f7fa;--muted:#94a5b5;--accent:#7
 .phone .setting-text{min-width:0;flex:1;}
 .phone .setting-chevron{flex:none;margin-left:12px;}
 @media(max-width:360px){.phone .rail{gap:2px;padding-left:4px;padding-right:4px}.phone .rail button span{font-size:10px}.phone .rail button svg{width:21px;height:21px}}
+
+/* Phone fullscreen: symmetric touch targets, centered artwork and safe edges. */
+.phone .player-buttons button{align-items:center;justify-content:center;min-height:64px;box-sizing:border-box;padding:8px 4px;line-height:1.2}
+.phone .player-buttons button .tool-icon{flex:none;align-self:center;margin:0 auto 5px;line-height:1}
+.phone .player-buttons button svg{display:block;flex:none;margin:auto}
+.phone #player-close,.phone #player .icon-button{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;padding:10px;box-sizing:border-box}
+.phone .player-controls{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.phone button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}

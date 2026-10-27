@@ -114,8 +114,8 @@
     let pending = null;
     let epg = "";
     const attr = (s) => Object.fromEntries([...s.matchAll(/([\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s,]+))/g)].map((m) => {
-      var _a3, _b2, _c;
-      return [m[1].toLowerCase(), (_c = (_b2 = (_a3 = m[2]) != null ? _a3 : m[3]) != null ? _b2 : m[4]) != null ? _c : ""];
+      var _a4, _b3, _c;
+      return [m[1].toLowerCase(), (_c = (_b3 = (_a4 = m[2]) != null ? _a4 : m[3]) != null ? _b3 : m[4]) != null ? _c : ""];
     }));
     const resolve = (s) => {
       if (!s) return "";
@@ -183,18 +183,18 @@
     return t - minutes * 6e4;
   }
   function parseXMLTV(text, Parser = globalThis.DOMParser) {
-    var _a3, _b2, _c;
+    var _a4, _b3, _c;
     const doc = new Parser().parseFromString(text, "text/xml");
     if (doc.querySelector("parsererror") || !doc.querySelector("tv")) throw Error("XMLTV fayl\u0131 oxunmad\u0131. D\xFCzg\xFCn XMLTV fayl\u0131 se\xE7in.");
     const names = {};
     doc.querySelectorAll("channel").forEach((c) => {
-      var _a4;
-      names[c.id] = ((_a4 = c.querySelector("display-name")) == null ? void 0 : _a4.textContent) || c.id;
+      var _a5;
+      names[c.id] = ((_a5 = c.querySelector("display-name")) == null ? void 0 : _a5.textContent) || c.id;
     });
     const programs = [];
     for (const p of doc.querySelectorAll("programme")) {
       const start = xmlDate(p.getAttribute("start")), end = xmlDate(p.getAttribute("stop"));
-      if (Number.isFinite(start) && end > start) programs.push({ channel: p.getAttribute("channel"), start, end, title: ((_a3 = p.querySelector("title")) == null ? void 0 : _a3.textContent) || "Ads\u0131z proqram", description: ((_b2 = p.querySelector("desc")) == null ? void 0 : _b2.textContent) || "", category: ((_c = p.querySelector("category")) == null ? void 0 : _c.textContent) || "" });
+      if (Number.isFinite(start) && end > start) programs.push({ channel: p.getAttribute("channel"), start, end, title: ((_a4 = p.querySelector("title")) == null ? void 0 : _a4.textContent) || "Ads\u0131z proqram", description: ((_b3 = p.querySelector("desc")) == null ? void 0 : _b3.textContent) || "", category: ((_c = p.querySelector("category")) == null ? void 0 : _c.textContent) || "" });
     }
     if (!programs.length) throw Error("XMLTV-d\u0259 etibarl\u0131 proqram vaxt\u0131 tap\u0131lmad\u0131.");
     return { names, programs };
@@ -253,12 +253,12 @@
     return { title: s.slice(0, m.index).replace(/[-_:\s]+$/, "").trim() || s, season: Number(m[1] || m[3]), episode: Number(m[2] || m[4]), identified: true };
   }
   function seriesCatalog(channels) {
-    var _a3, _b2;
+    var _a4, _b3;
     const shows = /* @__PURE__ */ new Map();
     for (const c of channels) {
       if (c.type !== "series") continue;
-      const e = parseEpisode(c.name), key = (c.seriesShowName || (((_a3 = c.xtream) == null ? void 0 : _a3.seriesId) ? c.name : e.identified ? e.title : c.group)).toLocaleLowerCase();
-      if (!shows.has(key)) shows.set(key, { id: key, name: c.seriesShowName || (((_b2 = c.xtream) == null ? void 0 : _b2.seriesId) ? c.name : e.identified ? e.title : c.group), poster: c.poster || c.logo || "", episodes: [] });
+      const e = parseEpisode(c.name), key = (c.seriesShowName || (((_a4 = c.xtream) == null ? void 0 : _a4.seriesId) ? c.name : e.identified ? e.title : c.group)).toLocaleLowerCase();
+      if (!shows.has(key)) shows.set(key, { id: key, name: c.seriesShowName || (((_b3 = c.xtream) == null ? void 0 : _b3.seriesId) ? c.name : e.identified ? e.title : c.group), poster: c.poster || c.logo || "", episodes: [] });
       shows.get(key).episodes.push({ ...c, season: c.season || e.season, episode: c.episode || e.episode });
     }
     for (const s of shows.values()) s.episodes.sort((a, b) => a.season - b.season || a.episode - b.episode);
@@ -335,10 +335,10 @@
       this.key = key;
     }
     back() {
-      var _a3, _b2;
+      var _a4, _b3;
       const frame = this.frames.pop();
-      this.key = (_a3 = frame == null ? void 0 : frame.key) != null ? _a3 : null;
-      return (_b2 = frame == null ? void 0 : frame.value) != null ? _b2 : null;
+      this.key = (_a4 = frame == null ? void 0 : frame.key) != null ? _a4 : null;
+      return (_b3 = frame == null ? void 0 : frame.value) != null ? _b3 : null;
     }
     clear() {
       this.key = null;
@@ -411,7 +411,7 @@
     return { id: "series-show-" + hash(root + "|" + credentials.username + "|" + id), name: String(item.name || "Series"), group: String(item.category_name || "Series"), type: "series", url: "", poster: String(item.cover || item.stream_icon || ""), xtream: { ...credentials, server: root, seriesId: id } };
   }
   function xtreamEpisodes(raw, show) {
-    var _a3;
+    var _a4;
     const seasons = (raw == null ? void 0 : raw.episodes) || {};
     const all = [];
     for (const [season, parts] of Object.entries(seasons)) {
@@ -420,7 +420,7 @@
         if (!e || !e.id) continue;
         const ext = String(e.container_extension || "mp4").replace(/[^a-zA-Z0-9]/g, "") || "mp4";
         const cr = show.xtream;
-        all.push({ id: "ep-" + hash(cr.server + "|" + cr.username + "|" + e.id), name: String(e.title || show.name + " S" + season + " E" + (e.episode_num || 1)), group: show.group, seriesShowName: show.name, type: "series", url: cr.server + "/series/" + encodeURIComponent(cr.username) + "/" + encodeURIComponent(cr.password) + "/" + encodeURIComponent(e.id) + "." + ext, poster: String(((_a3 = e.info) == null ? void 0 : _a3.movie_image) || show.poster || ""), season: Number(season) || 1, episode: Number(e.episode_num) || 1 });
+        all.push({ id: "ep-" + hash(cr.server + "|" + cr.username + "|" + e.id), name: String(e.title || show.name + " S" + season + " E" + (e.episode_num || 1)), group: show.group, seriesShowName: show.name, type: "series", url: cr.server + "/series/" + encodeURIComponent(cr.username) + "/" + encodeURIComponent(cr.password) + "/" + encodeURIComponent(e.id) + "." + ext, poster: String(((_a4 = e.info) == null ? void 0 : _a4.movie_image) || show.poster || ""), season: Number(season) || 1, episode: Number(e.episode_num) || 1 });
       }
     }
     return all.sort((a, b) => a.season - b.season || a.episode - b.episode);
@@ -433,14 +433,14 @@
     return { phase, active: phase !== "idle", label: labels[phase] || "" };
   }
   function syncPlaybackRows(root, state) {
-    var _a3;
+    var _a4;
     for (const row of root.querySelectorAll(".channel-name")) {
       const p = playbackPresentation(state, row.dataset.channel), marker = row.querySelector("[data-playback-indicator]");
       row.classList.toggle("is-tuned", p.active);
       row.classList.toggle("is-playing", p.phase === "playing");
       if (p.active) row.setAttribute("aria-current", "true");
       else row.removeAttribute("aria-current");
-      const name = ((_a3 = row.querySelector(".label")) == null ? void 0 : _a3.textContent) || "";
+      const name = ((_a4 = row.querySelector(".label")) == null ? void 0 : _a4.textContent) || "";
       row.setAttribute("aria-label", name + (p.label ? " \xB7 " + p.label : ""));
       if (marker) {
         marker.hidden = !p.active;
@@ -453,8 +453,8 @@
   function favoriteNumberLookup(state, value) {
     const text = String(value), favorites = new Set(state.favorites || []), hidden = new Set(state.hiddenChannels || []), groups = new Set(state.hiddenGroups || []);
     const candidates = state.channels.filter((c) => {
-      var _a3;
-      return c.type === "tv" && favorites.has(c.id) && !hidden.has(c.id) && !groups.has(c.group) && Number.isInteger((_a3 = state.channelNumbers) == null ? void 0 : _a3[c.id]) && String(state.channelNumbers[c.id]).startsWith(text);
+      var _a4;
+      return c.type === "tv" && favorites.has(c.id) && !hidden.has(c.id) && !groups.has(c.group) && Number.isInteger((_a4 = state.channelNumbers) == null ? void 0 : _a4[c.id]) && String(state.channelNumbers[c.id]).startsWith(text);
     });
     return { exact: candidates.find((c) => String(state.channelNumbers[c.id]) === text) || null, candidates };
   }
@@ -568,16 +568,16 @@
     };
   }
   function loadCatalog(value, legacyState = {}, legacyResume = {}) {
-    var _a3, _b2;
+    var _a4, _b3;
     if ((value == null ? void 0 : value.version) === 2 && Array.isArray(value.playlists)) {
       const seen = /* @__PURE__ */ new Set(), playlists = value.playlists.filter((p) => {
         if (!p || typeof p.id !== "string" || !Array.isArray(p.channels) || !p.channels.length || seen.has(p.id)) return false;
         seen.add(p.id);
         return true;
       });
-      return { version: 2, activeId: playlists.some((p) => p.id === value.activeId && p.enabled !== false) ? value.activeId : ((_a3 = playlists.find((p) => p.enabled !== false)) == null ? void 0 : _a3.id) || null, playlists };
+      return { version: 2, activeId: playlists.some((p) => p.id === value.activeId && p.enabled !== false) ? value.activeId : ((_a4 = playlists.find((p) => p.enabled !== false)) == null ? void 0 : _a4.id) || null, playlists };
     }
-    if ((value == null ? void 0 : value.imported) && ((_b2 = value.channels) == null ? void 0 : _b2.length)) {
+    if ((value == null ? void 0 : value.imported) && ((_b3 = value.channels) == null ? void 0 : _b3.length)) {
       const playlist = { ...playlistSnapshot({ ...legacyState, ...value }, legacyResume), id: "legacy-active" };
       return { version: 2, activeId: playlist.id, playlists: [playlist] };
     }
@@ -608,15 +608,15 @@
     return { ...playlist, favorites, history: filter(saved.history), reminders: list(saved.reminders), savedPrograms: list(saved.savedPrograms || playlist.savedPrograms).filter((p) => p && ids.has(p.channelId)), resume: { ...playlist.resume, ...saved.resume }, ...cleanOptions({ ...playlist, ...saved }, playlist.channels, favorites) };
   }
   function editPlaylist(catalog, id, patch) {
-    var _a3;
+    var _a4;
     if (!catalog.playlists.some((p) => p.id === id)) throw Error("Playlist was not found.");
     const playlists = catalog.playlists.map((p) => p.id === id ? { ...p, ...patch, id: p.id } : p);
-    return { ...catalog, playlists, activeId: playlists.some((p) => p.id === catalog.activeId && p.enabled !== false) ? catalog.activeId : ((_a3 = playlists.find((p) => p.enabled !== false)) == null ? void 0 : _a3.id) || null };
+    return { ...catalog, playlists, activeId: playlists.some((p) => p.id === catalog.activeId && p.enabled !== false) ? catalog.activeId : ((_a4 = playlists.find((p) => p.enabled !== false)) == null ? void 0 : _a4.id) || null };
   }
   function deletePlaylist(catalog, id) {
-    var _a3;
+    var _a4;
     const playlists = catalog.playlists.filter((p) => p.id !== id);
-    return { ...catalog, playlists, activeId: playlists.some((p) => p.id === catalog.activeId && p.enabled !== false) ? catalog.activeId : ((_a3 = playlists.find((p) => p.enabled !== false)) == null ? void 0 : _a3.id) || null };
+    return { ...catalog, playlists, activeId: playlists.some((p) => p.id === catalog.activeId && p.enabled !== false) ? catalog.activeId : ((_a4 = playlists.find((p) => p.enabled !== false)) == null ? void 0 : _a4.id) || null };
   }
 
   // src/advanced-ui.mjs
@@ -639,8 +639,8 @@
       return remoteChoices.map((v) => `<option value="${v}" ${v === selected ? "selected" : ""}>${names[v]}</option>`).join("");
     }
     function guard(kind, action2, c) {
-      var _a3;
-      const protectedItem = kind === "pin" ? true : kind === "settings" ? state.prefs.lockSettings : (_a3 = state.lockedChannels) == null ? void 0 : _a3.includes(c == null ? void 0 : c.id);
+      var _a4;
+      const protectedItem = kind === "pin" ? true : kind === "settings" ? state.prefs.lockSettings : (_a4 = state.lockedChannels) == null ? void 0 : _a4.includes(c == null ? void 0 : c.id);
       if (!state.prefs.parental || !protectedItem || Date.now() < unlockedUntil) return false;
       pinAction = action2;
       ctx.modal("Enter PIN", '<form id="pin-form"><label>PIN<input id="pin-input" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></label><p id="adv-status" role="status"></p><button class="primary" type="submit">Unlock</button></form>', '<button class="secondary" data-action="close">Cancel</button>');
@@ -670,11 +670,11 @@
       }
     }
     function settings(section) {
-      var _a3;
+      var _a4;
       if (section === "sources") {
         const catalog = ctx.getCatalog();
         panel("Playlists", button("Back to settings", "settings-root") + `<div class="settings-section-title">Saved playlists \xB7 ${catalog.playlists.length}</div>` + catalog.playlists.map((p) => `<div class="playlist-entry"><button class="setting-row playlist-row" data-tv="playlist-select" data-id="${esc(p.id)}" aria-pressed="${p.id === catalog.activeId}" ${p.enabled === false ? "disabled" : ""}><span class="setting-text">${esc(p.name)}<small>${p.channels.length} channels \xB7 ${p.enabled === false ? "Disabled" : p.id === catalog.activeId ? "Active" : "Saved"}</small></span><span>${p.id === catalog.activeId ? "\u2713" : "\u203A"}</span></button><button class="playlist-options" data-adv="playlist-details" data-id="${esc(p.id)}" aria-label="Options for ${esc(p.name)}">\u22EF</button></div>`).join("") + `<div class="menu-list"><button data-tv="import">\uFF0B Add playlist</button><button data-action="epg">EPG for active playlist</button><button data-tv="sample">Load sample playlist</button></div>`, "sources");
-        (_a3 = $('.playlist-row[aria-pressed="true"]') || $('[data-tv="import"]')) == null ? void 0 : _a3.focus();
+        (_a4 = $('.playlist-row[aria-pressed="true"]') || $('[data-tv="import"]')) == null ? void 0 : _a4.focus();
         return true;
       }
       if (section === "library") {
@@ -688,8 +688,8 @@
       if (section === "remote") {
         const defaults = { favorite: "favorite", guide: "guide", search: "search", context: "context" };
         panel("Remote control", button("Back to settings", "settings-root") + Object.entries(defaults).map(([key, v], i) => {
-          var _a4;
-          return `<label class="setting-row"><span class="setting-text">${["Red", "Green", "Yellow", "Blue"][i]} button</span><select data-remote="${key}">${optionList(((_a4 = state.prefs.remoteActions) == null ? void 0 : _a4[key]) || v)}</select></label>`;
+          var _a5;
+          return `<label class="setting-row"><span class="setting-text">${["Red", "Green", "Yellow", "Blue"][i]} button</span><select data-remote="${key}">${optionList(((_a5 = state.prefs.remoteActions) == null ? void 0 : _a5[key]) || v)}</select></label>`;
         }).join("") + `<label class="setting-row"><span class="setting-text">Long OK</span><select data-long-ok>${optionList(state.prefs.longOK || "context")}</select></label><p class="panel-note">Type a favorite number, then OK, or wait one second. Back clears the typed number.</p>`, "remote");
         return true;
       }
@@ -713,21 +713,21 @@
       panel(p.name, `<button class="setting-row" data-adv="toggle-playlist"><span class="setting-text">Enable playlist</span><span class="setting-switch ${p.enabled !== false ? "on" : ""}" aria-hidden="true"></span></button>` + detail("Playlist name", p.name, "edit-playlist", 'data-field="pl-name"') + detail("Playlist URL", p.sourceURL || "Not set", "edit-playlist", 'data-field="pl-url"') + detail("EPG sources", p.epgURL ? "1 source" : "Not set", "edit-playlist", 'data-field="pl-epg"') + detail("User-Agent", p.userAgent || "Not set", "edit-playlist", 'data-field="pl-agent"') + button("Manage groups \xB7 rename / PIN", "group-manager", `data-id="${esc(p.id)}"`) + `<div class="settings-section-title">Update options</div>` + detail("Update interval, hours", p.updateHours || "None", "edit-playlist", 'data-field="pl-interval"') + `<label class="setting-row startup-setting"><span class="setting-text">Update on app start</span><input type="checkbox" data-update-start="${esc(p.id)}" ${p.updateOnStart ? "checked" : ""}></label>` + button("Update playlist", "refresh-playlist") + `<p class="playlist-updated">${p.channels.length} channels${p.lastUpdated ? " \xB7 " + esc(new Date(p.lastUpdated).toLocaleString()) : ""}</p>` + button("Delete playlist", "delete-playlist"), "sources", "playlist:" + p.id, () => playlistDetails(p.id));
     }
     function editForm(focus = "pl-name") {
-      var _a3;
+      var _a4;
       const p = ctx.getCatalog().playlists.find((p2) => p2.id === editingId);
       if (!p) return;
       panel("Edit playlist", `<form id="playlist-edit-form"><label>Playlist name<input id="pl-name" value="${esc(p.name)}" maxlength="80" required></label><label>Playlist URL<input id="pl-url" type="url" value="${esc(p.sourceURL || "")}" autocomplete="off"></label><label>EPG URL<input id="pl-epg" type="url" value="${esc(p.epgURL || "")}" autocomplete="off"></label><label>Playlist User-Agent<input id="pl-agent" value="${esc(p.userAgent || "")}" maxlength="200" autocomplete="off"></label><label>Update interval<select id="pl-interval">${[0, 1, 3, 6, 12, 24, 48, 168].map((n) => `<option value="${n}" ${Number(p.updateHours || 0) === n ? "selected" : ""}>${n ? n + " hours" : "Off"}</option>`).join("")}</select></label><label class="setting-row startup-setting"><span>Update on app start</span><input id="pl-start" type="checkbox" ${p.updateOnStart ? "checked" : ""}></label><button class="primary" type="submit">Save playlist</button></form><p class="panel-note">A changed playlist URL is loaded before saving. Scheduled updates run while TiviLoom is open.</p><p id="adv-status" role="status"></p>`, "sources", "playlist-edit:" + p.id);
-      (_a3 = $("#" + focus)) == null ? void 0 : _a3.focus();
+      (_a4 = $("#" + focus)) == null ? void 0 : _a4.focus();
     }
     async function parsedSource(p) {
-      var _a3;
+      var _a4;
       if (!p.sourceURL) throw Error("Enter the playlist URL in Edit playlist first.");
       const text = await ctx.api("source", { url: p.sourceURL, userAgent: p.userAgent });
       const parsed = await ctx.parsePlaylist(text, platform2.sourceBase(p.sourceURL));
-      const cr = (_a3 = p.channels.find((c) => {
-        var _a4;
-        return (_a4 = c.xtream) == null ? void 0 : _a4.server;
-      })) == null ? void 0 : _a3.xtream;
+      const cr = (_a4 = p.channels.find((c) => {
+        var _a5;
+        return (_a5 = c.xtream) == null ? void 0 : _a5.server;
+      })) == null ? void 0 : _a4.xtream;
       if (cr) {
         const additions = [];
         for (const [action2, convert] of [["get_vod_streams", xtreamMovie], ["get_series", xtreamSeries]]) {
@@ -740,8 +740,8 @@
             }
           } catch {
             additions.push(...p.channels.filter((c) => {
-              var _a4, _b2;
-              return action2 === "get_vod_streams" ? (_a4 = c.xtream) == null ? void 0 : _a4.vodId : (_b2 = c.xtream) == null ? void 0 : _b2.seriesId;
+              var _a5, _b3;
+              return action2 === "get_vod_streams" ? (_a5 = c.xtream) == null ? void 0 : _a5.vodId : (_b3 = c.xtream) == null ? void 0 : _b3.seriesId;
             }));
             toast("Provider catalog unavailable; saved catalog retained.");
           }
@@ -800,10 +800,10 @@
       toast("Playlist saved.");
     }
     function channelTools(c) {
-      var _a3, _b2;
+      var _a4, _b3;
       if (!c) return;
       channelId = c.id;
-      const fav = state.favorites.includes(c.id), locked = (_a3 = state.lockedChannels) == null ? void 0 : _a3.includes(c.id), p = state.channel === c.id && state.selected ? state.selected : ctx.programAt(c);
+      const fav = state.favorites.includes(c.id), locked = (_a4 = state.lockedChannels) == null ? void 0 : _a4.includes(c.id), p = state.channel === c.id && state.selected ? state.selected : ctx.programAt(c);
       ctx.menu(c.name, [["Search", () => {
         ctx.closeModal();
         ctx.doAction("search");
@@ -816,7 +816,7 @@
       }], ["Program description", () => ctx.programDetails(p, c)], ...p.start > Date.now() ? [["Remind", () => ctx.reminder(p, c)]] : [], { heading: c.name }, [fav ? "Remove from Favorites" : "Add to Favorites", () => {
         ctx.favorite(c);
         channelTools(c);
-      }], ["Favorite number" + (((_b2 = state.channelNumbers) == null ? void 0 : _b2[c.id]) ? " \xB7 " + state.channelNumbers[c.id] : ""), () => numberDialog(c)], ["Move favorite up", () => reorder(c, -1)], ["Move favorite down", () => reorder(c, 1)], [locked ? "Unblock channel" : "Block channel", () => {
+      }], ["Favorite number" + (((_b3 = state.channelNumbers) == null ? void 0 : _b3[c.id]) ? " \xB7 " + state.channelNumbers[c.id] : ""), () => numberDialog(c)], ["Move favorite up", () => reorder(c, -1)], ["Move favorite down", () => reorder(c, 1)], [locked ? "Unblock channel" : "Block channel", () => {
         if (!state.prefs.parental) return settings("parental");
         if (guard("channel", () => lockChannel(c), c)) return;
         lockChannel(c);
@@ -854,21 +854,21 @@
       channelTools(c);
     }
     function numberDialog(c) {
-      var _a3;
+      var _a4;
       if (!state.favorites.includes(c.id)) return toast("Add this channel to Favorites first.");
       channelId = c.id;
-      ctx.modal("Favorite number", `<form id="number-form"><p>${esc(c.name)}</p><label>Number (1\u20139999)<input id="favorite-number" inputmode="numeric" maxlength="4" value="${((_a3 = state.channelNumbers) == null ? void 0 : _a3[c.id]) || ""}"></label><p class="note">Leave blank to remove the number. Each favorite has a unique number in this playlist.</p><p id="adv-status" role="status"></p><button class="primary" type="submit">Save number</button></form>`);
+      ctx.modal("Favorite number", `<form id="number-form"><p>${esc(c.name)}</p><label>Number (1\u20139999)<input id="favorite-number" inputmode="numeric" maxlength="4" value="${((_a4 = state.channelNumbers) == null ? void 0 : _a4[c.id]) || ""}"></label><p class="note">Leave blank to remove the number. Each favorite has a unique number in this playlist.</p><p id="adv-status" role="status"></p><button class="primary" type="submit">Save number</button></form>`);
     }
     function logoDialog(c) {
-      var _a3;
+      var _a4;
       channelId = c.id;
-      ctx.modal("Channel logo", `<form id="logo-form"><label>Logo URL<input id="channel-logo-url" type="url" value="${esc(((_a3 = state.logoOverrides) == null ? void 0 : _a3[c.id]) || c.logo || "")}" autocomplete="off"></label><p id="adv-status" role="status"></p><button class="primary" type="submit">Save logo</button></form>`);
+      ctx.modal("Channel logo", `<form id="logo-form"><label>Logo URL<input id="channel-logo-url" type="url" value="${esc(((_a4 = state.logoOverrides) == null ? void 0 : _a4[c.id]) || c.logo || "")}" autocomplete="off"></label><p id="adv-status" role="status"></p><button class="primary" type="submit">Save logo</button></form>`);
     }
     function favoritesPanel() {
       panel("Favorites", button("Back to settings", "settings-root") + state.favorites.map((id, i) => {
-        var _a3;
+        var _a4;
         const c = state.channels.find((c2) => c2.id === id);
-        return c ? `<div class="favorite-entry"><button class="setting-row" data-adv="favorite-tools" data-id="${esc(id)}"><span class="favorite-identity">${ctx.renderLogo(c)}<span class="favorite-name">${esc(c.name)}</span></span><small>${((_a3 = state.channelNumbers) == null ? void 0 : _a3[id]) ? "#" + state.channelNumbers[id] : "Set number"}</small></button><button class="favorite-reorder" data-adv="favorite-up" data-id="${esc(id)}" ${i === 0 ? "disabled" : ""} aria-label="Move ${esc(c.name)} up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><button class="favorite-reorder" data-adv="favorite-down" data-id="${esc(id)}" ${i === state.favorites.length - 1 ? "disabled" : ""} aria-label="Move ${esc(c.name)} down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button></div>` : "";
+        return c ? `<div class="favorite-entry"><button class="setting-row" data-adv="favorite-tools" data-id="${esc(id)}"><span class="favorite-identity">${ctx.renderLogo(c)}<span class="favorite-name">${esc(c.name)}</span></span><small>${((_a4 = state.channelNumbers) == null ? void 0 : _a4[id]) ? "#" + state.channelNumbers[id] : "Set number"}</small></button><button class="favorite-reorder" data-adv="favorite-up" data-id="${esc(id)}" ${i === 0 ? "disabled" : ""} aria-label="Move ${esc(c.name)} up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><button class="favorite-reorder" data-adv="favorite-down" data-id="${esc(id)}" ${i === state.favorites.length - 1 ? "disabled" : ""} aria-label="Move ${esc(c.name)} down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button></div>` : "";
       }).join("") + (!state.favorites.length ? '<p class="panel-note">Add channels to Favorites from the channel menu.</p>' : ""), "library");
     }
     let visibilityKind = "groups", visibilityQuery = "";
@@ -906,17 +906,17 @@
       return ctx.getCatalog().playlists.find((p) => p.id === playlistId);
     }
     function isGroupLocked(group, playlistId) {
-      var _a3, _b2;
-      return !!((_b2 = (_a3 = groupPlaylist(playlistId)) == null ? void 0 : _a3.groupPins) == null ? void 0 : _b2[group]);
+      var _a4, _b3;
+      return !!((_b3 = (_a4 = groupPlaylist(playlistId)) == null ? void 0 : _a4.groupPins) == null ? void 0 : _b3[group]);
     }
     function groupAccessible(group, playlistId) {
       return !isGroupLocked(group, playlistId) || (groupUnlocks.get(groupKey(group, playlistId)) || 0) > Date.now();
     }
     function guardGroup(group, whenAllowed, playlistId = activeGroupPlaylistId()) {
-      var _a3, _b2;
+      var _a4, _b3;
       if (groupAccessible(group, playlistId)) return false;
       pinAction = null;
-      const label = ((_b2 = (_a3 = groupPlaylist(playlistId)) == null ? void 0 : _a3.groupNames) == null ? void 0 : _b2[group]) || group;
+      const label = ((_b3 = (_a4 = groupPlaylist(playlistId)) == null ? void 0 : _a4.groupNames) == null ? void 0 : _b3[group]) || group;
       ctx.modal("\u{1F512} " + label, `<form id="group-unlock-form"><p>Enter the group PIN to open this group.</p><label>Group PIN<input id="group-unlock-pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" required></label><p id="adv-status" role="status"></p><button type="submit" class="primary">Unlock group</button></form>`, `<button data-action="close" class="secondary">Cancel</button>`);
       groupPending = { group, whenAllowed, playlistId };
       return true;
@@ -944,10 +944,10 @@
       return true;
     }
     async function verifyGroup() {
-      var _a3, _b2;
+      var _a4, _b3;
       if (!groupPending) return;
       if (Date.now() < groupBlockedUntil) throw Error("Too many attempts. Wait 30 seconds.");
-      const pin = $("#group-unlock-pin").value, pending = groupPending, record = (_b2 = (_a3 = groupPlaylist(pending.playlistId)) == null ? void 0 : _a3.groupPins) == null ? void 0 : _b2[pending.group];
+      const pin = $("#group-unlock-pin").value, pending = groupPending, record = (_b3 = (_a4 = groupPlaylist(pending.playlistId)) == null ? void 0 : _a4.groupPins) == null ? void 0 : _b3[pending.group];
       const valid = platform2.native ? (await platform2.request("verifyPIN", { pin, record })).valid : await checkPIN(pin, record);
       if (groupPending !== pending) return;
       if (!valid) {
@@ -983,15 +983,15 @@
       if (!p) return settings("sources");
       const groups = [...new Set(p.channels.map((c) => c.group))];
       panel("Manage groups", button("Back to playlists", "playlists") + '<p class="panel-note">Rename groups without changing the original source. A PIN protects entry and hides its channels outside the unlocked group.</p>' + groups.map((g) => {
-        var _a3, _b2;
-        return button(esc(((_a3 = p.groupNames) == null ? void 0 : _a3[g]) || g) + (((_b2 = p.groupPins) == null ? void 0 : _b2[g]) ? " \u{1F512}" : "") + `<small>${esc(g)}</small>`, "group-detail", `data-id="${esc(g)}"`);
+        var _a4, _b3;
+        return button(esc(((_a4 = p.groupNames) == null ? void 0 : _a4[g]) || g) + (((_b3 = p.groupPins) == null ? void 0 : _b3[g]) ? " \u{1F512}" : "") + `<small>${esc(g)}</small>`, "group-detail", `data-id="${esc(g)}"`);
       }).join(""), "sources");
     }
     function groupPanel() {
-      var _a3, _b2, _c, _d;
+      var _a4, _b3, _c, _d;
       const p = ctx.getCatalog().playlists.find((x) => x.id === editingId), g = managingGroup;
       if (!p || !g) return groupList();
-      panel("Group: " + (((_a3 = p.groupNames) == null ? void 0 : _a3[g]) || g), button("Back to groups", "group-list") + `<form id="group-rename-form"><label>Display name<input id="group-name" maxlength="80" value="${esc(((_b2 = p.groupNames) == null ? void 0 : _b2[g]) || g)}" required></label><button class="primary" type="submit">Save group name</button></form><form id="group-pin-form"><label>${((_c = p.groupPins) == null ? void 0 : _c[g]) ? "Change" : "Set"} group PIN (4\u20136 digits)<input id="group-new-pin" type="password" inputmode="numeric" maxlength="6" required></label><label>Confirm PIN<input id="group-confirm-pin" type="password" inputmode="numeric" maxlength="6" required></label><button class="primary" type="submit">Save group PIN</button></form>${((_d = p.groupPins) == null ? void 0 : _d[g]) ? button("Remove group PIN", "group-pin-remove") : ""}<p id="adv-status" role="status"></p>`, "sources");
+      panel("Group: " + (((_a4 = p.groupNames) == null ? void 0 : _a4[g]) || g), button("Back to groups", "group-list") + `<form id="group-rename-form"><label>Display name<input id="group-name" maxlength="80" value="${esc(((_b3 = p.groupNames) == null ? void 0 : _b3[g]) || g)}" required></label><button class="primary" type="submit">Save group name</button></form><form id="group-pin-form"><label>${((_c = p.groupPins) == null ? void 0 : _c[g]) ? "Change" : "Set"} group PIN (4\u20136 digits)<input id="group-new-pin" type="password" inputmode="numeric" maxlength="6" required></label><label>Confirm PIN<input id="group-confirm-pin" type="password" inputmode="numeric" maxlength="6" required></label><button class="primary" type="submit">Save group PIN</button></form>${((_d = p.groupPins) == null ? void 0 : _d[g]) ? button("Remove group PIN", "group-pin-remove") : ""}<p id="adv-status" role="status"></p>`, "sources");
     }
     async function groupChange(patch) {
       const c = ctx.getCatalog(), p = c.playlists.find((x) => x.id === editingId);
@@ -1029,8 +1029,8 @@
       ctx.play(state.channels.find((c) => c.id === previous), state.full);
     }
     function remoteAction2(action2) {
-      var _a3;
-      const saved = (_a3 = state.prefs.remoteActions) == null ? void 0 : _a3[action2], mapped = remoteChoices.includes(saved) ? saved : action2;
+      var _a4;
+      const saved = (_a4 = state.prefs.remoteActions) == null ? void 0 : _a4[action2], mapped = remoteChoices.includes(saved) ? saved : action2;
       if (mapped === "last-channel") {
         lastChannel();
         return true;
@@ -1177,23 +1177,23 @@
       }
     });
     document.addEventListener("keydown", (e) => {
-      var _a3, _b2;
+      var _a4, _b3;
       if (e.target.matches("#modal-root input") && e.key === "Enter") {
-        const submit = (_a3 = e.target.closest("form")) == null ? void 0 : _a3.querySelector('[type="submit"]');
+        const submit = (_a4 = e.target.closest("form")) == null ? void 0 : _a4.querySelector('[type="submit"]');
         if (submit) {
           e.preventDefault();
           e.stopImmediatePropagation();
           const fields = [...e.target.closest("form").querySelectorAll("input,select,button")].filter((x) => !x.disabled);
-          (_b2 = fields[fields.indexOf(e.target) + 1]) == null ? void 0 : _b2.focus();
+          (_b3 = fields[fields.indexOf(e.target) + 1]) == null ? void 0 : _b3.focus();
         }
       }
     }, true);
     function clearDigits() {
-      var _a3;
+      var _a4;
       digits = "";
       clearTimeout(digitTimer);
       clearTimeout(hudTimer);
-      (_a3 = $("#number-hud")) == null ? void 0 : _a3.remove();
+      (_a4 = $("#number-hud")) == null ? void 0 : _a4.remove();
     }
     function numberHUD(value, lookup, committing = false) {
       clearTimeout(hudTimer);
@@ -1218,8 +1218,8 @@
         ctx.focusNumberChannel(c);
         ctx.play(c, state.full);
         hudTimer = setTimeout(() => {
-          var _a3;
-          return (_a3 = $("#number-hud")) == null ? void 0 : _a3.remove();
+          var _a4;
+          return (_a4 = $("#number-hud")) == null ? void 0 : _a4.remove();
         }, 2200);
       } else {
         clearDigits();
@@ -1293,8 +1293,8 @@
         return await new Promise((resolve) => {
           const req = d.transaction("images").objectStore("images").get(url);
           req.onsuccess = () => {
-            var _a3;
-            return resolve(((_a3 = req.result) == null ? void 0 : _a3.expires) > Date.now() ? req.result.data : null);
+            var _a4;
+            return resolve(((_a4 = req.result) == null ? void 0 : _a4.expires) > Date.now() ? req.result.data : null);
           };
           req.onerror = () => resolve(null);
         });
@@ -1438,8 +1438,8 @@
   // src/playback.mjs
   function nativeHLSSupported(video) {
     return ["application/vnd.apple.mpegurl", "application/x-mpegURL"].some((type) => {
-      var _a3;
-      return !!((_a3 = video.canPlayType) == null ? void 0 : _a3.call(video, type));
+      var _a4;
+      return !!((_a4 = video.canPlayType) == null ? void 0 : _a4.call(video, type));
     });
   }
   function streamKind(value) {
@@ -1450,15 +1450,15 @@
     return "unknown";
   }
   function playbackEngine(video, url, { native: native2 = false, Hls: Hls2, forceHls = false } = {}) {
-    var _a3;
-    const kind = streamKind(url), mse = !!((_a3 = Hls2 == null ? void 0 : Hls2.isSupported) == null ? void 0 : _a3.call(Hls2));
+    var _a4;
+    const kind = streamKind(url), mse = !!((_a4 = Hls2 == null ? void 0 : Hls2.isSupported) == null ? void 0 : _a4.call(Hls2));
     if (forceHls && mse && ["hls", "unknown"].includes(kind)) return "hlsjs";
     if (kind === "hls" && mse && (!native2 || !nativeHLSSupported(video))) return "hlsjs";
     return "native";
   }
   function playbackError(error, { url = "", hls = null } = {}) {
-    var _a3, _b2;
-    const status = Number(((_a3 = hls == null ? void 0 : hls.response) == null ? void 0 : _a3.code) || ((_b2 = hls == null ? void 0 : hls.networkDetails) == null ? void 0 : _b2.status) || 0);
+    var _a4, _b3;
+    const status = Number(((_a4 = hls == null ? void 0 : hls.response) == null ? void 0 : _a4.code) || ((_b3 = hls == null ? void 0 : hls.networkDetails) == null ? void 0 : _b3.status) || 0);
     const detail = String((hls == null ? void 0 : hls.details) || "");
     const code = Number((error == null ? void 0 : error.code) || 0);
     if (status === 401 || status === 403) return `Yay\u0131m serveri giri\u015Fi r\u0259dd etdi (HTTP ${status}). Abun\u0259ni v\u0259 ba\u011Flant\u0131 limitini yoxlay\u0131n.`;
@@ -1525,8 +1525,8 @@
       return data;
     });
     return new Promise((resolve, reject) => {
-      var _a3, _b2;
-      if (!((_b2 = (_a3 = window.webOS) == null ? void 0 : _a3.service) == null ? void 0 : _b2.request)) return reject(Error("The TV source service is unavailable. Install the complete TiviLoom package."));
+      var _a4, _b3;
+      if (!((_b3 = (_a4 = window.webOS) == null ? void 0 : _a4.service) == null ? void 0 : _b3.request)) return reject(Error("The TV source service is unavailable. Install the complete TiviLoom package."));
       let handle;
       const timer = setTimeout(() => {
         handle == null ? void 0 : handle.cancel();
@@ -1586,9 +1586,9 @@
     },
     assetURL: (value) => validMediaURL(value),
     exit() {
-      var _a3;
+      var _a4;
       if (window.TiviLoomNative) return window.TiviLoomNative.close();
-      if (native && ((_a3 = window.webOS) == null ? void 0 : _a3.platformBack)) webOS.platformBack();
+      if (native && ((_a4 = window.webOS) == null ? void 0 : _a4.platformBack)) webOS.platformBack();
       else {
         const toast = document.querySelector("#toast");
         toast.textContent = "LG TV: exit confirmation opens here.";
@@ -1605,8 +1605,8 @@
     window.addEventListener("TiviLoomAndroidResume", () => handlers.resume());
     let previewFocus = null;
     const backPress = createPressGesture({ short: () => handlers.back(), long: () => {
-      var _a3;
-      return ((_a3 = handlers.longBack) == null ? void 0 : _a3.call(handlers)) || void 0;
+      var _a4;
+      return ((_a4 = handlers.longBack) == null ? void 0 : _a4.call(handlers)) || void 0;
     } });
     if (!native) document.addEventListener("focusin", (event) => {
       if (event.target.matches("button,input,select,textarea")) previewFocus = event.target;
@@ -1630,8 +1630,8 @@
     window.addEventListener("blur", () => backPress.cancel());
     let hidden = false;
     const changed = () => {
-      var _a3, _b2;
-      if ((_b2 = (_a3 = window.TiviLoomNative) == null ? void 0 : _a3.isPickingFile) == null ? void 0 : _b2.call(_a3)) return;
+      var _a4, _b3;
+      if ((_b3 = (_a4 = window.TiviLoomNative) == null ? void 0 : _a4.isPickingFile) == null ? void 0 : _b3.call(_a4)) return;
       const value = !!(document.hidden || document.webkitHidden);
       if (value && !hidden) {
         hidden = true;
@@ -1651,8 +1651,8 @@
       }
     });
     if (!native) window.addEventListener("message", (event) => {
-      var _a3, _b2;
-      if (event.origin !== location.origin || event.source !== window.parent || ((_a3 = event.data) == null ? void 0 : _a3.type) !== "TiviLoomPreview") return;
+      var _a4, _b3;
+      if (event.origin !== location.origin || event.source !== window.parent || ((_a4 = event.data) == null ? void 0 : _a4.type) !== "TiviLoomPreview") return;
       if (event.data.action === "suspend") {
         handlers.suspend();
         return;
@@ -1665,7 +1665,7 @@
       if (code >= 48 && code <= 57) keys[code] = String(code - 48);
       if (!keys[code]) return;
       const target = (previewFocus == null ? void 0 : previewFocus.isConnected) && previewFocus.offsetParent !== null ? previewFocus : document.activeElement || document.body;
-      (_b2 = target.focus) == null ? void 0 : _b2.call(target, { preventScroll: true });
+      (_b3 = target.focus) == null ? void 0 : _b3.call(target, { preventScroll: true });
       const down = new KeyboardEvent("keydown", { key: keys[code], keyCode: code, which: code, bubbles: true, cancelable: true });
       target.dispatchEvent(down);
       if (code === 13 && !down.defaultPrevented && target.matches("button")) target.click();
@@ -1779,24 +1779,24 @@
     edge.textContent = "\u2039";
     app.append(edge);
     function setNav(n, focus = true) {
-      var _a3, _b2, _c;
+      var _a4, _b3, _c;
       nav = Math.max(0, Math.min(ctx.platform.isPhone ? 1 : 2, n));
       if (!ctx.platform.isPhone && nav === 1 && !state.prefs.groups) nav = 2;
       app.dataset.nav = nav;
       const scrim = $("#phone-group-scrim");
       if (scrim) scrim.hidden = nav === 0;
       if (focus) {
-        if (nav === 1) (_a3 = $("#groups .group-button.active") || $("#groups .group-button")) == null ? void 0 : _a3.focus({ preventScroll: true });
-        if (nav === 2) (_b2 = $(".rail button.active")) == null ? void 0 : _b2.focus({ preventScroll: true });
+        if (nav === 1) (_a4 = $("#groups .group-button.active") || $("#groups .group-button")) == null ? void 0 : _a4.focus({ preventScroll: true });
+        if (nav === 2) (_b3 = $(".rail button.active")) == null ? void 0 : _b3.focus({ preventScroll: true });
         if (nav === 0) (_c = $(".movie-card") || $$(".programme.selected")[0]) == null ? void 0 : _c.focus({ preventScroll: true });
       }
     }
     function groupLabel(g) {
-      var _a3;
+      var _a4;
       if (g === "programs") return "My TV programs";
       if (g === "reminders") return "My reminders";
       if (state.view === "movies" && g === "Sevimlil\u0259r") return "My list";
-      return g === "Ham\u0131s\u0131" ? state.view === "movies" ? "All movies" : state.view === "series" ? "All series" : "All channels" : g === "Sevimlil\u0259r" ? "Favorites" : ((_a3 = state.groupNames) == null ? void 0 : _a3[g]) || g;
+      return g === "Ham\u0131s\u0131" ? state.view === "movies" ? "All movies" : state.view === "series" ? "All series" : "All channels" : g === "Sevimlil\u0259r" ? "Favorites" : ((_a4 = state.groupNames) == null ? void 0 : _a4[g]) || g;
     }
     let lastGroupMarkup = "";
     let groupCache = null;
@@ -1815,12 +1815,12 @@
       return result;
     }
     function renderGroups() {
-      var _a3, _b2, _c, _d, _e, _f;
+      var _a4, _b3, _c, _d, _e, _f;
       $('.rail [data-tv="nav-movies"]').hidden = !state.channels.some((c) => c.type === "movie");
       stage.classList.toggle("movie-view", state.view === "movies" || state.view === "series" || state.view === "history");
       stage.classList.toggle("search-view", state.view === "search");
-      (_a3 = $(".rail button.active")) == null ? void 0 : _a3.classList.remove("active");
-      if (ctx.platform.isPhone) (_b2 = $('.rail [data-mobile="favorites"]')) == null ? void 0 : _b2.classList.toggle("active", state.view === "guide" && state.group === "Sevimlil\u0259r");
+      (_a4 = $(".rail button.active")) == null ? void 0 : _a4.classList.remove("active");
+      if (ctx.platform.isPhone) (_b3 = $('.rail [data-mobile="favorites"]')) == null ? void 0 : _b3.classList.toggle("active", state.view === "guide" && state.group === "Sevimlil\u0259r");
       (_c = $(`[data-tv="nav-${state.view === "guide" ? ctx.platform.isPhone && state.group === "Sevimlil\u0259r" ? "none" : "guide" : state.view === "mylist" ? "favorites" : state.view}"]`)) == null ? void 0 : _c.classList.add("active");
       stage.classList.toggle("mylist-view", state.view === "mylist");
       const markup = (state.view === "mylist" ? "" : `<button class="group-button playlist-selector" data-tv="playlists" aria-label="Switch playlist"><span>${esc(state.source)}</span><span>\u2304</span></button>`) + groups().map((g) => `<button class="group-button" data-group="${esc(g)}" aria-label="${esc(groupLabel(g))}; long OK for properties"><span>${ctx.advanced.isGroupLocked(g) ? "\u{1F512} " : ""}${esc(groupLabel(g))}</span></button>`).join("") + '<div class="group-hint">Hold OK on a group: Rename / PIN</div>';
@@ -1840,7 +1840,7 @@
     }
     let identityChannel = null;
     function syncPlaybackStatus() {
-      var _a3;
+      var _a4;
       syncPlaybackRows(stage, state);
       let chip = $("#playback-identity");
       if (!chip) {
@@ -1855,7 +1855,7 @@
         identityChannel = null;
         return;
       }
-      const key = c.id + "|" + (((_a3 = state.logoOverrides) == null ? void 0 : _a3[c.id]) || c.logo || "");
+      const key = c.id + "|" + (((_a4 = state.logoOverrides) == null ? void 0 : _a4[c.id]) || c.logo || "");
       if (identityChannel !== key) {
         identityChannel = key;
         chip.innerHTML = logo(c) + '<span class="playback-identity-text"><strong></strong><small></small></span>';
@@ -1896,13 +1896,13 @@
     }
     let lastGuideChannel = "", guideSource = null, guideGroup = "", guideScroll = 0, guideActive = null;
     function renderGuide() {
-      var _a3, _b2;
+      var _a4, _b3;
       const a = visibleChannels(), start = state.window, unit = 213.333333, now = Date.now(), rowHeight = ctx.platform.isPhone ? 76 : state.prefs.compact ? 47 : 52;
       if (a.length && !a.some((c) => c.id === state.channel)) {
         state.channel = a[0].id;
         state.selected = programAt(a[0]);
       }
-      let scroll = (_b2 = (_a3 = $(".guide-scroll")) == null ? void 0 : _a3.scrollTop) != null ? _b2 : guideScroll;
+      let scroll = (_b3 = (_a4 = $(".guide-scroll")) == null ? void 0 : _a4.scrollTop) != null ? _b3 : guideScroll;
       if (guideSource !== state.channels || guideGroup !== state.group) {
         scroll = 0;
         guideSource = state.channels;
@@ -1918,24 +1918,24 @@
       const scroller = $(".guide-scroll"), inner = $(".guide-virtual");
       let lastFirst = -1;
       function draw() {
-        var _a4, _b3;
+        var _a5, _b4;
         const first = Math.max(0, Math.floor(scroller.scrollTop / rowHeight) - 4);
         guideScroll = scroller.scrollTop;
         if (first === lastFirst) return;
         lastFirst = first;
-        const focused = (_a4 = document.activeElement) == null ? void 0 : _a4.classList.contains("programme");
+        const focused = (_a5 = document.activeElement) == null ? void 0 : _a5.classList.contains("programme");
         inner.innerHTML = a.slice(first, first + 22).map((c, offset) => {
           const i = first + offset;
           let ps = channelPrograms(c).filter((p) => p.end > start && p.start < start + 108e5);
           if (!ps.length) ps = [{ ...programAt(c, start), start, end: start + 108e5 }];
           return `<div class="guide-row" data-row="${esc(c.id)}" style="position:absolute;top:${i * rowHeight}px;left:0;right:0"><button class="channel-name ${c.id === state.channel ? "is-selected" : ""}" data-channel="${esc(c.id)}" title="${esc(c.name)}"><span class="num">${ctx.channelNumber(c, i)}</span>${logo(c)}<span class="label">${esc(c.name)}</span><span class="channel-status"><span class="playback-indicator" data-playback-indicator hidden></span>${icon("history")}</span></button>${ctx.platform.isPhone ? `<button class="phone-row-menu" data-mobile-channel-tools="${esc(c.id)}" aria-label="Options for ${esc(c.name)}">\u22EF</button>` : ""}<div class="programs">${ps.map((p) => {
-            var _a5, _b4;
+            var _a6, _b5;
             const left = Math.max(0, (p.start - start) / 18e5 * unit), right = (p.end - start) / 18e5 * unit;
-            return `<button class="programme ${p.start <= now && p.end > now ? "current" : ""} ${c.id === state.channel && (p.empty || p.start === ((_b4 = (_a5 = state.selected) == null ? void 0 : _a5.start) != null ? _b4 : programAt(c).start)) ? "selected" : ""}" data-channel-id="${esc(c.id)}" data-program="${p.start}" style="left:${left}px;width:${Math.max(1, right - left - 4)}px" tabindex="${c.id === state.channel ? 0 : -1}"><span>${esc(p.empty ? "No information" : p.title)}</span></button>`;
+            return `<button class="programme ${p.start <= now && p.end > now ? "current" : ""} ${c.id === state.channel && (p.empty || p.start === ((_b5 = (_a6 = state.selected) == null ? void 0 : _a6.start) != null ? _b5 : programAt(c).start)) ? "selected" : ""}" data-channel-id="${esc(c.id)}" data-program="${p.start}" style="left:${left}px;width:${Math.max(1, right - left - 4)}px" tabindex="${c.id === state.channel ? 0 : -1}"><span>${esc(p.empty ? "No information" : p.title)}</span></button>`;
           }).join("")}${now >= start ? `<i class="now-line" style="left:${(now - start) / 18e5 * unit}px"></i>` : ""}</div></div>`;
         }).join("");
         syncPlaybackRows(stage, state);
-        if (focused && nav === 0) (_b3 = inner.querySelector(".programme.selected")) == null ? void 0 : _b3.focus({ preventScroll: true });
+        if (focused && nav === 0) (_b4 = inner.querySelector(".programme.selected")) == null ? void 0 : _b4.focus({ preventScroll: true });
       }
       guideActive = { channels: a, scroll: scroller, rowHeight, draw };
       scroller.scrollTop = scroll;
@@ -1958,7 +1958,7 @@
       renderInfo();
     }
     function fastSelectGuide(c, p, focus) {
-      var _a3;
+      var _a4;
       if (state.view !== "guide" || !guideActive || !guideActive.scroll.isConnected) return false;
       const guide = guideActive, index = guide.channels.findIndex((row2) => row2.id === c.id);
       if (index < 0) return false;
@@ -1976,7 +1976,7 @@
       $$(".guide-virtual .channel-name.is-selected").forEach((el) => el.classList.remove("is-selected"));
       const rows = $$(".guide-virtual .guide-row"), row = rows.find((el) => el.dataset.row === c.id);
       if (row) {
-        (_a3 = row.querySelector(".channel-name")) == null ? void 0 : _a3.classList.add("is-selected");
+        (_a4 = row.querySelector(".channel-name")) == null ? void 0 : _a4.classList.add("is-selected");
         const choices = [...row.querySelectorAll(".programme")];
         let target = choices.find((el) => Number(el.dataset.program) === state.selected.start) || choices[0];
         if (target) {
@@ -2034,11 +2034,11 @@
       backdrop.querySelector("img").src = src;
     }
     function movieDetails(c) {
-      var _a3;
+      var _a4;
       if (!c) return;
       if (ctx.advanced.guardGroup(c.group, () => movieDetails(c))) return;
       state.channel = c.id;
-      (_a3 = $("#movie-detail")) == null ? void 0 : _a3.remove();
+      (_a4 = $("#movie-detail")) == null ? void 0 : _a4.remove();
       const el = document.createElement("section");
       el.id = "movie-detail";
       el.dataset.mediaId = c.id;
@@ -2054,8 +2054,8 @@
       const request2 = ++seriesRequest, sourceChannels = state.channels;
       let episodes = show.episodes.filter((c) => !!c.url);
       const remote = show.episodes.find((c) => {
-        var _a3;
-        return (_a3 = c.xtream) == null ? void 0 : _a3.seriesId;
+        var _a4;
+        return (_a4 = c.xtream) == null ? void 0 : _a4.seriesId;
       });
       if (remote) {
         ctx.modal(show.name, "<p>Loading episodes from your IPTV provider\u2026</p>", "", { panel: true });
@@ -2095,10 +2095,10 @@
       toast("Series is no longer available.");
     }
     function closeMovie() {
-      var _a3, _b2;
+      var _a4, _b3;
       const c = currentChannel();
-      (_a3 = $("#movie-detail")) == null ? void 0 : _a3.remove();
-      (_b2 = $(`[data-movie="${CSS.escape((c == null ? void 0 : c.id) || "")}"]`)) == null ? void 0 : _b2.focus({ preventScroll: true });
+      (_a4 = $("#movie-detail")) == null ? void 0 : _a4.remove();
+      (_b3 = $(`[data-movie="${CSS.escape((c == null ? void 0 : c.id) || "")}"]`)) == null ? void 0 : _b3.focus({ preventScroll: true });
     }
     function renderMyList() {
       const reminders = state.group === "reminders", rows = (reminders ? state.reminders : state.savedPrograms || []).filter((p) => {
@@ -2128,7 +2128,7 @@
       }
     }
     function settings(section = "root") {
-      var _a3, _b2;
+      var _a4, _b3;
       if (ctx.advanced.guard(section === "parental" ? "pin" : "settings", () => settings(section))) return;
       if (ctx.advanced.settings(section)) return;
       setNav(0, false);
@@ -2136,7 +2136,7 @@
         const playlists = ctx.playlists();
         ctx.modal("Playlists", `<button class="setting-row" data-tv="setting-root"><span>Back to settings</span></button><div class="settings-section-title">Saved playlists \xB7 ${playlists.length}</div>${playlists.map((p) => `<button class="setting-row playlist-row" data-tv="playlist-select" data-id="${esc(p.id)}" aria-pressed="${p.active}"><span class="setting-text">${esc(p.name)}<small>${p.channels.length} channels${p.active ? " \xB7 Active" : ""}</small></span><span>${p.active ? "\u2713" : "\u203A"}</span></button>`).join("")}<div class="menu-list"><button data-tv="import">\uFF0B Add playlist</button><button data-action="epg">EPG for active playlist</button><button data-tv="sample">Load sample playlist</button></div>`, "", { panel: true });
         $(".settings-panel").dataset.tvSettings = "sources";
-        (_a3 = $('.playlist-row[aria-pressed="true"]') || $('[data-tv="import"]')) == null ? void 0 : _a3.focus();
+        (_a4 = $('.playlist-row[aria-pressed="true"]') || $('[data-tv="import"]')) == null ? void 0 : _a4.focus();
         return;
       }
       if (section === "library") {
@@ -2162,7 +2162,7 @@
       const settingsIcons = { library: "settings", sources: "list", epg: "clock", appearance: "palette", playback: "play", remote: "screen", parental: "lock", status: "history", about: "info" };
       ctx.modal("Settings", `<div class="settings-section-title">TiviLoom \xB7 ${ctx.platform.isPhone ? "Android" : "webOS TV"} \xB7 ${VERSION}</div>${rows.filter(([id]) => id !== "about").map(([id, name]) => `<button class="setting-row" data-tv="setting-${id}">${icon(settingsIcons[id] || "settings")}<span class="setting-text">${name}</span><span class="setting-chevron">\u203A</span></button>`).join("")}<div class="settings-section-title settings-about-heading">Application</div><button class="setting-row" data-tv="about">${icon("info")}<span class="setting-text">Application information<small>Version, build and licenses</small></span><span class="setting-chevron">\u203A</span></button>`, "", { panel: true });
       $(".settings-panel").dataset.tvSettings = "root";
-      (_b2 = $('[data-tv="setting-library"]')) == null ? void 0 : _b2.focus();
+      (_b3 = $('[data-tv="setting-library"]')) == null ? void 0 : _b3.focus();
     }
     function wizardIcon(step) {
       return `<img class="wizard-material-icon ${step === "processed" ? "download-icon" : ""}" src="assets/icons/${step === "type" ? "playlist-add" : step === "processed" ? "download" : "link"}.svg" alt="">`;
@@ -2171,7 +2171,7 @@
       return wizard.edit === key ? `<div class="wizard-input-row"><label>${label}<input id="wizard-field" data-wizard-field="${key}" value="${esc(value)}" ${key === "password" ? 'type="password"' : ""} autocomplete="off" spellcheck="false" aria-label="${label}"></label></div>` : `<button class="wizard-option ${value ? "double" : ""}" data-tv="edit-${key}"><span>${label}${value ? `<small>${esc(key === "password" ? "\u2022".repeat(Math.min(value.length, 20)) : value)}</small>` : ""}</span></button>`;
     }
     function renderWizard(focus = "") {
-      var _a3, _b2, _c;
+      var _a4, _b3, _c;
       if (!wizard) return;
       const w = wizard;
       let title = "", desc = "", body = "", kind = "", next = "Next", canNext = true, back = "Back";
@@ -2184,7 +2184,7 @@
       if (w.step === "m3u") {
         title = "M3U playlist";
         kind = "url-options";
-        body = fieldRow("url", "Enter URL", w.url) + `<button class="wizard-option" ${((_a3 = navigator.clipboard) == null ? void 0 : _a3.readText) ? "" : "disabled"} data-tv="paste-url">Paste from clipboard</button><button ${ctx.platform.fileSupport ? "" : "disabled"} class="wizard-option ${w.file ? "double" : ""}" data-tv="pick-playlist"><span>Select local playlist${w.file ? `<small>${esc(w.file.name)}</small>` : ""}</span></button>`;
+        body = fieldRow("url", "Enter URL", w.url) + `<button class="wizard-option" ${((_a4 = navigator.clipboard) == null ? void 0 : _a4.readText) ? "" : "disabled"} data-tv="paste-url">Paste from clipboard</button><button ${ctx.platform.fileSupport ? "" : "disabled"} class="wizard-option ${w.file ? "double" : ""}" data-tv="pick-playlist"><span>Select local playlist${w.file ? `<small>${esc(w.file.name)}</small>` : ""}</span></button>`;
         canNext = !!w.url || !!w.file;
       }
       if (w.step === "xtream") {
@@ -2222,7 +2222,7 @@
         title = "EPG URL";
         desc = "Enter EPG URL for the playlist. You can add or change it later in the settings. XMLTV format only is supported.";
         kind = "epg-options";
-        body = fieldRow("epg", "Enter URL", w.epg) + `<button class="wizard-option" ${((_b2 = navigator.clipboard) == null ? void 0 : _b2.readText) ? "" : "disabled"} data-tv="paste-epg">Paste from clipboard</button><button class="wizard-option double" data-tv="paste-playlist"><span>Paste playlist URL<small>You can edit playlist URL if it has a similar format</small></span></button><button class="wizard-option" data-tv="default-epg" ${w.defaultEpg ? "" : "disabled"}>Use default source</button>`;
+        body = fieldRow("epg", "Enter URL", w.epg) + `<button class="wizard-option" ${((_b3 = navigator.clipboard) == null ? void 0 : _b3.readText) ? "" : "disabled"} data-tv="paste-epg">Paste from clipboard</button><button class="wizard-option double" data-tv="paste-playlist"><span>Paste playlist URL<small>You can edit playlist URL if it has a similar format</small></span></button><button class="wizard-option" data-tv="default-epg" ${w.defaultEpg ? "" : "disabled"}>Use default source</button>`;
         next = "Done";
       }
       $("#wizard").hidden = false;
@@ -2237,8 +2237,8 @@
       }
     }
     function openImport() {
-      var _a3;
-      wizardOrigin = welcome ? "welcome" : ((_a3 = $(".settings-panel")) == null ? void 0 : _a3.dataset.tvSettings) === "sources" ? "sources" : "guide";
+      var _a4;
+      wizardOrigin = welcome ? "welcome" : ((_a4 = $(".settings-panel")) == null ? void 0 : _a4.dataset.tvSettings) === "sources" ? "sources" : "guide";
       ctx.closeModal();
       if (listMode) closeList();
       wizard = { id: ++wizardCounter, step: "type", origin: "m3u", url: "", name: "", epg: "", defaultEpg: "", mode: "tv", server: "", username: "", password: "", mac: "00:1A:79:00:00:00", device: "", serial: "", includeTV: true, includeVOD: true, file: null, parsed: null, status: "", edit: null };
@@ -2268,7 +2268,7 @@
       renderWizard();
     }
     async function processPlaylist() {
-      var _a3, _b2;
+      var _a4, _b3;
       const w = wizard;
       if (!w) return;
       if (w.step === "stalker") {
@@ -2294,7 +2294,7 @@
           epg.search = new URLSearchParams({ username: w.username, password: w.password }).toString();
           w.epg = epg.href;
         }
-        if (((_a3 = w.file) == null ? void 0 : _a3.size) > 3e7) throw Error("The selected playlist is larger than 30 MB.");
+        if (((_a4 = w.file) == null ? void 0 : _a4.size) > 3e7) throw Error("The selected playlist is larger than 30 MB.");
         let text;
         try {
           text = w.file ? await w.file.text() : await api("source", { url });
@@ -2341,7 +2341,7 @@
         w.resolvedURL = url;
         w.defaultEpg = parsed.epg || w.epg;
         w.epg = parsed.epg || w.epg;
-        w.name = ((_b2 = w.file) == null ? void 0 : _b2.name) || new URL(url).hostname;
+        w.name = ((_b3 = w.file) == null ? void 0 : _b3.name) || new URL(url).hostname;
         w.step = "processed";
         w.edit = null;
         renderWizard();
@@ -2458,7 +2458,7 @@
     }
     let listLastChannel = "", listScroll = 0;
     function renderList() {
-      var _a3;
+      var _a4;
       const a = listChannels(), c = currentChannel();
       if (!c) return;
       const p = programAt(c), now = Date.now();
@@ -2499,10 +2499,10 @@
       $(".list-program-column").innerHTML = channelPrograms(c).map((pr) => `<button data-tv="list-program" data-start="${pr.start}" class="${pr.start <= now && pr.end > now ? "current" : ""}"><time>${fmt(pr.start)}</time><span>${esc(pr.title)}</span></button>`).join("");
       $(".list-details").innerHTML = `<h2>${esc(p.empty ? "No information" : p.title)}</h2><div class="time-progress"><span>${fmt(p.start)} \u2013 ${fmt(p.end)}</span><span>${mins(p.end - now)} min</span></div><p>${esc(p.description || "")}</p>`;
       ctx.placeVideo($("#list-preview"));
-      (_a3 = $(".list-program-column button.current")) == null ? void 0 : _a3.scrollIntoView({ block: "center" });
+      (_a4 = $(".list-program-column button.current")) == null ? void 0 : _a4.scrollIntoView({ block: "center" });
     }
     function openList() {
-      var _a3;
+      var _a4;
       if (welcome) return;
       if (ctx.platform.isPhone) {
         ctx.closeModal();
@@ -2516,14 +2516,14 @@
       listOrigin = state.full;
       $("#player").hidden = true;
       renderList();
-      (_a3 = $(".list-channel.selected")) == null ? void 0 : _a3.focus({ preventScroll: true });
+      (_a4 = $(".list-channel.selected")) == null ? void 0 : _a4.focus({ preventScroll: true });
     }
     function closeList() {
-      var _a3;
+      var _a4;
       if (!listMode) return;
       listMode = false;
       ctx.placeVideo($(listOrigin ? "#player" : "#preview"), listOrigin);
-      (_a3 = $("#channels-screen")) == null ? void 0 : _a3.remove();
+      (_a4 = $("#channels-screen")) == null ? void 0 : _a4.remove();
       $("#player").hidden = !listOrigin;
       if (listOrigin) showControls("info");
       else {
@@ -2573,7 +2573,7 @@
       ctx.modal("History", `<div class="menu-list">${historyChannels().map((c) => `<button data-tv="recent-channel" data-id="${esc(c.id)}">${logo(c)}<span>${esc(c.name)}</span></button>`).join("") || '<p class="panel-note">No history</p>'}<button data-tv="clear-recent">Clear history</button></div>`, "", { panel: true, key: "player-history" });
     }
     function showControls(mode) {
-      var _a3, _b2;
+      var _a4, _b3;
       const previous = state.playerMode;
       enhancePlayer();
       playerInfo();
@@ -2583,8 +2583,8 @@
       $("#player").classList.toggle("player-info", m === "info");
       ctx.showControlsLegacy();
       if (typeof mode === "string") {
-        if (m === "tools") (_a3 = $(".player-buttons button:not(:disabled)")) == null ? void 0 : _a3.focus({ preventScroll: true });
-        else (_b2 = $("#player-recents button")) == null ? void 0 : _b2.focus({ preventScroll: true });
+        if (m === "tools") (_a4 = $(".player-buttons button:not(:disabled)")) == null ? void 0 : _a4.focus({ preventScroll: true });
+        else (_b3 = $("#player-recents button")) == null ? void 0 : _b3.focus({ preventScroll: true });
       }
     }
     function context() {
@@ -2608,13 +2608,13 @@
       ctx.modalBack();
     }
     function audioPanel() {
-      var _a3, _b2;
+      var _a4, _b3;
       const h = ctx.getHls(), items = [["Off", () => setMuted(true), video.muted ? "Selected" : ""]];
-      if ((_a3 = h == null ? void 0 : h.audioTracks) == null ? void 0 : _a3.length) h.audioTracks.forEach((t, i) => items.push([t.name || t.lang || "Audio " + (i + 1), () => {
+      if ((_a4 = h == null ? void 0 : h.audioTracks) == null ? void 0 : _a4.length) h.audioTracks.forEach((t, i) => items.push([t.name || t.lang || "Audio " + (i + 1), () => {
         h.audioTrack = i;
         setMuted(false);
       }, !video.muted && h.audioTrack === i ? "Selected" : ""]));
-      else if ((_b2 = video.audioTracks) == null ? void 0 : _b2.length) {
+      else if ((_b3 = video.audioTracks) == null ? void 0 : _b3.length) {
         for (let i = 0; i < video.audioTracks.length; i++) {
           const t = video.audioTracks[i];
           items.push([t.label || t.language || "Audio " + (i + 1), () => {
@@ -2626,14 +2626,14 @@
       choicePanel("Audio tracks", items);
     }
     function subtitlePanel() {
-      var _a3;
+      var _a4;
       const h = ctx.getHls(), off = () => {
         if (h) h.subtitleTrack = -1;
         for (const t of video.textTracks) t.mode = "disabled";
         ctx.modalBack();
       };
       const items = [["Off", off, (!h || h.subtitleTrack === -1) && ![...video.textTracks].some((t) => t.mode === "showing") ? "Selected" : ""]];
-      if ((_a3 = h == null ? void 0 : h.subtitleTracks) == null ? void 0 : _a3.length) h.subtitleTracks.forEach((t, i) => items.push([t.name || t.lang || "Subtitles " + (i + 1), () => {
+      if ((_a4 = h == null ? void 0 : h.subtitleTracks) == null ? void 0 : _a4.length) h.subtitleTracks.forEach((t, i) => items.push([t.name || t.lang || "Subtitles " + (i + 1), () => {
         h.subtitleTrack = i;
         ctx.modalBack();
       }, h.subtitleTrack === i ? "Selected" : ""]));
@@ -2648,9 +2648,9 @@
       choicePanel("Closed captions", items);
     }
     function videoTracks() {
-      var _a3;
+      var _a4;
       const h = ctx.getHls();
-      if ((_a3 = h == null ? void 0 : h.levels) == null ? void 0 : _a3.length) {
+      if ((_a4 = h == null ? void 0 : h.levels) == null ? void 0 : _a4.length) {
         choicePanel("Video tracks", [["Auto", () => {
           h.currentLevel = -1;
           ctx.closeModal();
@@ -2661,7 +2661,7 @@
       } else choicePanel("Video tracks", [[video.videoWidth ? video.videoWidth + " \xD7 " + video.videoHeight : "Default video track", () => ctx.closeModal(), "Selected"]]);
     }
     function keyControl(key) {
-      var _a3, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+      var _a4, _b3, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
       if (wizard) {
         wizardKey(key);
         return;
@@ -2676,7 +2676,7 @@
       }
       if ($("#movie-detail")) {
         const a = $$("#movie-detail button:not(:disabled)"), i = a.indexOf(document.activeElement);
-        if (key === "ArrowLeft" || key === "ArrowRight") (_a3 = a[Math.max(0, Math.min(a.length - 1, i + (key === "ArrowRight" ? 1 : -1)))]) == null ? void 0 : _a3.focus();
+        if (key === "ArrowLeft" || key === "ArrowRight") (_a4 = a[Math.max(0, Math.min(a.length - 1, i + (key === "ArrowRight" ? 1 : -1)))]) == null ? void 0 : _a4.focus();
         if (key === "Escape" || key === "Backspace") closeMovie();
         return;
       }
@@ -2689,7 +2689,7 @@
           const buttons = $$(".rail button:not(.drawer-brand)").filter((b) => !b.hidden), active = document.activeElement;
           let i = buttons.indexOf(active);
           if (key === "ArrowUp" || key === "ArrowDown") {
-            (_b2 = buttons[(i + (key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length]) == null ? void 0 : _b2.focus();
+            (_b3 = buttons[(i + (key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length]) == null ? void 0 : _b3.focus();
             return;
           }
           if (key === "ArrowRight") {
@@ -2793,7 +2793,7 @@
       return ctx.keyLegacy(key);
     }
     function welcomeKey(key) {
-      var _a3, _b2;
+      var _a4, _b3;
       if (key === "Escape" || key === "Backspace") {
         leaveWelcome();
         setNav(0);
@@ -2802,12 +2802,12 @@
       const a = $$("#welcome .welcome-actions button");
       if (["ArrowLeft", "ArrowRight"].includes(key)) {
         const i = a.indexOf(document.activeElement);
-        (_a3 = a[(i + (key === "ArrowRight" ? 1 : -1) + a.length) % a.length]) == null ? void 0 : _a3.focus();
+        (_a4 = a[(i + (key === "ArrowRight" ? 1 : -1) + a.length) % a.length]) == null ? void 0 : _a4.focus();
       }
-      if (key === "Enter") (_b2 = document.activeElement) == null ? void 0 : _b2.click();
+      if (key === "Enter") (_b3 = document.activeElement) == null ? void 0 : _b3.click();
     }
     function wizardKey(key) {
-      var _a3, _b2, _c;
+      var _a4, _b3, _c;
       if (!wizard) return;
       const editing = $("#wizard-field");
       if (editing) {
@@ -2822,16 +2822,16 @@
       const opts = $$("#wizard .wizard-option:not(:disabled)"), side = $$("#wizard .wizard-controls button:not(:disabled)"), active = document.activeElement, arr = (active == null ? void 0 : active.closest(".wizard-side")) ? side : opts;
       if (key === "ArrowDown" || key === "ArrowUp") {
         const i = arr.indexOf(active);
-        (_a3 = arr[(i + (key === "ArrowDown" ? 1 : -1) + arr.length) % arr.length]) == null ? void 0 : _a3.focus();
+        (_a4 = arr[(i + (key === "ArrowDown" ? 1 : -1) + arr.length) % arr.length]) == null ? void 0 : _a4.focus();
       }
-      if (key === "ArrowRight") (_b2 = side[0] || active) == null ? void 0 : _b2.focus();
+      if (key === "ArrowRight") (_b3 = side[0] || active) == null ? void 0 : _b3.focus();
       if (key === "ArrowLeft") (_c = opts[0] || active) == null ? void 0 : _c.focus();
       if (key === "Enter") active == null ? void 0 : active.click();
     }
     function listKey(key) {
-      var _a3, _b2, _c, _d, _e;
+      var _a4, _b3, _c, _d, _e;
       if (key === "Escape" || key === "Backspace") return closeList();
-      const a = $$(((_a3 = document.activeElement) == null ? void 0 : _a3.closest(".list-program-column")) ? ".list-program-column button" : ".list-channel"), i = a.indexOf(document.activeElement);
+      const a = $$(((_a4 = document.activeElement) == null ? void 0 : _a4.closest(".list-program-column")) ? ".list-program-column button" : ".list-channel"), i = a.indexOf(document.activeElement);
       if (key === "ArrowDown" || key === "ArrowUp") {
         const n = a[Math.max(0, Math.min(a.length - 1, i + (key === "ArrowDown" ? 1 : -1)))];
         n == null ? void 0 : n.focus({ preventScroll: true });
@@ -2840,7 +2840,7 @@
           state.channel = n.dataset.id;
           state.selected = null;
           renderList();
-          (_b2 = $(`[data-tv="list-channel"][data-id="${CSS.escape(state.channel)}"]`)) == null ? void 0 : _b2.focus({ preventScroll: true });
+          (_b3 = $(`[data-tv="list-channel"][data-id="${CSS.escape(state.channel)}"]`)) == null ? void 0 : _b3.focus({ preventScroll: true });
         }
         return;
       }
@@ -2849,7 +2849,7 @@
       if (key === "Enter") (_e = document.activeElement) == null ? void 0 : _e.click();
     }
     document.addEventListener("keydown", (e) => {
-      var _a3, _b2;
+      var _a4, _b3;
       if (e.target.id === "search-input" && e.key === "Enter") {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -2857,13 +2857,13 @@
           searchHistory = [state.query.trim(), ...searchHistory.filter((q) => q !== state.query.trim())].slice(0, 20);
           localStorage.setItem("tl-search-history", JSON.stringify(searchHistory));
         }
-        (_a3 = $(".result")) == null ? void 0 : _a3.focus();
+        (_a4 = $(".result")) == null ? void 0 : _a4.focus();
         return;
       }
       if (!wizard && e.target.id === "search-input" && e.key === "ArrowDown") {
         e.preventDefault();
         e.stopImmediatePropagation();
-        (_b2 = $(".result")) == null ? void 0 : _b2.focus();
+        (_b3 = $(".result")) == null ? void 0 : _b3.focus();
         return;
       }
       if (wizard) {
@@ -2935,7 +2935,7 @@
       }
     }, true);
     document.addEventListener("click", async (e) => {
-      var _a3, _b2;
+      var _a4, _b3;
       const seriesCard = e.target.closest("[data-series]");
       if (seriesCard) {
         openSeries(Number(seriesCard.dataset.series));
@@ -2948,7 +2948,7 @@
         if (a === "media-page") {
           mediaPage += Number(b.dataset.step) || 0;
           renderCards();
-          (_a3 = $(".movie-card")) == null ? void 0 : _a3.focus();
+          (_a4 = $(".movie-card")) == null ? void 0 : _a4.focus();
           return;
         }
         if (a === "series-season") {
@@ -2968,8 +2968,8 @@
           if (ctx.advanced.selectGroup(group)) {
             setNav(ctx.platform.isPhone && !$("#modal-root").children.length ? 0 : 1, false);
             requestAnimationFrame(() => {
-              var _a4;
-              (_a4 = $$("#groups .group-button").find((x) => x.dataset.group === group)) == null ? void 0 : _a4.focus({ preventScroll: true });
+              var _a5;
+              (_a5 = $$("#groups .group-button").find((x) => x.dataset.group === group)) == null ? void 0 : _a5.focus({ preventScroll: true });
             });
           }
           return;
@@ -2987,8 +2987,8 @@
         }
         if (a === "movie-play") {
           const c = state.channels.find((c2) => {
-            var _a4;
-            return c2.id === ((_a4 = $("#movie-detail")) == null ? void 0 : _a4.dataset.mediaId);
+            var _a5;
+            return c2.id === ((_a5 = $("#movie-detail")) == null ? void 0 : _a5.dataset.mediaId);
           });
           if (!c) return toast("Movie no longer exists. Refresh the playlist.");
           closeMovie();
@@ -3107,7 +3107,7 @@
         }
         if (a.startsWith("nav-") || a === "search") {
           if (ctx.platform.isPhone) {
-            (_b2 = $("#movie-detail")) == null ? void 0 : _b2.remove();
+            (_b3 = $("#movie-detail")) == null ? void 0 : _b3.remove();
             ctx.closeModal();
             if (listMode) closeList();
             setNav(0, false);
@@ -3147,12 +3147,12 @@
       }
     });
     function afterNavigate() {
-      var _a3, _b2;
+      var _a4, _b3;
       leaveWelcome();
       setNav(0, false);
-      if (state.view === "movies" || state.view === "series" || state.view === "history") (_a3 = $(".movie-card")) == null ? void 0 : _a3.focus({ preventScroll: true });
+      if (state.view === "movies" || state.view === "series" || state.view === "history") (_a4 = $(".movie-card")) == null ? void 0 : _a4.focus({ preventScroll: true });
       else if (state.view === "mylist") setNav(1);
-      else if (state.view === "guide") (_b2 = $(".programme.selected")) == null ? void 0 : _b2.focus({ preventScroll: true });
+      else if (state.view === "guide") (_b3 = $(".programme.selected")) == null ? void 0 : _b3.focus({ preventScroll: true });
     }
     function resetTransient() {
       if (wizard) closeWizard();
@@ -3287,8 +3287,10 @@
   }
 
   // src/app.mjs
+  var _a3, _b2;
+  var VERSION2 = ((_b2 = (_a3 = window.TiviLoomNative) == null ? void 0 : _a3.appVersion) == null ? void 0 : _b2.call(_a3)) || VERSION;
   async function main() {
-    var _a3, _b2, _c;
+    var _a4, _b3, _c;
     const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
     const esc = (s) => String(s != null ? s : "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
     const safeImage = (s) => {
@@ -3306,9 +3308,9 @@
     const mins = (ms) => Math.max(0, Math.ceil(ms / 6e4));
     const initial = demoData();
     function read(key, fallback) {
-      var _a4;
+      var _a5;
       try {
-        return (_a4 = JSON.parse(localStorage.getItem("tl-" + key))) != null ? _a4 : fallback;
+        return (_a5 = JSON.parse(localStorage.getItem("tl-" + key))) != null ? _a5 : fallback;
       } catch {
         return fallback;
       }
@@ -3363,10 +3365,10 @@
       }
     });
     video.addEventListener("loadedmetadata", () => {
-      var _a4;
+      var _a5;
       const c = state.channels.find((x) => x.id === state.playing);
       if (!c || !["movie", "series"].includes(c.type) || !canSeek(video)) return;
-      const offset = resumeOffset((_a4 = state.watchProgress[c.id]) == null ? void 0 : _a4.time, video.duration);
+      const offset = resumeOffset((_a5 = state.watchProgress[c.id]) == null ? void 0 : _a5.time, video.duration);
       if (offset && video.currentTime < 3) try {
         video.currentTime = offset;
       } catch {
@@ -3430,7 +3432,7 @@
       $("#preview-play").textContent = "\u25B6";
     }
     function applyPlaylist(playlist) {
-      var _a4, _b3;
+      var _a5, _b4;
       resumeReady = false;
       const saved = read("playlist-state-" + playlist.id, null);
       const p = overlayPlaylist(playlist, saved);
@@ -3444,8 +3446,8 @@
       resumeState = { ...p.resume };
       lastResumeJSON = "";
       const plan = resumePlan(state.channels, resumeState, state.prefs, state.favorites, state.history);
-      Object.assign(state, { channel: plan.channel, group: ((_a4 = state.groupPins) == null ? void 0 : _a4[plan.group]) ? "Ham\u0131s\u0131" : plan.group, view: state.channels.some((c) => c.type === "tv") ? "guide" : "movies", window: plan.window });
-      if (state.view === "movies") state.channel = ((_b3 = state.channels[0]) == null ? void 0 : _b3.id) || null;
+      Object.assign(state, { channel: plan.channel, group: ((_a5 = state.groupPins) == null ? void 0 : _a5[plan.group]) ? "Ham\u0131s\u0131" : plan.group, view: state.channels.some((c) => c.type === "tv") ? "guide" : "movies", window: plan.window });
+      if (state.view === "movies") state.channel = ((_b4 = state.channels[0]) == null ? void 0 : _b4.id) || null;
       resumeReady = true;
       $("#preview-status").textContent = "KANAL SE\xC7\u0130N";
     }
@@ -3476,7 +3478,7 @@
       }
     }
     async function storeNewPlaylist(data) {
-      var _a4, _b3;
+      var _a5, _b4;
       if (libraryBusy) {
         state.libraryError = "Another library operation is running.";
         return false;
@@ -3486,7 +3488,7 @@
       state.libraryError = "";
       try {
         persistResume();
-        const id = ((_b3 = (_a4 = globalThis.crypto) == null ? void 0 : _a4.randomUUID) == null ? void 0 : _b3.call(_a4)) || "playlist-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+        const id = ((_b4 = (_a5 = globalThis.crypto) == null ? void 0 : _a5.randomUUID) == null ? void 0 : _b4.call(_a5)) || "playlist-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
         const next = addPlaylist(captureActive(catalog, state, resumeState), data, id);
         await writeCatalog(next);
         committed = true;
@@ -3517,7 +3519,7 @@
       return state.channels.find((c) => c.id === state.channel && channelVisible(c)) || state.channels.find(channelVisible) || null;
     }
     function channelPrograms(c) {
-      var _a4;
+      var _a5;
       if (!c) return [];
       if (indexedPrograms !== state.programs) {
         indexedPrograms = state.programs;
@@ -3529,7 +3531,7 @@
         }
         for (const [id, ps] of epgIndex) {
           ps.sort((a, b) => a.start - b.start);
-          const name = (_a4 = state.epgNames[id]) == null ? void 0 : _a4.toLowerCase();
+          const name = (_a5 = state.epgNames[id]) == null ? void 0 : _a5.toLowerCase();
           if (name) epgNameIndex.set(name, ps);
         }
       }
@@ -3548,11 +3550,11 @@
       const type = state.view === "movies" ? "movie" : state.view === "series" ? "series" : "tv";
       let a = channelsFor(type);
       if (state.group === "Continue Watching") return a.filter((c) => {
-        var _a4, _b3;
-        return resumeOffset((_a4 = state.watchProgress[c.id]) == null ? void 0 : _a4.time, (_b3 = state.watchProgress[c.id]) == null ? void 0 : _b3.duration) > 0;
+        var _a5, _b4;
+        return resumeOffset((_a5 = state.watchProgress[c.id]) == null ? void 0 : _a5.time, (_b4 = state.watchProgress[c.id]) == null ? void 0 : _b4.duration) > 0;
       }).sort((a2, b) => {
-        var _a4, _b3;
-        return (((_a4 = state.watchProgress[b.id]) == null ? void 0 : _a4.updated) || 0) - (((_b3 = state.watchProgress[a2.id]) == null ? void 0 : _b3.updated) || 0);
+        var _a5, _b4;
+        return (((_a5 = state.watchProgress[b.id]) == null ? void 0 : _a5.updated) || 0) - (((_b4 = state.watchProgress[a2.id]) == null ? void 0 : _b4.updated) || 0);
       });
       if (state.view === "movies" && state.group === "Recently Added") return a.filter((c) => c.added > 0).sort((a2, b) => b.added - a2.added);
       if (state.view === "movies" && state.group === "History") return state.history.map((id) => state.channels.find((c) => c.id === id && c.type === "movie" && channelVisible(c))).filter(Boolean);
@@ -3564,12 +3566,12 @@
       return a;
     }
     function channelNumber(c, index) {
-      var _a4;
-      return ((_a4 = state.channelNumbers) == null ? void 0 : _a4[c.id]) || index + 1;
+      var _a5;
+      return ((_a5 = state.channelNumbers) == null ? void 0 : _a5[c.id]) || index + 1;
     }
     function renderLogo(c) {
-      var _a4;
-      const url = ((_a4 = state.logoOverrides) == null ? void 0 : _a4[c.id]) || c.logo;
+      var _a5;
+      const url = ((_a5 = state.logoOverrides) == null ? void 0 : _a5[c.id]) || c.logo;
       return `<span class="channel-logo"><span class="logo-initials">${esc(initials(c.name))}</span>${url ? `<img data-logo-url="${safeImage(url)}" alt="">` : ""}</span>`;
     }
     function initials(name) {
@@ -3627,9 +3629,9 @@
         let ps = channelPrograms(c).filter((p) => p.end > start && p.start < end);
         if (!ps.length) ps = [{ ...programAt(c, start), start, end }];
         return `<div class="guide-row" data-row="${esc(c.id)}"><button class="channel-name" data-channel="${esc(c.id)}" title="${esc(c.name)}"><span class="num">${i + 1}</span>${logo(c)}<span class="label">${esc(c.name)}</span>${state.favorites.includes(c.id) ? '<span class="favorite-dot">\u2605</span>' : ""}</button><div class="programs">${ps.map((p) => {
-          var _a4, _b3;
+          var _a5, _b4;
           const l = Math.max(0, (p.start - start) / 72e5 * 100), r = Math.min(100, (p.end - start) / 72e5 * 100);
-          return `<button class="programme ${p.start <= now && p.end > now ? "current" : ""} ${c.id === state.channel && p.start === ((_b3 = (_a4 = state.selected) == null ? void 0 : _a4.start) != null ? _b3 : programAt(c).start) ? "selected" : ""}" data-program="${p.start}" data-channel-id="${esc(c.id)}" style="left:${l}%;width:${r - l}%" tabindex="${c.id === state.channel ? 0 : -1}"><span>${esc(p.title)}</span></button>`;
+          return `<button class="programme ${p.start <= now && p.end > now ? "current" : ""} ${c.id === state.channel && p.start === ((_b4 = (_a5 = state.selected) == null ? void 0 : _a5.start) != null ? _b4 : programAt(c).start) ? "selected" : ""}" data-program="${p.start}" data-channel-id="${esc(c.id)}" style="left:${l}%;width:${r - l}%" tabindex="${c.id === state.channel ? 0 : -1}"><span>${esc(p.title)}</span></button>`;
         }).join("")}${now >= start && now < end ? `<i class="now-line" style="left:${(now - start) / 72e5 * 100}%"></i>` : ""}</div></div>`;
       }).join("")}</div></div>`;
       renderInfo();
@@ -3655,17 +3657,17 @@
       videoSurface.refresh();
     }
     function navigate(view) {
-      var _a4, _b3;
+      var _a5, _b4;
       state.view = view;
       state.group = "Ham\u0131s\u0131";
       state.selected = null;
-      if (view === "movies") state.channel = ((_a4 = state.channels.find((c) => c.type === "movie")) == null ? void 0 : _a4.id) || state.channel;
+      if (view === "movies") state.channel = ((_a5 = state.channels.find((c) => c.type === "movie")) == null ? void 0 : _a5.id) || state.channel;
       render();
-      if (view === "search") (_b3 = $("#search-input")) == null ? void 0 : _b3.focus();
+      if (view === "search") (_b4 = $("#search-input")) == null ? void 0 : _b4.focus();
     }
     let selectionPersistTimer = null;
     function select(c, p, focus = false) {
-      var _a4;
+      var _a5;
       state.channel = c.id;
       state.selected = p || programAt(c);
       if (tvUI.fastSelectGuide(c, state.selected, focus)) {
@@ -3677,7 +3679,7 @@
       renderGuide();
       if (focus) {
         const row2 = $$("[data-row]").find((r) => r.dataset.row === c.id);
-        (_a4 = row2 == null ? void 0 : row2.querySelector(".selected")) == null ? void 0 : _a4.focus({ preventScroll: true });
+        (_a5 = row2 == null ? void 0 : row2.querySelector(".selected")) == null ? void 0 : _a5.focus({ preventScroll: true });
         row2 == null ? void 0 : row2.scrollIntoView({ block: "nearest" });
       }
     }
@@ -3729,17 +3731,26 @@
       }
     }
     async function play(c, fullscreen = false, automatic = false) {
-      var _a4, _b3, _c2;
+      var _a5, _b4, _c2;
       if (!c) return;
-      if (((_a4 = window.TiviLoomNative) == null ? void 0 : _a4.openNativePlayer) && fullscreen && !c.demo) {
+      if (advanced.guardGroup(c.group, () => play(c, fullscreen, automatic))) return;
+      if (advanced.guard("channel", () => play(c, fullscreen, automatic), c)) return;
+      if (((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.openNativePlayer) && fullscreen && !c.demo) {
         try {
           const url = await mediaURL(c);
-          const payload = JSON.stringify({ url, userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/0.6.6", referer: c.referer || "" });
+          const payload = JSON.stringify({ url, name: c.name, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/0.6.9", referer: c.referer || "" });
+          video.pause();
+          if (hls) {
+            hls.destroy();
+            hls = null;
+          }
+          video.removeAttribute("src");
+          video.load();
           if (!window.TiviLoomNative.openNativePlayer(payload)) throw Error("Native player could not be opened.");
           state.channel = c.id;
           state.playing = c.id;
           state.full = true;
-          state.playbackPhase = "playing";
+          state.playbackPhase = "loading";
           state.history = [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60);
           save("history");
           persistResume();
@@ -3749,6 +3760,10 @@
           renderInfo();
           return;
         } catch (error) {
+          state.playing = null;
+          state.full = false;
+          delete video.dataset.tiviSource;
+          setPlaybackPhase("idle");
           toast("Native playback: " + error.message);
           return;
         }
@@ -3798,7 +3813,7 @@
             await playableStart(video.play());
           } catch (error) {
             if (!valid()) return;
-            if (!instance && ((_b3 = window.Hls) == null ? void 0 : _b3.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && (error.name === "NotSupportedError" || ((_c2 = video.error) == null ? void 0 : _c2.code) === 4)) {
+            if (!instance && ((_b4 = window.Hls) == null ? void 0 : _b4.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && (error.name === "NotSupportedError" || ((_c2 = video.error) == null ? void 0 : _c2.code) === 4)) {
               video.pause();
               video.removeAttribute("src");
               video.load();
@@ -3917,12 +3932,12 @@
       modal("Favorite folder", `<p>${esc(c.name)}</p><p>Current folder: ${esc(current)}</p><form id="folder-form"><label>Folder name<input id="folder-name" maxlength="32" value="${esc(current === "Unsorted" ? "" : current)}" placeholder="Sports, News, Kids\u2026"></label><button class="primary" type="submit">Save folder</button></form><p>${names.length ? "Existing: " + esc(names.join(" \xB7 ")) : ""}</p>`, '<button data-action="close" class="secondary">Close</button>');
     }
     document.addEventListener("submit", (event) => {
-      var _a4;
+      var _a5;
       if (event.target.id !== "folder-form") return;
       event.preventDefault();
       const c = currentChannel();
       if (!c) return;
-      const folder = (_a4 = $("#folder-name")) == null ? void 0 : _a4.value.trim();
+      const folder = (_a5 = $("#folder-name")) == null ? void 0 : _a5.value.trim();
       if (!folder) {
         delete state.favCollections[c.id];
         save("favCollections");
@@ -3936,6 +3951,9 @@
       toast("Saved to " + folder);
     });
     function enterPlayer() {
+      var _a5;
+      const c = state.channels.find((c2) => c2.id === state.playing) || currentChannel();
+      if (((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.openNativePlayer) && c && !c.demo) return play(c, true);
       state.full = true;
       $("#player").hidden = false;
       videoSurface.place($("#player"), true);
@@ -3967,8 +3985,8 @@
       const multi = $("#multiview");
       if (multi) {
         multis.forEach((x) => {
-          var _a4;
-          (_a4 = x.h) == null ? void 0 : _a4.destroy();
+          var _a5;
+          (_a5 = x.h) == null ? void 0 : _a5.destroy();
           x.v.pause();
           x.v.removeAttribute("src");
           x.v.load();
@@ -3986,7 +4004,7 @@
       if (state.full) showControls();
     }
     function modalBack() {
-      var _a4;
+      var _a5;
       const frame = dialogStack.back();
       if (!frame) return closeModal();
       $("#modal-root").textContent = "";
@@ -3997,10 +4015,10 @@
         frame.resume();
         return;
       }
-      ((_a4 = frame.focus) == null ? void 0 : _a4.isConnected) && frame.focus.focus({ preventScroll: true });
+      ((_a5 = frame.focus) == null ? void 0 : _a5.isConnected) && frame.focus.focus({ preventScroll: true });
     }
     function modal(title, body, actions = "", opts = {}) {
-      var _a4;
+      var _a5;
       const root = $("#modal-root"), key = opts.key || title;
       if (!root.children.length) {
         dialogStack.clear();
@@ -4011,10 +4029,10 @@
       modalResume = opts.resume || null;
       modalLastFocus = document.activeElement;
       root.innerHTML = `<div class="overlay ${opts.panel ? "panel-overlay" : ""} ${opts.choice ? "choice-overlay" : ""} ${opts.context ? "context-overlay" : ""} ${opts.program ? "program-overlay" : ""}"><section role="dialog" aria-modal="true" aria-label="${esc(title)}" class="${opts.panel ? "settings-panel" : "dialog"} ${opts.choice ? "choice-dialog" : ""} ${opts.context ? "context-dialog" : ""} ${opts.program ? "program-dialog" : ""}"><div class="dialog-header"><h2>${esc(title)}</h2><button data-action="modal-back" aria-label="Back" title="Back">\u2039</button></div>${opts.panel ? `<div class="settings-body">${body}</div>` : `<div class="dialog-body">${body}</div>${actions ? `<div class="dialog-actions">${actions}</div>` : ""}`}</section></div>`;
-      (_a4 = root.querySelector("input:not([type=file]):not([type=checkbox])") || root.querySelector(".primary") || root.querySelector(".settings-body button:not(:disabled)") || root.querySelector("button")) == null ? void 0 : _a4.focus();
+      (_a5 = root.querySelector("input:not([type=file]):not([type=checkbox])") || root.querySelector(".primary") || root.querySelector(".settings-body button:not(:disabled)") || root.querySelector("button")) == null ? void 0 : _a5.focus();
     }
     function menu(title, items, opts = {}) {
-      var _a4;
+      var _a5;
       const actions = {};
       items.forEach((it, i) => {
         if (Array.isArray(it)) actions[i] = it[1];
@@ -4022,7 +4040,7 @@
       modal(title, items.map((it, i) => !Array.isArray(it) ? `<div class="menu-section">${esc(it.heading)}</div>` : `<button data-menu="${i}" ${it[3] ? "disabled" : ""}><span>${opts.choice ? `<i class="choice-radio ${it[2] ? "selected" : ""}"></i>` : ""}${esc(it[0])}</span>${it[2] && !opts.choice ? `<small>${esc(it[2])}</small>` : ""}</button>`).join(""), "", opts);
       menuActions = actions;
       $("#modal-root .dialog-body").className = opts.compact ? "menu-list compact-menu" : "menu-list";
-      (_a4 = $("#modal-root [data-menu]:not(:disabled)")) == null ? void 0 : _a4.focus();
+      (_a5 = $("#modal-root [data-menu]:not(:disabled)")) == null ? void 0 : _a5.focus();
     }
     function bookmarkProgram(p, c) {
       if (!p || p.empty || !c) return toast("No programme information is available.");
@@ -4188,7 +4206,7 @@
     function settings(section = "root") {
       let body = "", title = "Ayarlar";
       const link = (a, t, s = "") => `<button class="setting-row" data-settings="${a}"><span class="setting-text">${t}<small>${s}</small></span><span>\u203A</span></button>`;
-      if (section === "root") body = `<div class="settings-section-title">TiviLoom \xB7 ${VERSION}</div>${link("sources", "Pleylistl\u0259r v\u0259 EPG", state.source)}${link("appearance", "G\xF6r\xFCn\xFC\u015F", "C\u0259dv\u0259l s\u0131xl\u0131\u011F\u0131, m\u0259tn v\u0259 h\u0259r\u0259k\u0259t")}${link("playback", "Oynatma", "S\u0259s, ekran \xF6l\xE7\xFCs\xFC v\u0259 taymer")}${link("library", "Kitabxana", "Sevimlil\u0259r, tarix\xE7\u0259 v\u0259 xat\u0131rlatmalar")}${link("remote", "Pult v\u0259 klaviatura", "Komp\xFCterd\u0259 TV davran\u0131\u015F\u0131n\u0131 yoxla")}${link("status", "Funksiyalar\u0131n v\u0259ziyy\u0259ti", "Haz\u0131r olanlar v\u0259 n\xF6vb\u0259ti m\u0259rh\u0259l\u0259l\u0259r")}${link("about", "T\u0259tbiq haqq\u0131nda", "Versiya v\u0259 yerli s\u0131naq m\xFChiti")}<div class="panel-note">D\u0259yi\u015Fiklikl\u0259r bu komp\xFCterin brauzerind\u0259 saxlan\u0131r.</div>`;
+      if (section === "root") body = `<div class="settings-section-title">TiviLoom \xB7 ${VERSION2}</div>${link("sources", "Pleylistl\u0259r v\u0259 EPG", state.source)}${link("appearance", "G\xF6r\xFCn\xFC\u015F", "C\u0259dv\u0259l s\u0131xl\u0131\u011F\u0131, m\u0259tn v\u0259 h\u0259r\u0259k\u0259t")}${link("playback", "Oynatma", "S\u0259s, ekran \xF6l\xE7\xFCs\xFC v\u0259 taymer")}${link("library", "Kitabxana", "Sevimlil\u0259r, tarix\xE7\u0259 v\u0259 xat\u0131rlatmalar")}${link("remote", "Pult v\u0259 klaviatura", "Komp\xFCterd\u0259 TV davran\u0131\u015F\u0131n\u0131 yoxla")}${link("status", "Funksiyalar\u0131n v\u0259ziyy\u0259ti", "Haz\u0131r olanlar v\u0259 n\xF6vb\u0259ti m\u0259rh\u0259l\u0259l\u0259r")}${link("about", "T\u0259tbiq haqq\u0131nda", "Versiya v\u0259 yerli s\u0131naq m\xFChiti")}<div class="panel-note">D\u0259yi\u015Fiklikl\u0259r bu komp\xFCterin brauzerind\u0259 saxlan\u0131r.</div>`;
       if (section === "sources") {
         title = "Pleylistl\u0259r v\u0259 EPG";
         body = `${row("Aktiv m\u0259nb\u0259", esc(state.source), '<span class="pill">' + state.channels.length + " m\u0259zmun</span>")}<div class="menu-list"><button data-action="import">M3U pleylist \u0259lav\u0259 et <span>\uFF0B</span></button><button data-action="epg">XMLTV EPG \u0259lav\u0259 et <span>\uFF0B</span></button><button data-action="demo">N\xFCmun\u0259 pleylistin\u0259 qay\u0131t <span>\u21BA</span></button></div><div class="panel-note">${state.programs.length} proqram qeydiyyat\u0131. TV v\u0259 filml\u0259r M3U daxilind\u0259n qrupla\u015Fd\u0131r\u0131l\u0131r. Xtream API, Stalker portal\u0131 v\u0259 serial m\xF6vs\xFCml\u0259ri sonrak\u0131 m\u0259rh\u0259l\u0259dir.</div>`;
@@ -4215,7 +4233,7 @@
       }
       if (section === "about") {
         title = "TiviLoom haqq\u0131nda";
-        body = `<div class="panel-note" style="text-align:center"><img src="assets/logo.png" style="width:480px;max-width:90%;height:auto" alt="TiviLoom loqosu"><h2 style="font-weight:400;color:#dcebe2">TiviLoom</h2>${VERSION} \xB7 ${platform.isPhone ? "Android" : "webOS TV<br>LG webOS 6.0+"}<br><br>M\xFCst\u0259qil brend v\u0259 yeni t\u0259tbiq. Kanal xidm\u0259ti v\u0259 kommersiya m\u0259zmunu daxil deyil. ${platform.isPhone ? "\u015E\u0259xsi pleylistl\u0259rinizd\u0259n canl\u0131 TV v\u0259 film izl\u0259yin." : "webOS TV \xFC\xE7\xFCn yerli qura\u015Fd\u0131r\u0131lan s\u0131naq paketi."}<br><br>Yay\u0131m\u0131n a\xE7\u0131lmas\u0131 televizorun format v\u0259 kodek d\u0259st\u0259yind\u0259n as\u0131l\u0131d\u0131r.</div>`;
+        body = `<div class="panel-note" style="text-align:center"><img src="assets/logo.png" style="width:480px;max-width:90%;height:auto" alt="TiviLoom loqosu"><h2 style="font-weight:400;color:#dcebe2">TiviLoom</h2>${VERSION2} \xB7 ${platform.isPhone ? "Android" : "webOS TV<br>LG webOS 6.0+"}<br><br>M\xFCst\u0259qil brend v\u0259 yeni t\u0259tbiq. Kanal xidm\u0259ti v\u0259 kommersiya m\u0259zmunu daxil deyil. ${platform.isPhone ? "\u015E\u0259xsi pleylistl\u0259rinizd\u0259n canl\u0131 TV v\u0259 film izl\u0259yin." : "webOS TV \xFC\xE7\xFCn yerli qura\u015Fd\u0131r\u0131lan s\u0131naq paketi."}<br><br>Yay\u0131m\u0131n a\xE7\u0131lmas\u0131 televizorun format v\u0259 kodek d\u0259st\u0259yind\u0259n as\u0131l\u0131d\u0131r.</div>`;
       }
       modal(title, body, "", { panel: true, key: "settings:" + section });
     }
@@ -4284,13 +4302,13 @@
       $("#tv-screen").append(el);
       multis = [];
       await Promise.all([...el.querySelectorAll("video")].map(async (v, i) => {
-        var _a4;
+        var _a5;
         const x = { v, h: null };
         multis[i] = x;
         try {
           x.h = await attachVideo(v, a[i], true, () => el.isConnected);
           if (!el.isConnected) {
-            (_a4 = x.h) == null ? void 0 : _a4.destroy();
+            (_a5 = x.h) == null ? void 0 : _a5.destroy();
             return;
           }
           await v.play();
@@ -4577,7 +4595,7 @@
       if (c) play(c, state.full);
     }
     document.addEventListener("click", async (e) => {
-      var _a4, _b3;
+      var _a5, _b4;
       const t = e.target.closest("button,[data-action]");
       if (!t) return;
       try {
@@ -4585,11 +4603,11 @@
         if (t.dataset.key) return keyControl(t.dataset.key);
         if (t.dataset.group) return;
         if (t.dataset.settings) return settings(t.dataset.settings);
-        if (t.dataset.menu !== void 0) return await ((_a4 = menuActions[t.dataset.menu]) == null ? void 0 : _a4.call(menuActions));
+        if (t.dataset.menu !== void 0) return await ((_a5 = menuActions[t.dataset.menu]) == null ? void 0 : _a5.call(menuActions));
         if (t.dataset.program) {
           const c = state.channels.find((c2) => c2.id === t.dataset.channelId);
           const p = programAt(c, +t.dataset.program);
-          const same = state.channel === c.id && ((_b3 = state.selected) == null ? void 0 : _b3.start) === p.start;
+          const same = state.channel === c.id && ((_b4 = state.selected) == null ? void 0 : _b4.start) === p.start;
           select(c, p);
           if (p.start > Date.now() || p.end < Date.now()) programActions(p, c);
           else await play(c, !platform.isPhone && (same && state.playing === c.id));
@@ -4730,7 +4748,7 @@
       }
     });
     function keyControl(key) {
-      var _a4, _b3, _c2;
+      var _a5, _b4, _c2;
       if (key === "Escape" || key === "Backspace") {
         if ($("#modal-root").children.length || $("#multiview")) return modalBack();
         if (state.full) return exitPlayer();
@@ -4743,8 +4761,8 @@
         const buttons = $$("#modal-root button,#modal-root input,#modal-root select").filter((x) => !x.disabled);
         let i2 = buttons.indexOf(document.activeElement);
         if (key === "ArrowUp" || key === "ArrowDown") {
-          (_a4 = buttons[(i2 + (key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length]) == null ? void 0 : _a4.focus();
-        } else if (key === "Enter") (_b3 = document.activeElement) == null ? void 0 : _b3.click();
+          (_a5 = buttons[(i2 + (key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length]) == null ? void 0 : _a5.focus();
+        } else if (key === "Enter") (_b4 = document.activeElement) == null ? void 0 : _b4.click();
         return;
       }
       if (key === "m" || key === "M") return context();
@@ -4789,10 +4807,10 @@
       if (key === " " && state.playing) doAction("pause").catch(() => toast("\u018Fvv\u0259l kanal se\xE7in."));
     }
     video.addEventListener("error", () => {
-      var _a4, _b3;
+      var _a5, _b4;
       if (!state.playing || !video.currentSrc) return;
       const c = state.channels.find((c2) => c2.id === state.playing), generation = playGeneration;
-      if (c && !hls && hlsFallbackGeneration !== generation && ((_a4 = window.Hls) == null ? void 0 : _a4.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && ((_b3 = video.error) == null ? void 0 : _b3.code) === 4) {
+      if (c && !hls && hlsFallbackGeneration !== generation && ((_a5 = window.Hls) == null ? void 0 : _a5.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && ((_b4 = video.error) == null ? void 0 : _b4.code) === 4) {
         hlsFallbackGeneration = generation;
         $("#preview-status").textContent = "ALTERNAT\u0130V PLAYER YOXLANIR";
         attachVideo(video, c, false, () => generation === playGeneration, true).then((instance) => {
@@ -5068,7 +5086,7 @@
       } else if (catalog.playlists.length) {
         emptyLibrary();
         render();
-      } else if (((_a3 = data == null ? void 0 : data.channels) == null ? void 0 : _a3.length) && !data.imported) {
+      } else if (((_a4 = data == null ? void 0 : data.channels) == null ? void 0 : _a4.length) && !data.imported) {
         Object.assign(state, { channels: data.channels, source: data.source, imported: false });
         const fresh = demoData(), order = data.channels.map((c) => c.id);
         state.channels = fresh.channels.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
@@ -5082,7 +5100,7 @@
     tvUI.ready();
     const startup = resumePlan(state.channels, resumeState, state.prefs, state.favorites, state.history);
     state.channel = startup.channel;
-    state.group = ((_b2 = state.groupPins) == null ? void 0 : _b2[startup.group]) ? "Ham\u0131s\u0131" : startup.group;
+    state.group = ((_b3 = state.groupPins) == null ? void 0 : _b3[startup.group]) ? "Ham\u0131s\u0131" : startup.group;
     state.view = state.channels.some((c) => c.type === "tv") ? startup.view : "movies";
     state.window = startup.window;
     state.selected = null;
@@ -5098,8 +5116,8 @@
       persistResume();
       hls == null ? void 0 : hls.destroy();
       multis.forEach((x) => {
-        var _a4;
-        return (_a4 = x.h) == null ? void 0 : _a4.destroy();
+        var _a5;
+        return (_a5 = x.h) == null ? void 0 : _a5.destroy();
       });
     });
     for (const event of ["stalled", "waiting"]) video.addEventListener(event, () => {
@@ -5108,6 +5126,15 @@
       stallTimer = setTimeout(() => {
         if (state.playing && !video.paused && !document.hidden) showVideoError("Yay\u0131m ba\u011Flant\u0131s\u0131 dayand\u0131.");
       }, 2e4);
+    });
+    window.addEventListener("TiviLoomNativePlayerError", () => {
+      state.playing = null;
+      state.full = false;
+      delete video.dataset.tiviSource;
+      setPlaybackPhase("idle");
+      $("#player").hidden = true;
+      videoSurface.place($("#preview"));
+      toast("Player a\xE7\u0131la bilm\u0259di. Kanal\u0131 yenid\u0259n se\xE7in.");
     });
     let suspended = false;
     function tvSuspend() {
@@ -5133,14 +5160,14 @@
       $("#video-error").hidden = true;
     }
     function tvResume() {
-      var _a4;
+      var _a5;
       if (!suspended) return;
       suspended = false;
       closeModal();
       tvUI.resetTransient();
       if (state.full) exitPlayer();
       const plan = resumePlan(state.channels, resumeState, state.prefs, state.favorites, state.history);
-      Object.assign(state, { channel: plan.channel, group: ((_a4 = state.groupPins) == null ? void 0 : _a4[plan.group]) ? "Ham\u0131s\u0131" : plan.group, view: plan.view, window: plan.window, selected: null });
+      Object.assign(state, { channel: plan.channel, group: ((_a5 = state.groupPins) == null ? void 0 : _a5[plan.group]) ? "Ham\u0131s\u0131" : plan.group, view: plan.view, window: plan.window, selected: null });
       render();
       tvUI.ready();
       if (plan.autoplay && (state.imported || localStorage.getItem("tl-tv-ready") === "true")) play(currentChannel(), true);

@@ -22,3 +22,10 @@ ipk/
 *.ipk
 *.apk
 work/
+
+# Generated Android build assets and local SDK settings
+android/app/src/main/assets/web/
+android/local.properties
+android/out/
+android/test-apk/
+apk/

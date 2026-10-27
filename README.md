@@ -1,6 +1,6 @@
-# TiviLoom 0.6.8 — LG webOS
+# TiviLoom — LG webOS and Android phone
 
-LG webOS maintenance release. Android APK development and publishing remain paused.
+LG webOS base: 0.6.8. Android phone development has resumed as version 0.6.9 with a native fullscreen player. See RELEASE-ANDROID-0.6.9.md.
 
 ## Install
 
@@ -25,7 +25,7 @@ npm test
 npm run package
 ```
 
-The LG workflow builds, tests and packages the IPK on main. Package and webOS app/service versions are 0.6.8. The paused Android source retains version 0.6.7.
+The LG workflow builds, tests and packages the IPK on main. Package and webOS app/service versions are 0.6.8. Android version metadata is maintained separately from the webOS package.
 
 Local validation: 97/97 automated tests passed and the IPK packaged successfully. Tests dedicated to the removed transfer feature were removed; a new UI test verifies direct playlist entry and that focus navigation does not start playback.
 

@@ -2,14 +2,16 @@ plugins { id 'com.android.application' }
 
 android {
     namespace 'com.tiviloom.mobile'
-    compileSdk 35
+    compileSdk 36
     defaultConfig {
         applicationId 'com.tiviloom.mobile'
         minSdk 26
         targetSdk 35
-        versionCode 67
-        versionName '0.6.7'
+        versionCode 69
+        versionName '0.6.9'
+        testInstrumentationRunner 'com.tiviloom.mobile.test.NativePlayerTest'
     }
+    sourceSets { androidTest { java.srcDirs = ['../instrumentation/src'] } }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
