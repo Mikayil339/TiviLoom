@@ -1,6 +1,6 @@
 {
   "name": "com.tiviloom.app.source",
-  "version": "0.6.8",
+  "version": "0.6.10",
   "main": "service.js",
   "description": "TiviLoom playlist and XMLTV source loader",
   "type": "commonjs"

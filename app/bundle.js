@@ -1,6 +1,6 @@
 (() => {
   // src/version.mjs
-  var VERSION = "0.6.8";
+  var VERSION = "0.6.10";
 
   // src/library-store.mjs
   function createLibraryStore({ indexedDB: indexedDB2, storage, timeout = 5e3 } = {}) {
@@ -1684,7 +1684,7 @@
   function mountTVUI(ctx) {
     const { state, $, $$, esc, fmt, mins, programAt, channelPrograms, currentChannel, visibleChannels, api, persistLibrary, video, toast } = ctx;
     const stage = $("#tv-screen"), app = $("#app");
-    const paths = { microphone: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>', search: '<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>', tv: '<rect x="2" y="4" width="20" height="14" rx="1"/><path d="M8 21h8M12 18v3"/>', film: '<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/>', bookmark: '<path d="M5 3h14v19l-7-5-7 5z"/>', trash: '<path d="M5 6h14M9 3h6M7 6v15h10V6M10 10v7M14 10v7"/>', settings: '<path d="m9 3 1-2h4l1 2 3 2h2l2 4-1 2v3l1 2-2 4h-2l-3 2-1 2h-4l-1-2-3-2H4l-2-4 1-2v-3L2 9l2-4h2z"/><circle cx="12" cy="12" r="3"/>', list: '<path d="M8 5h14M8 12h14M8 19h14"/><circle cx="3" cy="5" r="1"/><circle cx="3" cy="12" r="1"/><circle cx="3" cy="19" r="1"/>', star: '<path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>', history: '<path d="M3 11a9 9 0 1 1 1 6M3 5v6h6M12 7v6l4 2"/>', grid: '<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>', pip: '<rect x="2" y="4" width="20" height="16" rx="1"/><path d="M12 11h7v6h-7z"/>', play: '<path d="m8 4 13 8-13 8z"/>', pause: '<path d="M8 4v16M16 4v16"/>', volume: '<path d="M3 9h4l5-5v16l-5-5H3zM16 7a7 7 0 0 1 0 10M19 4a11 11 0 0 1 0 16"/>', screen: '<rect x="2" y="5" width="20" height="14" rx="1"/>', captions: '<rect x="2" y="5" width="20" height="14" rx="1"/><path d="M10 9H7v6h3M18 9h-3v6h3"/>', link: '<path d="M10 5H7a7 7 0 0 0 0 14h3M14 5h3a7 7 0 0 1 0 14h-3M7 12h10"/>', add: '<path d="M1 4h15M1 10h15M1 16h10M19 10v14M12 17h14"/>', download: '<path d="M9 1h6v12h5l-8 8-8-8h5zM4 24h16"/>', chevron: '<path d="m9 4 8 8-8 8z"/>' };
+    const paths = { microphone: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>', search: '<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>', tv: '<rect x="2" y="4" width="20" height="14" rx="1"/><path d="M8 21h8M12 18v3"/>', film: '<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/>', bookmark: '<path d="M5 3h14v19l-7-5-7 5z"/>', trash: '<path d="M5 6h14M9 3h6M7 6v15h10V6M10 10v7M14 10v7"/>', settings: '<path d="M9.5 3h5l.5 2.5 2 1.2 2.4-.8 2.5 4.2-1.9 1.7v2.4l1.9 1.7-2.5 4.2-2.4-.8-2 1.2-.5 2.5h-5L9 20.5l-2-1.2-2.4.8-2.5-4.2L4 14.2v-2.4l-1.9-1.7 2.5-4.2 2.4.8 2-1.2z" transform="translate(0 -1)"/><circle cx="12" cy="12" r="3"/>', list: '<path d="M8 5h14M8 12h14M8 19h14"/><circle cx="3" cy="5" r="1"/><circle cx="3" cy="12" r="1"/><circle cx="3" cy="19" r="1"/>', star: '<path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>', history: '<path d="M3 11a9 9 0 1 1 1 6M3 5v6h6M12 7v6l4 2"/>', grid: '<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>', pip: '<rect x="2" y="4" width="20" height="16" rx="1"/><path d="M12 11h7v6h-7z"/>', play: '<path d="m8 4 13 8-13 8z"/>', pause: '<path d="M8 4v16M16 4v16"/>', volume: '<path d="M3 9h4l5-5v16l-5-5H3zM16 7a7 7 0 0 1 0 10M19 4a11 11 0 0 1 0 16"/>', screen: '<rect x="2" y="5" width="20" height="14" rx="1"/>', captions: '<rect x="2" y="5" width="20" height="14" rx="1"/><path d="M10 9H7v6h3M18 9h-3v6h3"/>', link: '<path d="M10 5H7a7 7 0 0 0 0 14h3M14 5h3a7 7 0 0 1 0 14h-3M7 12h10"/>', add: '<path d="M1 4h15M1 10h15M1 16h10M19 10v14M12 17h14"/>', download: '<path d="M9 1h6v12h5l-8 8-8-8h5zM4 24h16"/>', chevron: '<path d="m9 4 8 8-8 8z"/>' };
     const icon = (n) => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[n] || paths.tv}</svg>`;
     const localDate = (t) => {
       const d = new Date(t);
@@ -3374,7 +3374,10 @@
       } catch {
       }
     });
-    const videoSurface = createVideoSurface(video, $("#tv-screen"), $("#video-error"), () => applyDisplayMode(video, videoSurface.host, state.prefs.fit));
+    const videoSurface = createVideoSurface(video, $("#tv-screen"), $("#video-error"), () => {
+      applyDisplayMode(video, videoSurface.host, state.prefs.fit);
+      syncNativeBounds();
+    });
     mountLogos(platform);
     function toolLabel(selector, text) {
       const el = $(selector);
@@ -3413,11 +3416,14 @@
       }
     }
     function stopMedia() {
+      var _a5, _b4;
       if ($("#mini-player") && !$("#mini-player").hidden) toggleMini(true);
       clearTimeout(reconnectTimer);
       clearTimeout(stallTimer);
       reconnectTimer = null;
       reconnectAttempts = 0;
+      (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
+      document.documentElement.classList.remove("native-preview");
       ++playGeneration;
       hls == null ? void 0 : hls.destroy();
       hls = null;
@@ -3731,43 +3737,57 @@
       }
     }
     async function play(c, fullscreen = false, automatic = false) {
-      var _a5, _b4, _c2;
+      var _a5, _b4, _c2, _d, _e, _f, _g;
       if (!c) return;
       if (advanced.guardGroup(c.group, () => play(c, fullscreen, automatic))) return;
       if (advanced.guard("channel", () => play(c, fullscreen, automatic), c)) return;
-      if (((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.openNativePlayer) && fullscreen && !c.demo) {
+      if (((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.openNativePlayer) && !c.demo) {
+        const generation2 = ++playGeneration;
         try {
           const url = await mediaURL(c);
-          const payload = JSON.stringify({ url, name: c.name, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/0.6.9", referer: c.referer || "" });
+          if (generation2 !== playGeneration) return;
+          const payload = JSON.stringify({ url, name: c.name, fullscreen, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/0.6.10", referer: c.referer || "", catalogue: state.channels.filter((x) => {
+            var _a6, _b5;
+            return !((_a6 = state.hiddenChannels) == null ? void 0 : _a6.includes(x.id)) && !((_b5 = state.hiddenGroups) == null ? void 0 : _b5.includes(x.group)) && advanced.groupAccessible(x.group);
+          }).map(({ id, name, group }) => ({ id, name, group })), history: [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60) });
+          if (!window.TiviLoomNative.openNativePlayer(payload)) throw Error("Native player could not be opened.");
           video.pause();
           if (hls) {
             hls.destroy();
             hls = null;
           }
-          video.removeAttribute("src");
-          video.load();
-          if (!window.TiviLoomNative.openNativePlayer(payload)) throw Error("Native player could not be opened.");
+          if (video.hasAttribute("src")) {
+            video.removeAttribute("src");
+            video.load();
+          }
           state.channel = c.id;
           state.playing = c.id;
-          state.full = true;
+          state.full = fullscreen;
           state.playbackPhase = "loading";
+          document.documentElement.classList.add("native-preview");
           state.history = [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60);
           save("history");
           persistResume();
+          $("#player").hidden = !fullscreen;
+          videoSurface.place(fullscreen ? $("#player") : $("#preview"), fullscreen);
           $("#player-channel").textContent = c.name;
           $("#player-info").textContent = c.name;
           $("#preview-status").textContent = c.name;
           renderInfo();
+          syncNativeBounds();
           return;
         } catch (error) {
           state.playing = null;
           state.full = false;
-          delete video.dataset.tiviSource;
+          (_c2 = (_b4 = window.TiviLoomNative).stopNativePlayer) == null ? void 0 : _c2.call(_b4);
+          document.documentElement.classList.remove("native-preview");
           setPlaybackPhase("idle");
           toast("Native playback: " + error.message);
           return;
         }
       }
+      (_e = (_d = window.TiviLoomNative) == null ? void 0 : _d.stopNativePlayer) == null ? void 0 : _e.call(_d);
+      document.documentElement.classList.remove("native-preview");
       if (c.type !== "series") state.nextEpisodes = null;
       if (advanced.guardGroup(c.group, () => play(c, fullscreen, automatic))) return;
       if (advanced.guard("channel", () => play(c, fullscreen), c)) return;
@@ -3813,7 +3833,7 @@
             await playableStart(video.play());
           } catch (error) {
             if (!valid()) return;
-            if (!instance && ((_b4 = window.Hls) == null ? void 0 : _b4.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && (error.name === "NotSupportedError" || ((_c2 = video.error) == null ? void 0 : _c2.code) === 4)) {
+            if (!instance && ((_f = window.Hls) == null ? void 0 : _f.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && (error.name === "NotSupportedError" || ((_g = video.error) == null ? void 0 : _g.code) === 4)) {
               video.pause();
               video.removeAttribute("src");
               video.load();
@@ -3951,9 +3971,17 @@
       toast("Saved to " + folder);
     });
     function enterPlayer() {
-      var _a5;
+      var _a5, _b4;
+      if (((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeFullscreen) && document.documentElement.classList.contains("native-preview")) {
+        state.full = true;
+        $("#player").hidden = false;
+        videoSurface.place($("#player"), true);
+        window.TiviLoomNative.nativeFullscreen(true);
+        syncNativeBounds();
+        return;
+      }
       const c = state.channels.find((c2) => c2.id === state.playing) || currentChannel();
-      if (((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.openNativePlayer) && c && !c.demo) return play(c, true);
+      if (((_b4 = window.TiviLoomNative) == null ? void 0 : _b4.openNativePlayer) && c && !c.demo) return play(c, true);
       state.full = true;
       $("#player").hidden = false;
       videoSurface.place($("#player"), true);
@@ -3962,6 +3990,8 @@
       });
     }
     function exitPlayer() {
+      var _a5, _b4;
+      (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeFullscreen) == null ? void 0 : _b4.call(_a5, false);
       persistResume();
       state.full = false;
       $("#player").hidden = true;
@@ -4124,6 +4154,7 @@
       modal("Pleylist \u0259lav\u0259 et", `<p>M3U pleylistinin \xFCnvan\u0131n\u0131 yaz\u0131n v\u0259 ya komp\xFCterd\u0259n fayl se\xE7in.</p><label>Pleylistin ad\u0131<input id="source-name" placeholder="M\u0259nim televiziyam" maxlength="80"></label><label>M3U / M3U8 \xFCnvan\u0131<input id="source-url" type="url" placeholder="https://provider.example/playlist.m3u" autocomplete="off" spellcheck="false"></label><label>V\u0259 ya M3U fayl\u0131<input id="source-file" type="file" accept=".m3u,.m3u8,.txt"></label><label>EPG \xFCnvan\u0131 (ist\u0259y\u0259 g\xF6r\u0259)<input id="source-epg" type="url" placeholder="https://provider.example/epg.xml" autocomplete="off" spellcheck="false"></label><label>M\u0259zmun n\xF6v\xFC<select id="source-type"><option value="auto">Avtomatik: TV v\u0259 film qruplar\u0131</option><option value="tv">Ham\u0131s\u0131 TV kanal\u0131</option><option value="movie">Ham\u0131s\u0131 film</option></select></label><p class="note">Yeni pleylist ayr\u0131ca saxlan\u0131r. Saxlanm\u0131\u015F pleylistl\u0259r aras\u0131nda ke\xE7id ed\u0259 bil\u0259rsiniz. N\xFCmun\u0259 rejimin\u0259 Ayarlar vasit\u0259sil\u0259 qay\u0131tmaq olar. URL v\u0259 EPG bu brauzerin yerli yadda\u015F\u0131nda saxlan\u0131r. TiviLoom kanal abun\u0259si t\u0259qdim etmir.</p><p id="import-status" role="status"></p>`, `<button id="import-submit" data-action="import-submit" class="primary">Pleylisti a\xE7</button><button data-action="close" class="secondary">L\u0259\u011Fv et</button>`);
     }
     async function importSubmit() {
+      var _a5, _b4;
       const button = $("#import-submit");
       button.disabled = true;
       const status = $("#import-status");
@@ -4145,6 +4176,8 @@
           }
         }
         if (!button.isConnected) return;
+        (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
+        document.documentElement.classList.remove("native-preview");
         ++playGeneration;
         hls == null ? void 0 : hls.destroy();
         hls = null;
@@ -4233,7 +4266,7 @@
       }
       if (section === "about") {
         title = "TiviLoom haqq\u0131nda";
-        body = `<div class="panel-note" style="text-align:center"><img src="assets/logo.png" style="width:480px;max-width:90%;height:auto" alt="TiviLoom loqosu"><h2 style="font-weight:400;color:#dcebe2">TiviLoom</h2>${VERSION2} \xB7 ${platform.isPhone ? "Android" : "webOS TV<br>LG webOS 6.0+"}<br><br>M\xFCst\u0259qil brend v\u0259 yeni t\u0259tbiq. Kanal xidm\u0259ti v\u0259 kommersiya m\u0259zmunu daxil deyil. ${platform.isPhone ? "\u015E\u0259xsi pleylistl\u0259rinizd\u0259n canl\u0131 TV v\u0259 film izl\u0259yin." : "webOS TV \xFC\xE7\xFCn yerli qura\u015Fd\u0131r\u0131lan s\u0131naq paketi."}<br><br>Yay\u0131m\u0131n a\xE7\u0131lmas\u0131 televizorun format v\u0259 kodek d\u0259st\u0259yind\u0259n as\u0131l\u0131d\u0131r.</div>`;
+        body = `<div class="panel-note" style="text-align:center"><img src="assets/logo.png" style="width:480px;max-width:90%;height:auto" alt="TiviLoom loqosu"><h2 style="font-weight:400;color:#dcebe2">TiviLoom</h2>${VERSION2} \xB7 ${platform.isPhone ? "Android" : "webOS TV<br>LG webOS 6.0+"}<br><br>M\xFCst\u0259qil brend v\u0259 yeni t\u0259tbiq. Kanal xidm\u0259ti v\u0259 kommersiya m\u0259zmunu daxil deyil. ${platform.isPhone ? "\u015E\u0259xsi pleylistl\u0259rinizd\u0259n canl\u0131 TV v\u0259 film izl\u0259yin." : "webOS TV \xFC\xE7\xFCn yerli qura\u015Fd\u0131r\u0131lan s\u0131naq paketi."}<br><br>Yay\u0131m\u0131n a\xE7\u0131lmas\u0131 cihaz\u0131n format v\u0259 kodek d\u0259st\u0259yind\u0259n as\u0131l\u0131d\u0131r.${window.TiviLoomNative ? '<br><br>Media3 \xB7 Apache 2.0<br>VideoLAN LibVLC 3.7.6 \xB7 LGPL 2.1+<br><button class="secondary" data-action="licenses">A\xE7\u0131q m\u0259nb\u0259 lisenziyalar\u0131</button>' : ""}</div>`;
       }
       modal(title, body, "", { panel: true, key: "settings:" + section });
     }
@@ -4354,6 +4387,7 @@
       modal("Ehtiyat n\xFCsx\u0259ni b\u0259rpa et", '<p>Yaln\u0131z \xF6z TiviLoom ehtiyat n\xFCsx\u0259nizi se\xE7in. Aktiv pleylist v\u0259 ayarlar \u0259v\u0259z edil\u0259c\u0259k.</p><label>JSON fayl\u0131<input type="file" id="backup-file" accept=".json"></label><p id="backup-status"></p>', '<button data-action="restore-submit" class="primary">B\u0259rpa et</button><button data-action="close" class="secondary">L\u0259\u011Fv et</button>');
     }
     async function restoreSubmit() {
+      var _a5, _b4;
       try {
         const f = $("#backup-file").files[0];
         if (!f) throw Error("Fayl se\xE7in.");
@@ -4381,6 +4415,8 @@
         state.channel = state.channels[0].id;
         state.selected = null;
         state.playing = null;
+        (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
+        document.documentElement.classList.remove("native-preview");
         ++playGeneration;
         hls == null ? void 0 : hls.destroy();
         hls = null;
@@ -4410,6 +4446,16 @@
       if (action === "expand-player") {
         if (state.playing) enterPlayer();
         else toast("Select a channel first.");
+        return;
+      }
+      if (action === "licenses") {
+        try {
+          const response = await fetch("assets/licenses/libvlc-COPYING.LIB.txt");
+          if (!response.ok) throw Error();
+          modal("A\xE7\u0131q m\u0259nb\u0259 lisenziyalar\u0131", '<p>VideoLAN LibVLC 3.7.6 \xB7 LGPL 2.1 v\u0259 ya sonrak\u0131 versiya. AndroidX Media3 / AppCompat \xB7 Apache 2.0.</p><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;max-width:100%">' + esc(await response.text()) + "</pre>", "", { panel: true });
+        } catch {
+          toast("Lisenziya m\u0259tni a\xE7\u0131la bilm\u0259di.");
+        }
         return;
       }
       if (action === "display") return tvUI.displayMenu();
@@ -5127,7 +5173,67 @@
         if (state.playing && !video.paused && !document.hidden) showVideoError("Yay\u0131m ba\u011Flant\u0131s\u0131 dayand\u0131.");
       }, 2e4);
     });
+    function syncNativeBounds() {
+      var _a5;
+      if (!((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeBounds)) return;
+      const r = videoSurface.host.getBoundingClientRect();
+      window.TiviLoomNative.nativeBounds(JSON.stringify({ left: r.left, top: r.top, width: r.width, height: r.height, viewport: window.innerWidth, visible: r.width > 0 && r.height > 0 && !videoSurface.host.hidden && !$("#modal-root").children.length && !!state.playing && !document.hidden }));
+    }
+    new MutationObserver(syncNativeBounds).observe($("#modal-root"), { childList: true });
+    window.addEventListener("TiviLoomNativeExpand", enterPlayer);
+    window.addEventListener("TiviLoomNativeExit", () => {
+      exitPlayer();
+      syncNativeBounds();
+    });
+    window.addEventListener("TiviLoomNativeAction", (e) => {
+      var _a5, _b4;
+      const [action, ...parts] = String(e.detail || "").split(":");
+      const value = parts.join(":");
+      if (action === "panel") {
+        (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeCatalogue) == null ? void 0 : _b4.call(_a5, JSON.stringify({ mode: value, catalogue: state.channels.filter((x) => {
+          var _a6, _b5;
+          return !((_a6 = state.hiddenChannels) == null ? void 0 : _a6.includes(x.id)) && !((_b5 = state.hiddenGroups) == null ? void 0 : _b5.includes(x.group)) && advanced.groupAccessible(x.group);
+        }).map(({ id, name, group }) => ({ id, name, group })), history: state.history }));
+        return;
+      }
+      if (action === "fit") {
+        state.prefs.fit = value;
+        save("prefs");
+        applyPrefs();
+        return;
+      }
+      if (action === "muted") {
+        state.prefs.muted = value === "true";
+        save("prefs");
+        applyPrefs();
+        return;
+      }
+      if (action === "phase") {
+        setPlaybackPhase(value);
+        return;
+      }
+      if (action === "channel") {
+        const c = state.channels.find((c2) => c2.id === value);
+        if (c) play(c, state.full);
+        return;
+      }
+      if (action === "command") {
+        if (value === "next") channelStep(1);
+        else if (value === "previous") channelStep(-1);
+        else if (value === "favorite") favorite();
+        else if (value === "mute") {
+          state.prefs.muted = !state.prefs.muted;
+          save("prefs");
+          const c = state.channels.find((c2) => c2.id === state.playing);
+          if (c) play(c, state.full);
+        } else if (value === "settings") tvUI.settings();
+        else if (value === "sleep") tvUI.sleepPanel();
+      }
+    });
     window.addEventListener("TiviLoomNativePlayerError", () => {
+      var _a5, _b4;
+      (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
+      document.documentElement.classList.remove("native-preview");
       state.playing = null;
       state.full = false;
       delete video.dataset.tiviSource;
@@ -5138,6 +5244,7 @@
     });
     let suspended = false;
     function tvSuspend() {
+      var _a5, _b4;
       if ($("#mini-player") && !$("#mini-player").hidden) toggleMini(true);
       advanced.suspend();
       clearTimeout(reconnectTimer);
@@ -5146,6 +5253,8 @@
       if (suspended) return;
       suspended = true;
       persistResume();
+      (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
+      document.documentElement.classList.remove("native-preview");
       ++playGeneration;
       hls == null ? void 0 : hls.destroy();
       hls = null;

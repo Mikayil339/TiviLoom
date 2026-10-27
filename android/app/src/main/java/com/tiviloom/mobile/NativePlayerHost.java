@@ -1,0 +1,180 @@
+package com.tiviloom.mobile;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.os.Bundle;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.content.res.ColorStateList;
+import android.net.Uri;
+import android.view.*;
+import android.widget.*;
+import androidx.media3.common.*;
+import androidx.media3.exoplayer.*;
+import androidx.media3.exoplayer.analytics.AnalyticsListener;
+import androidx.media3.datasource.DefaultHttpDataSource;
+import androidx.media3.ui.*;
+import org.json.JSONObject;
+import java.util.*;
+
+/** Single native decoder with touch controls independent of the WebView layout. */
+public final class NativePlayerHost {
+ private final Activity owner;
+ private final Runnable expand,exit;
+ private final java.util.function.Consumer<String> event;
+ private boolean fullscreen=false;
+ private String sourceKey="";
+ private org.json.JSONArray catalogue=new org.json.JSONArray(),history=new org.json.JSONArray();
+ private ImageButton expandButton;
+ public FrameLayout view(){return root;}
+ private ExoPlayer player;private CompatibilityPlayer compatibility;private JSONObject sourceData;private boolean compatibilityAttempted=false;
+ private PlayerView playerView;
+ private FrameLayout root,controls;
+ private LinearLayout top,bottom;
+ private ImageButton playButton,rewind,forward,lockButton;
+ private TextView status,time,title;
+ private SeekBar seek;
+ private final Handler handler=new Handler(Looper.getMainLooper());
+ private boolean locked=false,dragging=false,resumePlayback=true,dialogOpen=false,released=false;
+ private int fit=0,retries=0;
+ private boolean allowReconnect=true,fitConfigured=false;
+ private long selectedAt;
+ private long resumePosition=0;
+ private TrackSelectionParameters savedTracks;
+ private String channelName="TiviLoom";
+ private final Runnable hide=()->{if(!dragging&&!dialogOpen&&isPlaying()){controls.setVisibility(View.GONE);if(!locked)lockButton.setVisibility(View.GONE);}};
+ private final Runnable progress=new Runnable(){public void run(){if(released)return;sync();handler.postDelayed(this,500);}};
+ private final Runnable retry=()->{if(!released&&player!=null){player.prepare();player.play();}};
+ private int dp(int n){return Math.round(n*owner.getResources().getDisplayMetrics().density);}
+ public NativePlayerHost(Activity owner,Runnable expand,Runnable exit,java.util.function.Consumer<String> event){
+  this.owner=owner;this.expand=expand;this.exit=exit;this.event=event;
+  root=new FrameLayout(owner);root.setBackgroundColor(Color.BLACK);
+  playerView=new PlayerView(owner);playerView.setUseController(false);playerView.setShowBuffering(PlayerView.SHOW_BUFFERING_WHEN_PLAYING);
+  root.addView(playerView,new FrameLayout.LayoutParams(-1,-1));
+  controls=new FrameLayout(owner);root.addView(controls,new FrameLayout.LayoutParams(-1,-1));
+  controls.setOnClickListener(v->toggleControls());playerView.setOnClickListener(v->toggleControls());
+  top=row();top.setGravity(Gravity.CENTER_VERTICAL);top.setPadding(dp(8),0,dp(72),0);top.setBackgroundColor(0xBB080C12);
+  FrameLayout.LayoutParams tp=new FrameLayout.LayoutParams(-1,dp(64),Gravity.TOP);controls.addView(top,tp);
+  top.addView(button(R.drawable.player_back,"Siyahıya qayıt",v->exit.run()),new LinearLayout.LayoutParams(dp(52),dp(52)));
+  title=new TextView(owner);title.setTextColor(Color.WHITE);title.setTextSize(18);title.setSingleLine(true);title.setEllipsize(android.text.TextUtils.TruncateAt.END);title.setPadding(dp(12),0,dp(8),0);
+  top.addView(title,new LinearLayout.LayoutParams(0,-2,1));
+  LinearLayout middle=row();middle.setGravity(Gravity.CENTER);FrameLayout.LayoutParams mp=new FrameLayout.LayoutParams(-2,dp(76),Gravity.CENTER);controls.addView(middle,mp);
+  rewind=button(R.drawable.player_rewind,"10 saniyə geri",v->jump(-10000));middle.addView(rewind,cell(56));
+  playButton=button(R.drawable.player_pause,"Fasilə",v->{if(compatibility!=null){if(isPlaying())compatibility.mp.pause();else compatibility.play();sync();return;}if(player==null)return;handler.removeCallbacks(retry);if(player.isPlaying())player.pause();else if(player.getPlayerError()!=null){retries=0;player.prepare();player.play();}else if(player.getPlaybackState()==Player.STATE_ENDED){player.seekToDefaultPosition();player.play();}else player.play();sync();showControls();});middle.addView(playButton,cell(72));
+  forward=button(R.drawable.player_forward,"10 saniyə irəli",v->jump(10000));middle.addView(forward,cell(56));
+  bottom=new LinearLayout(owner);bottom.setOrientation(LinearLayout.VERTICAL);bottom.setPadding(dp(16),dp(4),dp(16),dp(8));bottom.setBackgroundColor(0xCC080C12);
+  controls.addView(bottom,new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM));
+  seek=new SeekBar(owner);seek.setMax(10000);seek.setProgressTintList(ColorStateList.valueOf(0xFF00CDEB));seek.setThumbTintList(ColorStateList.valueOf(0xFF00CDEB));seek.setContentDescription("Video vaxtı");bottom.addView(seek,new LinearLayout.LayoutParams(-1,dp(40)));
+  seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onStartTrackingTouch(SeekBar s){dragging=true;handler.removeCallbacks(hide);}public void onProgressChanged(SeekBar s,int p,boolean user){if(user)time.setText(clock(duration()*p/10000)+" / "+clock(duration()));}public void onStopTrackingTouch(SeekBar s){if(seekable())seekTo(duration()*s.getProgress()/10000);dragging=false;showControls();}});
+  LinearLayout tools=row();tools.setGravity(Gravity.CENTER_VERTICAL);bottom.addView(tools,new LinearLayout.LayoutParams(-1,dp(52)));
+  time=new TextView(owner);time.setTextColor(Color.WHITE);time.setTextSize(14);time.setSingleLine(true);time.setPadding(dp(8),0,dp(8),0);tools.addView(time,new LinearLayout.LayoutParams(0,-2,1));
+  tools.addView(button(R.drawable.player_search,"Axtar",v->requestPanel("search")),cell(48));
+  tools.addView(button(R.drawable.player_list,"Kanal siyahısı",v->requestPanel("channels")),cell(48));
+  tools.addView(button(R.drawable.player_history,"Tarixçə",v->requestPanel("history")),cell(48));
+  tools.addView(button(R.drawable.player_more,"Digər funksiyalar",v->more()),cell(48));
+  tools.addView(button(R.drawable.player_audio,"Səs dilini seç",v->tracks(C.TRACK_TYPE_AUDIO,"Səs")),cell(48));
+  tools.addView(button(R.drawable.player_subtitles,"Altyazı seç",v->tracks(C.TRACK_TYPE_TEXT,"Altyazı")),cell(48));
+  tools.addView(button(R.drawable.player_fit,"Görüntü ölçüsü",v->{fit=(fit+1)%3;if(compatibility!=null)compatibility.fit(fit);playerView.setResizeMode(new int[]{AspectRatioFrameLayout.RESIZE_MODE_FIT,AspectRatioFrameLayout.RESIZE_MODE_ZOOM,AspectRatioFrameLayout.RESIZE_MODE_FILL}[fit]);event.accept("fit:"+new String[]{"contain","cover","fill"}[fit]);Toast.makeText(owner,new String[]{"Ölçüyə uyğun","Yaxınlaşdır","Ekranı doldur"}[fit],Toast.LENGTH_SHORT).show();showControls();}),cell(48));
+  lockButton=button(R.drawable.player_lock,"Ekranı kilidlə",v->{locked=!locked;controls.setVisibility(locked?View.GONE:View.VISIBLE);lockButton.setImageResource(locked?R.drawable.player_unlock:R.drawable.player_lock);lockButton.setContentDescription(locked?"Ekran kilidini aç":"Ekranı kilidlə");showControls();});
+  FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(dp(52),dp(52),Gravity.TOP|Gravity.RIGHT);lp.setMargins(dp(6),dp(6),dp(12),0);root.addView(lockButton,lp);
+  status=new TextView(owner);status.setTextColor(Color.WHITE);status.setTextSize(14);status.setMaxLines(2);status.setGravity(Gravity.CENTER);status.setPadding(dp(12),dp(8),dp(12),dp(8));status.setBackgroundColor(0xBB080C12);
+  FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-2,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL);sp.topMargin=dp(70);root.addView(status,sp);
+  root.setOnApplyWindowInsetsListener((v,insets)->{
+   int left=0,right=0,upper=0,lower=0;
+   if(fullscreen&&Build.VERSION.SDK_INT>=30){android.graphics.Insets i=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());left=i.left;right=i.right;upper=i.top;lower=i.bottom;}
+   else if(fullscreen){left=insets.getSystemWindowInsetLeft();right=insets.getSystemWindowInsetRight();upper=insets.getSystemWindowInsetTop();lower=insets.getSystemWindowInsetBottom();if(Build.VERSION.SDK_INT>=28&&insets.getDisplayCutout()!=null){left=Math.max(left,insets.getDisplayCutout().getSafeInsetLeft());right=Math.max(right,insets.getDisplayCutout().getSafeInsetRight());}}
+   controls.setPadding(left,upper,right,lower);FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)lockButton.getLayoutParams();p.topMargin=upper+dp(6);p.rightMargin=right+dp(12);lockButton.setLayoutParams(p);FrameLayout.LayoutParams st=(FrameLayout.LayoutParams)status.getLayoutParams();st.topMargin=upper+dp(70);status.setLayoutParams(st);return insets;
+  });
+  expandButton=button(R.drawable.player_fit,"Tam ekran",v->expand.run());
+  FrameLayout.LayoutParams ep=new FrameLayout.LayoutParams(dp(48),dp(48),Gravity.BOTTOM|Gravity.RIGHT);ep.setMargins(dp(8),dp(8),dp(8),dp(8));root.addView(expandButton,ep);
+  setFullscreen(false);handler.post(progress);
+ }
+ public void setFullscreen(boolean full){fullscreen=full;controls.setVisibility(full?View.VISIBLE:View.GONE);lockButton.setVisibility(full?View.VISIBLE:View.GONE);expandButton.setVisibility(full?View.GONE:View.VISIBLE);if(full)showControls();root.requestApplyInsets();}
+ public void load(String payload)throws Exception{
+  JSONObject data=new JSONObject(payload);catalogue=data.optJSONArray("catalogue");history=data.optJSONArray("history");if(catalogue==null)catalogue=new org.json.JSONArray();if(history==null)history=new org.json.JSONArray();
+  String key=data.getString("url")+"\n"+data.optString("userAgent")+"\n"+data.optString("referer");
+  channelName=data.optString("name","TiviLoom");title.setText(channelName);
+  if(compatibility!=null&&sourceKey.equals(key)){compatibility.setMuted(data.optBoolean("muted",false));return;}
+  if(player!=null&&sourceKey.equals(key)){if(player.getPlayerError()!=null){retries=0;player.prepare();}player.setVolume(data.optBoolean("muted",false)?0:1);return;}
+  if(compatibility!=null){root.removeView(compatibility.view);compatibility.release();compatibility=null;}compatibilityAttempted=false;sourceData=data;playerView.setVisibility(View.VISIBLE);
+  handler.removeCallbacks(retry);if(player!=null){playerView.setPlayer(null);player.release();player=null;}retries=0;resumePosition=0;savedTracks=null;resumePlayback=true;sourceKey=key;start(payload);
+ }
+ public void release(){if(compatibility!=null){compatibility.release();compatibility=null;}released=true;handler.removeCallbacksAndMessages(null);playerView.setPlayer(null);if(player!=null){player.release();player=null;}}
+ public void pause(){if(compatibility!=null)compatibility.mp.pause();handler.removeCallbacks(retry);if(player!=null)player.pause();}
+ public void back(){handleBack();}
+ private LinearLayout row(){LinearLayout l=new LinearLayout(owner);l.setOrientation(LinearLayout.HORIZONTAL);return l;}
+ private LinearLayout.LayoutParams cell(int size){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(size),dp(size));p.setMargins(dp(4),0,dp(4),0);return p;}
+ private ImageButton button(int icon,String label,View.OnClickListener action){ImageButton b=new ImageButton(owner);b.setImageResource(icon);b.setScaleType(ImageView.ScaleType.CENTER_INSIDE);b.setPadding(dp(14),dp(14),dp(14),dp(14));b.setContentDescription(label);b.setMinimumWidth(dp(48));b.setMinimumHeight(dp(48));GradientDrawable bg=new GradientDrawable();bg.setColor(0x99202A36);bg.setCornerRadius(dp(36));b.setBackground(new android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(0x5500CDEB),bg,null));b.setOnClickListener(v->{action.onClick(v);showControls();});return b;}
+ private void start(String payload)throws Exception{
+  selectedAt=System.nanoTime();
+  JSONObject data=new JSONObject(payload==null?"{}":payload);Uri uri=Uri.parse(data.getString("url"));if(!Arrays.asList("http","https").contains(uri.getScheme())||uri.getUserInfo()!=null)throw new IllegalArgumentException();
+  channelName=data.optString("name","TiviLoom");title.setText(channelName);allowReconnect=data.optBoolean("autoReconnect",true);if(!fitConfigured){String mode=data.optString("fit","contain");fit=mode.equals("fill")?2:mode.equals("cover")||mode.equals("cinema-zoom")?1:0;fitConfigured=true;}playerView.setResizeMode(new int[]{AspectRatioFrameLayout.RESIZE_MODE_FIT,AspectRatioFrameLayout.RESIZE_MODE_ZOOM,AspectRatioFrameLayout.RESIZE_MODE_FILL}[fit]);
+  String agent=data.optString("userAgent","");if(agent.isEmpty())agent="TiviLoom-Android/0.6.10";
+  String referer=data.optString("referer","");if((agent+referer).contains("\r")||(agent+referer).contains("\n"))throw new IllegalArgumentException();
+  Map<String,String> headers=new HashMap<>();headers.put("User-Agent",agent);if(!referer.isEmpty())headers.put("Referer",referer);
+  DefaultHttpDataSource.Factory http=new DefaultHttpDataSource.Factory().setUserAgent(agent).setConnectTimeoutMs(8000).setReadTimeoutMs(12000).setAllowCrossProtocolRedirects(true).setDefaultRequestProperties(headers);
+  DefaultLoadControl loadControl=new DefaultLoadControl.Builder().setBufferDurationsMs(1500,15000,500,1500).setPrioritizeTimeOverSizeThresholds(true).build();
+  player=new ExoPlayer.Builder(owner).setRenderersFactory(new DefaultRenderersFactory(owner).setEnableDecoderFallback(true)).setMediaSourceFactory(new androidx.media3.exoplayer.source.DefaultMediaSourceFactory(http)).setLoadControl(loadControl).build();
+  player.setAudioAttributes(new AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(),true);player.setHandleAudioBecomingNoisy(true);player.setVolume(data.optBoolean("muted",false)?0f:1f);playerView.setPlayer(player);
+  player.addListener(new Player.Listener(){
+   @Override public void onTracksChanged(Tracks tracks){if(compatibilityAttempted||released)return;boolean unsupported=false;for(int type:new int[]{C.TRACK_TYPE_AUDIO,C.TRACK_TYPE_VIDEO}){boolean present=false,supported=false;for(Tracks.Group g:tracks.getGroups())if(g.getType()==type){present=true;supported|=g.isSupported();}if(present&&!supported)unsupported=true;}if(unsupported){ExoPlayer expected=player;handler.post(()->{if(player==expected)startCompatibility();});}}
+
+   @Override public void onPlaybackStateChanged(int state){if(state==Player.STATE_BUFFERING){event.accept("phase:buffering");status.setVisibility(View.VISIBLE);status.setText("Yayım yüklənir…");}else if(state==Player.STATE_READY){event.accept("phase:playing");handler.removeCallbacks(retry);retries=0;status.setVisibility(View.GONE);}else if(state==Player.STATE_ENDED){status.setVisibility(View.VISIBLE);status.setText("Yayım bitdi");showControls();}sync();}
+   @Override public void onIsPlayingChanged(boolean value){sync();if(!value)showControls();else showControls();}
+   @Override public void onPlayerError(PlaybackException e){if(e.errorCode>=3000&&e.errorCode<5000&&!compatibilityAttempted){{ExoPlayer expected=player;handler.post(()->{if(player==expected)startCompatibility();});}return;}event.accept("phase:error");status.setVisibility(View.VISIBLE);boolean network=e.errorCode>=2000&&e.errorCode<3000&&e.errorCode!=PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS;if(allowReconnect&&network&&resumePlayback&&retries<2){retries++;status.setText("Bağlantı yenilənir · "+retries+"/2");handler.postDelayed(retry,retries*1000L);}else{status.setText(e.errorCode>=4000&&e.errorCode<5000?"Bu cihaz yayım formatını aça bilmədi":e.errorCode==PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS?"Provayder yayımı təqdim etmədi":"Yayım açıla bilmədi. Yenidən sınamaq üçün Oynat düyməsinə toxunun.");showControls();}}
+  });
+  player.addAnalyticsListener(new AnalyticsListener(){@Override public void onRenderedFirstFrame(AnalyticsListener.EventTime e,Object output,long renderTimeMs){android.util.Log.i("TiviLoomPlayback","first_frame_ms="+(System.nanoTime()-selectedAt)/1000000L);}});
+  player.setMediaItem(new MediaItem.Builder().setUri(uri).build());if(savedTracks!=null)player.setTrackSelectionParameters(savedTracks);if(resumePosition>0)player.seekTo(resumePosition);player.prepare();player.setPlayWhenReady(resumePlayback);showControls();
+ }
+ private void more(){String[] labels={"Əvvəlki kanal","Növbəti kanal","Sevimlilərə əlavə et / çıxar","Ayarlar","Yuxu taymeri","Səsi aç / bağla"};String[] commands={"previous","next","favorite","settings","sleep","mute"};AlertDialog d=new AlertDialog.Builder(owner).setTitle("Funksiyalar").setItems(labels,(dialog,which)->{if(commands[which].equals("mute")&&(player!=null||compatibility!=null)){boolean muted=compatibility!=null?compatibility.mp.getVolume()>0:player.getVolume()>0;if(compatibility!=null)compatibility.setMuted(muted);else player.setVolume(muted?0:1);event.accept("muted:"+muted);}else event.accept("command:"+commands[which]);}).create();dialogOpen=true;showTrackDialog(d);}
+ public void catalogue(String payload)throws Exception{JSONObject data=new JSONObject(payload);catalogue=data.getJSONArray("catalogue");history=data.getJSONArray("history");channelPanel(data.getString("mode"));}
+ private void requestPanel(String mode){if(owner instanceof MainActivity)event.accept("panel:"+mode);else channelPanel(mode);}
+ private void channelPanel(String mode){
+  LinearLayout content=new LinearLayout(owner);content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(16),dp(8),dp(16),dp(8));
+  EditText query=new EditText(owner);query.setSingleLine(true);query.setHint("Kanal və ya kateqoriya axtar");content.addView(query,new LinearLayout.LayoutParams(-1,dp(52)));
+  ListView list=new ListView(owner);content.addView(list,new LinearLayout.LayoutParams(-1,dp(260)));
+  java.util.List<JSONObject> entries=new ArrayList<>();
+  if(mode.equals("history")){for(int h=0;h<history.length();h++)for(int i=0;i<catalogue.length();i++){JSONObject c=catalogue.optJSONObject(i);if(c!=null&&c.optString("id").equals(history.optString(h)))entries.add(c);}}
+  else for(int i=0;i<catalogue.length();i++){JSONObject c=catalogue.optJSONObject(i);if(c!=null)entries.add(c);}
+  java.util.List<JSONObject> shown=new ArrayList<>();ArrayAdapter<String> adapter=new ArrayAdapter<>(owner,android.R.layout.simple_list_item_1);list.setAdapter(adapter);
+  Runnable filter=()->{String q=query.getText().toString().toLowerCase(Locale.ROOT).trim();shown.clear();adapter.clear();for(JSONObject c:entries){String label=c.optString("name")+" · "+c.optString("group");if(label.toLowerCase(Locale.ROOT).contains(q)){shown.add(c);adapter.add(label);}}adapter.notifyDataSetChanged();};
+  query.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){filter.run();}public void afterTextChanged(android.text.Editable e){}});filter.run();
+  AlertDialog dialog=new AlertDialog.Builder(owner).setTitle(mode.equals("history")?"Tarixçə":mode.equals("search")?"Axtar":"Kanal siyahısı").setView(content).setNegativeButton("Bağla",null).create();
+  list.setOnItemClickListener((parent,v,position,id)->{JSONObject c=shown.get(position);dialog.dismiss();event.accept("channel:"+c.optString("id"));});dialogOpen=true;showTrackDialog(dialog);if(mode.equals("search")){query.requestFocus();dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);}
+ }
+ private void tracks(int type,String label){
+  if(compatibility!=null){org.videolan.libvlc.MediaPlayer.TrackDescription[] tracks=type==C.TRACK_TYPE_AUDIO?compatibility.mp.getAudioTracks():compatibility.mp.getSpuTracks();if(tracks==null||tracks.length==0){dialogOpen=true;showTrackDialog(new AlertDialog.Builder(owner).setTitle(label).setMessage("Bu yayımda seçim üçün trek yoxdur.").setPositiveButton("OK",null).create());return;}String[] names=new String[tracks.length];int selected=type==C.TRACK_TYPE_AUDIO?compatibility.mp.getAudioTrack():compatibility.mp.getSpuTrack(),checked=-1;for(int i=0;i<tracks.length;i++){names[i]=tracks[i].name;if(tracks[i].id==selected)checked=i;}dialogOpen=true;showTrackDialog(new AlertDialog.Builder(owner).setTitle(label).setSingleChoiceItems(names,checked,(d,which)->{if(type==C.TRACK_TYPE_AUDIO)compatibility.mp.setAudioTrack(tracks[which].id);else compatibility.mp.setSpuTrack(tracks[which].id);d.dismiss();}).setNegativeButton("Bağla",null).create());return;}
+  if(player==null)return;handler.removeCallbacks(hide);dialogOpen=true;
+  android.app.Dialog dialog;
+  if(player.getCurrentTracks().getGroups().stream().noneMatch(g->g.getType()==type))dialog=new AlertDialog.Builder(owner).setTitle(label).setMessage("Bu yayımda seçim üçün trek yoxdur.").setPositiveButton("OK",null).create();
+  else dialog=new TrackSelectionDialogBuilder(owner,label,player,type).setTheme(androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert).setShowDisableOption(type==C.TRACK_TYPE_TEXT).setIsDisabled(player.getTrackSelectionParameters().disabledTrackTypes.contains(type)).build();
+  showTrackDialog(dialog);
+ }
+ private void showTrackDialog(android.app.Dialog dialog){
+  if(Build.VERSION.SDK_INT>=33){
+   android.window.OnBackInvokedCallback back=dialog::dismiss;
+   dialog.setOnDismissListener(d->{dialog.getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(back);dialogOpen=false;showControls();});
+   dialog.show();dialog.getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_OVERLAY,back);
+  }else{
+   dialog.setOnDismissListener(d->{dialogOpen=false;showControls();});
+   dialog.setOnKeyListener((d,key,event)->{if(key!=KeyEvent.KEYCODE_BACK)return false;if(event.getAction()==KeyEvent.ACTION_UP)dialog.dismiss();return true;});dialog.show();
+  }
+ }
+
+ private void jump(long amount){if(seekable()){seekTo(Math.max(0,Math.min(duration(),position()+amount)));showControls();}}
+ private String clock(long ms){long seconds=Math.max(0,ms/1000);return seconds>=3600?String.format(Locale.US,"%d:%02d:%02d",seconds/3600,seconds/60%60,seconds%60):String.format(Locale.US,"%d:%02d",seconds/60,seconds%60);}
+ private boolean isPlaying(){return compatibility!=null?compatibility.mp.isPlaying():player!=null&&player.isPlaying();}
+ private long duration(){return compatibility!=null?Math.max(0,compatibility.mp.getLength()):player==null?0:Math.max(0,player.getDuration());}
+ private long position(){return compatibility!=null?Math.max(0,compatibility.mp.getTime()):player==null?0:player.getCurrentPosition();}
+ private boolean seekable(){return compatibility!=null?compatibility.mp.isSeekable()&&duration()>0:player!=null&&player.isCurrentMediaItemSeekable()&&duration()>0;}
+ private void seekTo(long value){if(compatibility!=null)compatibility.mp.setTime(value);else if(player!=null)player.seekTo(value);}
+ private void startCompatibility(){if(released||compatibilityAttempted||sourceData==null)return;compatibilityAttempted=true;handler.removeCallbacks(retry);if(player!=null){playerView.setPlayer(null);player.release();player=null;}playerView.setVisibility(View.GONE);try{compatibility=new CompatibilityPlayer(owner,sourceData,phase->{event.accept("phase:"+phase);status.setVisibility(phase.equals("playing")?View.GONE:View.VISIBLE);status.setText(phase.equals("error")?"Yayım açıla bilmədi":phase.equals("ended")?"Yayım bitdi":"Yayım yüklənir…");sync();});root.addView(compatibility.view,0,new FrameLayout.LayoutParams(-1,-1));compatibility.view.setOnClickListener(v->toggleControls());compatibility.fit(fit);compatibility.play();}catch(Exception e){status.setVisibility(View.VISIBLE);status.setText("Uyğunluq pleyeri açıla bilmədi");event.accept("phase:error");}}
+ private void sync(){if((player==null&&compatibility==null)||released)return;boolean playing=compatibility!=null?compatibility.mp.isPlaying():player.getPlayerError()==null&&player.getPlayWhenReady()&&player.getPlaybackState()!=Player.STATE_ENDED;playButton.setImageResource(playing?R.drawable.player_pause:R.drawable.player_play);playButton.setContentDescription(playing?"Fasilə":"Oynat");boolean canSeek=seekable();rewind.setEnabled(canSeek);forward.setEnabled(canSeek);rewind.setAlpha(canSeek?1f:.35f);forward.setAlpha(canSeek?1f:.35f);seek.setVisibility(canSeek?View.VISIBLE:View.GONE);if(!dragging){if(canSeek){seek.setProgress((int)(10000L*position()/duration()));time.setText(clock(position())+" / "+clock(duration()));}else time.setText("CANLI");}}
+ private void toggleControls(){if(!fullscreen){expand.run();return;}if(locked)return;if(controls.getVisibility()==View.VISIBLE){controls.setVisibility(View.GONE);lockButton.setVisibility(View.GONE);}else showControls();}
+ private void showControls(){if(!fullscreen){controls.setVisibility(View.GONE);lockButton.setVisibility(View.GONE);return;}handler.removeCallbacks(hide);if(locked){controls.setVisibility(View.GONE);lockButton.setVisibility(View.VISIBLE);return;}controls.setVisibility(View.VISIBLE);lockButton.setVisibility(View.VISIBLE);handler.postDelayed(hide,4000);}
+ private void hideSystemBars(){if(Build.VERSION.SDK_INT>=30){WindowInsetsController c=owner.getWindow().getInsetsController();if(c!=null){c.hide(WindowInsets.Type.systemBars());c.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);}}else owner.getWindow().getDecorView().setSystemUiVisibility(5894|512|1024);}
+ private void handleBack(){if(locked){locked=false;lockButton.setImageResource(R.drawable.player_lock);lockButton.setContentDescription("Ekranı kilidlə");showControls();}else exit.run();}
+}

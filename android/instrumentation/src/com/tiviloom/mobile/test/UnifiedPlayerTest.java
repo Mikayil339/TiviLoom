@@ -1,0 +1,26 @@
+package com.tiviloom.mobile.test;
+import android.app.*;import android.content.*;import android.os.*;import android.webkit.*;import org.json.*;import java.lang.reflect.*;import java.util.concurrent.*;
+/** Real MainActivity bridge and orientation transitions, using a local fixture only. */
+public final class UnifiedPlayerTest extends NativePlayerTest {
+ Bundle arguments;WebView web;
+ @Override public void onCreate(Bundle args){arguments=args;super.onCreate(args);}
+ Object decoder()throws Exception{Object compat=field("compatibility");return compat!=null?compat:field("player");}
+ @Override boolean playing()throws Exception{Object compat=field("compatibility");if(compat==null)return super.playing();java.lang.reflect.Field f=compat.getClass().getDeclaredField("mp");f.setAccessible(true);Object mp=f.get(compat);return (boolean)mp.getClass().getMethod("isPlaying").invoke(mp);}
+ @Override Object host()throws Exception{Field f=activity.getClass().getDeclaredField("nativePlayer");f.setAccessible(true);return f.get(activity);}
+ String eval(String js)throws Exception{CountDownLatch l=new CountDownLatch(1);String[] v={"null"};runOnMainSync(()->web.evaluateJavascript(js,r->{v[0]=r;l.countDown();}));if(!l.await(20,TimeUnit.SECONDS))throw new AssertionError("JS timeout");return v[0];}
+ void waitJS(String js)throws Exception{long end=SystemClock.uptimeMillis()+90000;while(SystemClock.uptimeMillis()<end){dismissSystemOverlays();if("true".equals(eval(js)))return;SystemClock.sleep(200);}throw new AssertionError("UI state timeout");}
+ void full(boolean value)throws Exception{eval("TiviLoomNative.nativeFullscreen("+value+")");waitFor(()->{Field f=activity.getClass().getDeclaredField("nativeFull");f.setAccessible(true);return f.getBoolean(activity)==value;});}
+ @Override public void onStart(){try{
+ activity=startActivitySync(new Intent().setClassName("com.tiviloom.mobile","com.tiviloom.mobile.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));Field wf=activity.getClass().getDeclaredField("web");wf.setAccessible(true);web=(WebView)wf.get(activity);waitJS("document.querySelector('#boot')?.hidden===true");
+ eval("window.__fixturePending=true;localStorage.setItem('tl-tv-ready','true');localStorage.setItem('tl-prefs',JSON.stringify({autoplay:false,muted:false,motion:false}));const r=indexedDB.open('TiviLoom',1);r.onsuccess=()=>{const tx=r.result.transaction('library','readwrite');tx.objectStore('library').put({version:2,activeId:'fixture',playlists:[{id:'fixture',name:'Local fixture',imported:true,channels:[{id:'one',name:'Fixture One',type:'tv',group:'QA',url:"+JSONObject.quote(arguments.getString("url","http://10.0.2.2:18888/demo.mp4"))+"}],programs:[],favorites:[],history:[]}]},'active');tx.oncomplete=()=>{r.result.close();window.__fixtureReady=true}};");
+ waitJS("window.__fixtureReady===true");eval("window.__reloadPending=true;location.reload()");
+ waitJS("!window.__reloadPending && !!document.querySelector('[data-channel=one]')&&document.querySelector('#boot').hidden");eval("document.querySelector('[data-channel=one]').click()");
+ check("MainActivity native preview decodes",()->waitFor(()->host()!=null&&playing()));
+ Object original=decoder();
+ check("MainActivity expands same decoder",()->{eval("window.dispatchEvent(new Event('TiviLoomNativeExpand'))");waitJS("innerWidth>innerHeight&&!document.querySelector('#player').hidden");waitFor(()->playing());require(decoder()==original,"Fullscreen replaced decoder");capture("unified-fullscreen");});
+ check("MainActivity Back returns playing preview",()->{sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK);waitJS("document.querySelector('#player').hidden");waitFor(()->playing());require(decoder()==original,"Back replaced decoder");});
+ check("MainActivity repeated expansion keeps source",()->{eval("window.dispatchEvent(new Event('TiviLoomNativeExpand'))");waitJS("!document.querySelector('#player').hidden");waitFor(()->playing());require(decoder()==original,"Repeated expansion replaced decoder");});
+ check("MainActivity channel list preserves player",()->{tapLabel("Kanal siyahısı");waitFor(()->(boolean)field("dialogOpen"));sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK);waitFor(()->!(boolean)field("dialogOpen"));require(decoder()==original,"Channel panel replaced decoder");});
+ check("Startup switch thumb stays inside track in both states",()->{eval("window.dispatchEvent(new Event('TiviLoomNativeExit'));document.querySelector('[data-tv=settings]').click();document.querySelector('[data-tv=setting-library]').click()");waitJS("!!document.querySelector('.startup-setting input')");for(boolean checked:new boolean[]{false,true}){eval("document.querySelector('.startup-setting input').checked="+checked);waitJS("(()=>{const e=document.querySelector('.startup-setting input'),r=e.getBoundingClientRect(),s=getComputedStyle(e,'::before');return r.width===42&&r.height===24&&parseFloat(s.left)>=0&&parseFloat(s.left)+parseFloat(s.width)<=r.width})()");}});
+ }catch(Throwable e){failed++;report.append("FATAL ").append(e.toString());}finally{if(activity!=null)runOnMainSync(()->activity.finish());}Bundle result=new Bundle();result.putString("stream",report+"\nPASSED="+passed+" FAILED="+failed+"\n");finish(failed==0?-1:0,result);}
+}

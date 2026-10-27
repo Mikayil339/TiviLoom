@@ -29,17 +29,17 @@ jobs:
         with:
           gradle-version: '8.11.1'
       - name: Install Android build platform
-        run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager 'platforms;android-36' 'build-tools;35.0.0'"
+        run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager 'platforms;android-36' 'build-tools;35.0.0' 'ndk;27.1.12297006'"
       - run: npm ci
       - run: npm run build
       - run: npm test
       - name: Build native Android phone APK
         working-directory: android
-        run: gradle --no-daemon --max-workers=2 assembleDebug
+        run: gradle --no-daemon --max-workers=2 assembleDebug -PtargetAbis=arm64-v8a
       - name: Verify installable package signature
         run: "$ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose android/app/build/outputs/apk/debug/app-debug.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: TiviLoom-0.6.9-Android-personal-test-APK
+          name: TiviLoom-0.6.10-Android-arm64-personal-test-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error

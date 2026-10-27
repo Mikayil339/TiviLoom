@@ -274,3 +274,9 @@ html.phone{--bg:#0d1319;--panel:#17212b;--fg:#f5f7fa;--muted:#94a5b5;--accent:#7
 .phone #player-close,.phone #player .icon-button{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;padding:10px;box-sizing:border-box}
 .phone .player-controls{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:max(12px,env(safe-area-inset-bottom))}
 .phone button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+/* Keep preview controls in their own frame and make switches independent of checkbox defaults. */
+.phone .hero{position:relative}
+.phone #preview-play{box-sizing:border-box;padding:0;width:48px;height:48px;min-width:48px;min-height:48px;line-height:1}
+.phone .startup-setting input[type=checkbox]{appearance:none;box-sizing:border-box;flex:0 0 42px;width:42px;min-width:42px;max-width:42px;height:24px;min-height:24px;max-height:24px;padding:0;border:0;overflow:hidden}
+.phone.native-preview #preview-play{visibility:hidden}
