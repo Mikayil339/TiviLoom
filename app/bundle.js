@@ -1,6 +1,6 @@
 (() => {
   // src/version.mjs
-  var VERSION = "0.6.4";
+  var VERSION = "0.6.8";
 
   // src/library-store.mjs
   function createLibraryStore({ indexedDB: indexedDB2, storage, timeout = 5e3 } = {}) {
@@ -460,7 +460,7 @@
   }
 
   // src/usability.mjs
-  var remoteChoices = ["favorite", "guide", "search", "context", "last-channel", "playlists", "phone", "favorites", "mute"];
+  var remoteChoices = ["favorite", "guide", "search", "context", "last-channel", "playlists", "favorites", "mute"];
   function numberKey(e) {
     if (/^[0-9]$/.test(e.key || "")) return e.key;
     const c = e.keyCode || e.which;
@@ -619,66 +619,23 @@
     return { ...catalog, playlists, activeId: playlists.some((p) => p.id === catalog.activeId && p.enabled !== false) ? catalog.activeId : ((_a3 = playlists.find((p) => p.enabled !== false)) == null ? void 0 : _a3.id) || null };
   }
 
-  // src/backups.mjs
-  function safePrefs(prefs = {}) {
-    const out = {};
-    for (const k of ["compact", "large", "motion", "groups", "muted", "autoplay", "autoReconnect"]) if (typeof prefs[k] === "boolean") out[k] = prefs[k];
-    if (["contain", "cover", "fill", "cinema-zoom", "reduced", "4:3", "16:9", "2.35:1"].includes(prefs.fit)) out.fit = prefs.fit;
-    if (prefs.remoteActions) out.remoteActions = Object.fromEntries(Object.entries(prefs.remoteActions).filter(([k, v]) => ["favorite", "guide", "search", "context"].includes(k) && ["favorite", "guide", "search", "context", "last-channel", "playlists", "phone", "favorites", "mute"].includes(v)));
-    if (["favorite", "guide", "search", "context", "last-channel", "playlists", "phone", "favorites", "mute"].includes(prefs.longOK)) out.longOK = prefs.longOK;
-    return out;
-  }
-  function makeBackup(catalog, prefs) {
-    return { format: "TiviLoom", version: 2, created: (/* @__PURE__ */ new Date()).toISOString(), catalog: { ...catalog, playlists: catalog.playlists.map((p) => ({ ...p, groupPins: {} })) }, prefs: safePrefs(prefs) };
-  }
-  function validateBackup(data) {
-    if ((data == null ? void 0 : data.format) !== "TiviLoom" || ![1, 2].includes(data.version)) throw Error("This is not a TiviLoom backup.");
-    const catalog = data.version === 1 ? loadCatalog({ ...data, imported: true }, data) : loadCatalog(data.catalog);
-    if (!catalog.playlists.length || catalog.playlists.length > 200) throw Error("The backup has no valid playlists or exceeds the limit.");
-    for (const p of catalog.playlists) {
-      if (p.channels.length > 1e5) throw Error("Too many channels.");
-      for (const c of p.channels) {
-        if (typeof c.id !== "string" || typeof c.name !== "string" || !["tv", "movie"].includes(c.type)) throw Error("Invalid channel data.");
-        if (c.demo && /^\/?assets\//.test(c.url)) continue;
-        const u = new URL(c.url);
-        if (!["http:", "https:"].includes(u.protocol) || u.username || u.password) throw Error("Invalid channel address.");
-      }
-    }
-    return { catalog, prefs: safePrefs(data.prefs) };
-  }
-  function mergeBackup(current, backup, idFactory) {
-    var _a3;
-    let next = { ...current, playlists: [...current.playlists] }, active = null;
-    for (const p of backup.catalog.playlists) {
-      const id = idFactory();
-      next = addPlaylist(next, { ...p, name: p.name, source: p.name }, id);
-      if (p.id === backup.catalog.activeId) active = id;
-    }
-    const preferred = active || next.activeId;
-    return { ...next, activeId: next.playlists.some((p) => p.id === preferred && p.enabled !== false) ? preferred : ((_a3 = next.playlists.find((p) => p.enabled !== false)) == null ? void 0 : _a3.id) || null };
-  }
-
   // src/advanced-ui.mjs
   function mountAdvanced(ctx) {
     const { state, $, $$, esc, toast, platform: platform2 } = ctx;
-    let editingId = null, channelId = null, pinAction = null, unlockedUntil = 0, pinFailures = 0, pinBlockedUntil = 0, phone = null, phoneTimer = null, phoneBusy = false, phonePolling = false, phoneEpoch = 0, job = null, digits = "", digitTimer, hudTimer, refreshBusy = false;
+    let editingId = null, channelId = null, pinAction = null, unlockedUntil = 0, pinFailures = 0, pinBlockedUntil = 0, digits = "", digitTimer, hudTimer, refreshBusy = false;
     const refreshAttempts = /* @__PURE__ */ new Map();
-    const id = () => {
-      var _a3, _b2;
-      return ((_b2 = (_a3 = globalThis.crypto) == null ? void 0 : _a3.randomUUID) == null ? void 0 : _b2.call(_a3)) || "list-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
-    };
     const button = (label, action2, extra = "") => ["settings-root", "playlists"].includes(action2) ? "" : `<button class="setting-row" data-adv="${action2}" ${extra}><span class="setting-text">${label}</span><span>\u203A</span></button>`;
     function panel(title, body, section = "root", route = title, resume = null) {
       ctx.modal(title, body, "", { panel: true, key: route, resume: resume || (title === "Playlists" ? () => settings("sources") : null) });
       $(".settings-panel").dataset.tvSettings = section;
     }
     function error(text) {
-      const target = $("#adv-status") || $("#phone-status");
+      const target = $("#adv-status");
       if (target) target.textContent = text;
       else toast(text);
     }
     function optionList(selected) {
-      const names = { favorite: "Favorites", guide: "TV guide", search: "Search", context: "Channel menu", "last-channel": "Last watched channel", playlists: "Playlists", phone: "Connect phone", favorites: "Favorite channels", mute: "Mute / unmute" };
+      const names = { favorite: "Favorites", guide: "TV guide", search: "Search", context: "Channel menu", "last-channel": "Last watched channel", playlists: "Playlists", favorites: "Favorite channels", mute: "Mute / unmute" };
       return remoteChoices.map((v) => `<option value="${v}" ${v === selected ? "selected" : ""}>${names[v]}</option>`).join("");
     }
     function guard(kind, action2, c) {
@@ -716,12 +673,12 @@
       var _a3;
       if (section === "sources") {
         const catalog = ctx.getCatalog();
-        panel("Playlists", button("Back to settings", "settings-root") + `<div class="settings-section-title">Saved playlists \xB7 ${catalog.playlists.length}</div>` + catalog.playlists.map((p) => `<div class="playlist-entry"><button class="setting-row playlist-row" data-tv="playlist-select" data-id="${esc(p.id)}" aria-pressed="${p.id === catalog.activeId}" ${p.enabled === false ? "disabled" : ""}><span class="setting-text">${esc(p.name)}<small>${p.channels.length} channels \xB7 ${p.enabled === false ? "Disabled" : p.id === catalog.activeId ? "Active" : "Saved"}</small></span><span>${p.id === catalog.activeId ? "\u2713" : "\u203A"}</span></button><button class="playlist-options" data-adv="playlist-details" data-id="${esc(p.id)}" aria-label="Options for ${esc(p.name)}">\u22EF</button></div>`).join("") + `<div class="menu-list"><button data-tv="import">\uFF0B Add playlist</button><button data-adv="phone">Add from phone / QR</button><button data-action="epg">EPG for active playlist</button><button data-tv="sample">Load sample playlist</button></div>`, "sources");
+        panel("Playlists", button("Back to settings", "settings-root") + `<div class="settings-section-title">Saved playlists \xB7 ${catalog.playlists.length}</div>` + catalog.playlists.map((p) => `<div class="playlist-entry"><button class="setting-row playlist-row" data-tv="playlist-select" data-id="${esc(p.id)}" aria-pressed="${p.id === catalog.activeId}" ${p.enabled === false ? "disabled" : ""}><span class="setting-text">${esc(p.name)}<small>${p.channels.length} channels \xB7 ${p.enabled === false ? "Disabled" : p.id === catalog.activeId ? "Active" : "Saved"}</small></span><span>${p.id === catalog.activeId ? "\u2713" : "\u203A"}</span></button><button class="playlist-options" data-adv="playlist-details" data-id="${esc(p.id)}" aria-label="Options for ${esc(p.name)}">\u22EF</button></div>`).join("") + `<div class="menu-list"><button data-tv="import">\uFF0B Add playlist</button><button data-action="epg">EPG for active playlist</button><button data-tv="sample">Load sample playlist</button></div>`, "sources");
         (_a3 = $('.playlist-row[aria-pressed="true"]') || $('[data-tv="import"]')) == null ? void 0 : _a3.focus();
         return true;
       }
       if (section === "library") {
-        panel("General", button("Back to settings", "settings-root") + `<label class="setting-row startup-setting"><span class="setting-text">Turn on last channel on app start</span><input type="checkbox" data-pref="autoplay" ${state.prefs.autoplay ? "checked" : ""}></label>` + button("Connect phone / QR", "phone") + button("Phone pairing connection", "bridge-settings") + button("Manage favorites and numbers", "favorites") + '<button class="setting-row" data-tv="favorite-folders">Favorite folders \u203A</button><button class="setting-row" data-tv="health-check">Channel Health Check \u203A</button>' + button("Channels and groups", "visibility") + button("Last watched channel", "last-channel") + `<div class="menu-list"><button data-action="clear-history">Clear history</button></div>`, "library");
+        panel("General", button("Back to settings", "settings-root") + `<label class="setting-row startup-setting"><span class="setting-text">Turn on last channel on app start</span><input type="checkbox" data-pref="autoplay" ${state.prefs.autoplay ? "checked" : ""}></label>` + button("Manage favorites and numbers", "favorites") + '<button class="setting-row" data-tv="favorite-folders">Favorite folders \u203A</button><button class="setting-row" data-tv="health-check">Channel Health Check \u203A</button>' + button("Channels and groups", "visibility") + button("Last watched channel", "last-channel") + `<div class="menu-list"><button data-action="clear-history">Clear history</button></div>`, "library");
         return true;
       }
       if (section === "playback") {
@@ -741,11 +698,7 @@
         return true;
       }
       if (section === "status") {
-        panel("Other", button("Back to settings", "settings-root") + '<div class="settings-section-title">Available</div><p class="panel-note">Multiple playlists \xB7 Phone / QR import \xB7 Playlist editing and updates \xB7 Favorites, order and numbers \xB7 Hidden channels and groups \xB7 Logo cache and manual logo URL \xB7 Last channel \xB7 Auto reconnect \xB7 Remote button actions \xB7 Parental PIN \xB7 Phone backup and restore</p><div class="settings-section-title">Not available</div><p class="panel-note">Multiview \xB7 OS picture-in-picture \xB7 Stalker Portal \xB7 DRM playback \xB7 Cloud sync</p>', "status");
-        return true;
-      }
-      if (section === "bridge") {
-        panel("Phone pairing connection", button("Back to General", "bridge-back") + `<p class="panel-note">Direct TV mode is best effort. If blocked, run node tools/lan-relay.cjs on a computer/NAS on the same LAN. Enter the URL and code shown there. For your own HTTPS Worker, enter its root URL with an empty code. Clear both fields for direct TV mode.</p><form id="bridge-form"><label>Relay root URL<input id="bridge-url" type="url" value="${esc(state.prefs.bridgeURL || "")}"></label><label>LAN code (empty for HTTPS Worker)<input id="bridge-code" value="${esc(state.prefs.bridgeCode || "")}" maxlength="32"></label><button class="primary" type="submit">Save connection</button></form><p id="adv-status" role="status"></p>`, "library");
+        panel("Other", button("Back to settings", "settings-root") + '<div class="settings-section-title">Available</div><p class="panel-note">Multiple playlists \xB7 Playlist editing and updates \xB7 Favorites, order and numbers \xB7 Hidden channels and groups \xB7 Logo cache and manual logo URL \xB7 Last channel \xB7 Auto reconnect \xB7 Remote button actions \xB7 Parental PIN</p><div class="settings-section-title">Not available</div><p class="panel-note">Multiview \xB7 OS picture-in-picture \xB7 Stalker Portal \xB7 DRM playback \xB7 Cloud sync</p>', "status");
         return true;
       }
       if (section === "group-manage") return groupPanel();
@@ -892,7 +845,7 @@
     }
     async function lockChannel(c) {
       const a = state.lockedChannels || [];
-      state.lockedChannels = a.includes(c.id) ? a.filter((id2) => id2 !== c.id) : [...a, c.id];
+      state.lockedChannels = a.includes(c.id) ? a.filter((id) => id !== c.id) : [...a, c.id];
       if (state.playing === c.id && state.lockedChannels.includes(c.id)) {
         unlockedUntil = 0;
         ctx.stopMedia();
@@ -912,10 +865,10 @@
       ctx.modal("Channel logo", `<form id="logo-form"><label>Logo URL<input id="channel-logo-url" type="url" value="${esc(((_a3 = state.logoOverrides) == null ? void 0 : _a3[c.id]) || c.logo || "")}" autocomplete="off"></label><p id="adv-status" role="status"></p><button class="primary" type="submit">Save logo</button></form>`);
     }
     function favoritesPanel() {
-      panel("Favorites", button("Back to settings", "settings-root") + state.favorites.map((id2, i) => {
+      panel("Favorites", button("Back to settings", "settings-root") + state.favorites.map((id, i) => {
         var _a3;
-        const c = state.channels.find((c2) => c2.id === id2);
-        return c ? `<div class="favorite-entry"><button class="setting-row" data-adv="favorite-tools" data-id="${esc(id2)}"><span class="favorite-identity">${ctx.renderLogo(c)}<span class="favorite-name">${esc(c.name)}</span></span><small>${((_a3 = state.channelNumbers) == null ? void 0 : _a3[id2]) ? "#" + state.channelNumbers[id2] : "Set number"}</small></button><button class="favorite-reorder" data-adv="favorite-up" data-id="${esc(id2)}" ${i === 0 ? "disabled" : ""} aria-label="Move ${esc(c.name)} up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><button class="favorite-reorder" data-adv="favorite-down" data-id="${esc(id2)}" ${i === state.favorites.length - 1 ? "disabled" : ""} aria-label="Move ${esc(c.name)} down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button></div>` : "";
+        const c = state.channels.find((c2) => c2.id === id);
+        return c ? `<div class="favorite-entry"><button class="setting-row" data-adv="favorite-tools" data-id="${esc(id)}"><span class="favorite-identity">${ctx.renderLogo(c)}<span class="favorite-name">${esc(c.name)}</span></span><small>${((_a3 = state.channelNumbers) == null ? void 0 : _a3[id]) ? "#" + state.channelNumbers[id] : "Set number"}</small></button><button class="favorite-reorder" data-adv="favorite-up" data-id="${esc(id)}" ${i === 0 ? "disabled" : ""} aria-label="Move ${esc(c.name)} up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><button class="favorite-reorder" data-adv="favorite-down" data-id="${esc(id)}" ${i === state.favorites.length - 1 ? "disabled" : ""} aria-label="Move ${esc(c.name)} down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button></div>` : "";
       }).join("") + (!state.favorites.length ? '<p class="panel-note">Add channels to Favorites from the channel menu.</p>' : ""), "library");
     }
     let visibilityKind = "groups", visibilityQuery = "";
@@ -935,157 +888,6 @@
       const key = visibilityKind === "groups" ? "hiddenGroups" : "hiddenChannels", a = p[key] || [], next = a.includes(value) ? a.filter((x) => x !== value) : [...a, value];
       await ctx.commitCatalog(editPlaylist(catalog, target, { [key]: next }), false);
       visibilityPanel();
-    }
-    async function phoneOpen() {
-      var _a3, _b2, _c;
-      if (platform2.isPhone) {
-        toast("Use Add playlist to import a URL or a file on this phone. TV pairing is available on the TV app.");
-        return;
-      }
-      if (guard("settings", phoneOpen)) return;
-      await phoneClose();
-      const epoch = phoneEpoch;
-      panel("Connect your phone", '<div class="phone-pair"><div id="phone-qr"></div><p id="phone-status">Connecting\u2026</p></div>', "library");
-      let opened;
-      try {
-        opened = await platform2.request("phoneStart", state.prefs.bridgeURL ? { bridgeURL: state.prefs.bridgeURL, bridgeCode: state.prefs.bridgeCode || "", bridgeMode: state.prefs.bridgeCode ? "relay" : "cloud" } : { bridgeMode: "local" });
-      } catch (e) {
-        error("Phone pairing unavailable: " + e.message);
-        (_a3 = $("#phone-status")) == null ? void 0 : _a3.insertAdjacentHTML("afterend", button("Configure LAN / HTTPS relay", "bridge-settings"));
-        return;
-      }
-      if (epoch !== phoneEpoch || !$("#phone-qr")) {
-        await platform2.request("phoneStop", { token: opened.token }).catch(() => {
-        });
-        return;
-      }
-      if (platform2.native && !state.prefs.bridgeURL && opened.localOnly) {
-        await platform2.request("phoneStop", { token: opened.token }).catch(() => {
-        });
-        error("No reachable LAN address detected. Configure the LAN relay.");
-        (_b2 = $("#phone-status")) == null ? void 0 : _b2.insertAdjacentHTML("afterend", button("Configure LAN / HTTPS relay", "bridge-settings"));
-        return;
-      }
-      if (platform2.native && !state.prefs.bridgeURL && ((_c = opened.urls) == null ? void 0 : _c[0])) {
-        try {
-          const report = await platform2.request("probeMedia", { url: opened.urls[0] });
-          if (!(report.status >= 200 && report.status < 400)) {
-            await platform2.request("phoneStop", { token: opened.token }).catch(() => {
-            });
-            error("Local QR bridge is not reachable on this LG TV. Use manual playlist URL; LG TV server mode is not officially supported.");
-            return;
-          }
-        } catch (e) {
-          error("Local QR connection self-check failed: " + e.message);
-          return;
-        }
-      }
-      phone = opened;
-      panel("Connect your phone", `<div class="phone-pair"><div id="phone-qr"></div><p>Scan this QR code on your phone.</p><p>${phone.cloud ? "Your configured HTTPS relay." : "TV and phone must be on the same LAN. Keep the configured LAN relay running."}</p><p class="phone-address">${esc(phone.urls[0].split("#")[0])}</p>${phone.localOnly ? "<p>Only a local address was detected. For a phone connection, connect this device to Wi\u2011Fi or Ethernet.</p>" : ""}<p id="phone-status">Ready: scan the QR code and send a playlist. Confirm on TV. QR expires in 10 minutes.</p><p id="phone-job"></p></div>`, "library");
-      const qr = window.qrcode(0, "M");
-      qr.addData(phone.urls[0]);
-      qr.make();
-      $("#phone-qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4, scalable: true });
-      if (!platform2.native) $("#phone-status").insertAdjacentHTML("beforebegin", `<p><a id="phone-open" href="${esc(phone.urls[0])}" target="_blank" rel="noreferrer">Open phone page on this computer</a></p>`);
-      const session = phone;
-      phoneTimer = setInterval(() => pollPhone(session), 1800);
-      if (!session.cloud) prepareBackup(session).catch((e) => {
-        if (phone === session) error(e.message);
-      });
-    }
-    async function phoneClose() {
-      phoneEpoch++;
-      clearInterval(phoneTimer);
-      phoneTimer = null;
-      const s = phone;
-      phone = null;
-      job = null;
-      if (s) await platform2.request("phoneStop", { token: s.token }).catch(() => {
-      });
-    }
-    async function prepareBackup(s) {
-      const text = JSON.stringify(makeBackup(ctx.getCatalog(), state.prefs));
-      await platform2.request("phoneBackupBegin", { token: s.token });
-      for (let offset = 0; offset < text.length; offset += 8192) {
-        if (phone !== s) return;
-        await platform2.request("phoneBackupPart", { token: s.token, index: offset / 8192, text: text.slice(offset, offset + 8192) });
-      }
-      await platform2.request("phoneBackupEnd", { token: s.token });
-      if (phone === s && $("#phone-status")) $("#phone-status").textContent = "Ready: add a playlist, download a backup or restore from your phone. This QR code expires in 10 minutes.";
-    }
-    async function pollPhone(s) {
-      if (phone !== s) return;
-      if (!$("#phone-qr")) return phoneClose();
-      if (phonePolling || phoneBusy || job) return;
-      phonePolling = true;
-      try {
-        const response = await platform2.request("phonePoll", { token: s.token });
-        if (!response.job) return;
-        job = response.job;
-        if (job.type === "restore") {
-          const parts = [];
-          for (let i = 0; i < job.chunks; i++) parts.push((await platform2.request("phoneRead", { token: s.token, id: job.id, index: i })).text);
-          job.backup = validateBackup(JSON.parse(parts.join("")));
-        }
-        const target = $("#phone-job");
-        if (target) target.innerHTML = `<p>${job.type === "playlist" ? "Playlist: " + esc(job.payload.name) : "Restore " + job.backup.catalog.playlists.length + " playlists as additional lists?"}</p><button class="primary" data-adv="phone-accept">Confirm on TV</button><button class="secondary" data-adv="phone-reject">Reject</button>`;
-      } catch (e) {
-        if (!job) {
-          clearInterval(phoneTimer);
-          phoneTimer = null;
-        }
-        if (job) await platform2.request("phoneComplete", { token: s.token, id: job.id, ok: false, message: e.message }).catch(() => {
-        });
-        job = null;
-        if ($("#phone-job")) $("#phone-job").textContent = "";
-        error(e.message);
-      } finally {
-        phonePolling = false;
-      }
-    }
-    async function phoneAccept() {
-      if (!phone || !job || phoneBusy) return;
-      phoneBusy = true;
-      const s = phone, j = job;
-      try {
-        if (j.type === "playlist") {
-          const text = await ctx.api("source", { url: j.payload.url });
-          const parsed = await ctx.parsePlaylist(text, platform2.sourceBase(j.payload.url));
-          let epg = { programs: [], names: {} };
-          const epgURL = j.payload.epgURL || parsed.epg;
-          if (epgURL) {
-            try {
-              epg = await ctx.api("epg", { url: epgURL });
-            } catch {
-              toast("Playlist added. EPG could not be loaded; edit it in playlist settings.");
-            }
-          }
-          if (phone !== s || job !== j) return;
-          if (!await ctx.addPlaylist({ name: j.payload.name, channels: parsed.channels, programs: epg.programs, epgNames: epg.names, sourceURL: j.payload.url, epgURL, imported: true, lastUpdated: Date.now() })) throw Error("The playlist could not be saved.");
-          ctx.refresh();
-        } else {
-          if (phone !== s || job !== j) return;
-          const merged = mergeBackup(ctx.getCatalog(), j.backup, id);
-          await ctx.commitCatalog(merged, true);
-          Object.assign(state.prefs, j.backup.prefs);
-          ctx.save("prefs");
-          ctx.applyPrefs();
-        }
-        if (phone !== s || job !== j) return;
-        await platform2.request("phoneComplete", { token: s.token, id: j.id, ok: true, message: j.type === "playlist" ? "Playlist added on TV." : "Backup restored. Existing playlists were preserved." });
-        job = null;
-        if ($("#phone-job")) $("#phone-job").textContent = "Done.";
-        toast("Phone request completed.");
-        if (!s.cloud) await prepareBackup(s);
-      } catch (e) {
-        await platform2.request("phoneComplete", { token: s.token, id: j.id, ok: false, message: e.message }).catch(() => {
-        });
-        if (job === j) job = null;
-        if ($("#phone-job")) $("#phone-job").textContent = "";
-        error(e.message);
-      } finally {
-        phoneBusy = false;
-      }
     }
     let managingGroup = "", groupFail = 0, groupBlockedUntil = 0, groupUnlocks = /* @__PURE__ */ new Map();
     let activeIdCache = null, channelsForCache = null;
@@ -1221,24 +1023,20 @@
       await groupChange({ groupPins: next });
     }
     function lastChannel() {
-      const previous = state.history.find((id2) => id2 !== state.playing && state.channels.some((c) => c.id === id2 && c.type === "tv"));
+      const previous = state.history.find((id) => id !== state.playing && state.channels.some((c) => c.id === id && c.type === "tv"));
       if (!previous) return toast("No previous channel yet.");
       ctx.closeModal();
       ctx.play(state.channels.find((c) => c.id === previous), state.full);
     }
     function remoteAction2(action2) {
       var _a3;
-      const mapped = ((_a3 = state.prefs.remoteActions) == null ? void 0 : _a3[action2]) || action2;
+      const saved = (_a3 = state.prefs.remoteActions) == null ? void 0 : _a3[action2], mapped = remoteChoices.includes(saved) ? saved : action2;
       if (mapped === "last-channel") {
         lastChannel();
         return true;
       }
       if (mapped === "playlists") {
         ctx.settings("sources");
-        return true;
-      }
-      if (mapped === "phone") {
-        phoneOpen().catch((e) => toast(e.message));
         return true;
       }
       if (mapped !== action2) {
@@ -1279,8 +1077,6 @@
       if (a === "favorites") return favoritesPanel();
       if (a === "favorite-tools") return channelTools(state.channels.find((c) => c.id === el.dataset.id));
       if (a === "favorite-up" || a === "favorite-down") return reorder(state.channels.find((c) => c.id === el.dataset.id), a === "favorite-up" ? -1 : 1);
-      if (a === "bridge-back") return settings("library");
-      if (a === "bridge-settings") return settings("bridge");
       if (a === "group-manager") {
         editingId = el.dataset.id || ctx.getCatalog().activeId;
         return groupList();
@@ -1294,14 +1090,6 @@
       if (a === "group-pin-remove") {
         if (guardGroup(managingGroup, () => removeGroupPIN(), editingId)) return;
         return removeGroupPIN();
-      }
-      if (a === "phone") return phoneOpen();
-      if (a === "phone-accept") return phoneAccept();
-      if (a === "phone-reject" && phone && job) {
-        await platform2.request("phoneComplete", { token: phone.token, id: job.id, ok: false, message: "Rejected on TV." });
-        job = null;
-        $("#phone-job").textContent = "Request rejected.";
-        return;
       }
       if (a === "last-channel") return lastChannel();
       if (a === "remove-pin") {
@@ -1320,7 +1108,7 @@
     });
     document.addEventListener("submit", (e) => {
       const form = e.target;
-      if (!["playlist-edit-form", "number-form", "logo-form", "pin-form", "parental-form", "group-rename-form", "group-pin-form", "group-unlock-form", "bridge-form"].includes(form.id)) return;
+      if (!["playlist-edit-form", "number-form", "logo-form", "pin-form", "parental-form", "group-rename-form", "group-pin-form", "group-unlock-form"].includes(form.id)) return;
       e.preventDefault();
       const submit = form.querySelector('[type="submit"]');
       if (submit.disabled) return;
@@ -1331,21 +1119,6 @@
         if (form.id === "group-unlock-form") return verifyGroup();
         if (form.id === "group-rename-form") return saveGroupRename();
         if (form.id === "group-pin-form") return saveGroupPIN();
-        if (form.id === "bridge-form") {
-          const url = $("#bridge-url").value.trim(), code = $("#bridge-code").value.trim();
-          if (url) {
-            const u = new URL(url);
-            if (!["http:", "https:"].includes(u.protocol) || u.username || u.password || u.search || u.hash || u.pathname !== "/") throw Error("Enter a relay root URL ending with /.");
-            if (code && !/^[a-f0-9]{8,32}$/i.test(code)) throw Error("Invalid relay code.");
-            if (u.protocol === "http:" && (!/^(192\.168\.|10\.|127\.|172\.(1[6-9]|2\d|3[01])\.)/.test(u.hostname) || !code)) throw Error("HTTP requires a private LAN address and bridge code.");
-          }
-          state.prefs.bridgeURL = url;
-          state.prefs.bridgeCode = code;
-          ctx.save("prefs");
-          settings("library");
-          toast("Pairing connection saved.");
-          return;
-        }
         if (form.id === "number-form") {
           state.channelNumbers = assignNumber(state.channelNumbers || {}, channelId, $("#favorite-number").value.trim(), state.favorites);
           await saveOptions();
@@ -1490,13 +1263,11 @@
       groupUnlocks.clear();
       clearTimeout(groupExpiry);
       clearDigits();
-      phoneClose();
     }
-    return { settings, playlistDetails, channelTools, openGroupProperties, guard, guardGroup, isGroupLocked, groupAccessible, selectGroup, remoteAction: remoteAction2, phoneOpen, phoneClose, lastChannel, start, suspend, longOK: () => {
-      const a = state.prefs.longOK || "context";
+    return { settings, playlistDetails, channelTools, openGroupProperties, guard, guardGroup, isGroupLocked, groupAccessible, selectGroup, remoteAction: remoteAction2, lastChannel, start, suspend, longOK: () => {
+      const a = remoteChoices.includes(state.prefs.longOK) ? state.prefs.longOK : "context";
       if (a === "context") ctx.context();
       else if (a === "last-channel") lastChannel();
-      else if (a === "phone") phoneOpen();
       else ctx.doAction(a);
     } };
   }
@@ -2348,16 +2119,13 @@
       localStorage.setItem("tl-tv-ready", "true");
     }
     function ready() {
-      const remaining = Math.max(0, 3e3 - (Date.now() - (window.__tiviloomBootStarted || Date.now())));
-      setTimeout(() => {
-        const boot = $("#boot");
-        if (boot) boot.hidden = true;
-        if (!state.imported && localStorage.getItem("tl-tv-ready") !== "true") showWelcome();
-        else {
-          leaveWelcome();
-          setNav(0, false);
-        }
-      }, remaining);
+      const boot = $("#boot");
+      if (boot) boot.hidden = true;
+      if (!state.imported && localStorage.getItem("tl-tv-ready") !== "true") showWelcome();
+      else {
+        leaveWelcome();
+        setNav(0, false);
+      }
     }
     function settings(section = "root") {
       var _a3, _b2;
@@ -2391,9 +2159,10 @@
         return;
       }
       const rows = [["library", "General"], ["sources", "Playlists"], ["epg", "EPG"], ["appearance", "Appearance"], ["playback", "Playback"], ["remote", "Remote control"], ["parental", "Parental controls"], ["status", "Other"], ["about", "About"]];
-      ctx.modal("Settings", `<div class="settings-section-title">TiviLoom \xB7 ${ctx.platform.isPhone ? "Android" : "webOS TV"}</div><button class="setting-row" data-tv="about">${icon("settings")}<span>Application information</span></button>${rows.map(([id, name]) => `<button class="setting-row" data-tv="setting-${id}"><span class="setting-text">${name}</span></button>`).join("")}`, "", { panel: true });
+      const settingsIcons = { library: "settings", sources: "list", epg: "clock", appearance: "palette", playback: "play", remote: "screen", parental: "lock", status: "history", about: "info" };
+      ctx.modal("Settings", `<div class="settings-section-title">TiviLoom \xB7 ${ctx.platform.isPhone ? "Android" : "webOS TV"} \xB7 ${VERSION}</div>${rows.filter(([id]) => id !== "about").map(([id, name]) => `<button class="setting-row" data-tv="setting-${id}">${icon(settingsIcons[id] || "settings")}<span class="setting-text">${name}</span><span class="setting-chevron">\u203A</span></button>`).join("")}<div class="settings-section-title settings-about-heading">Application</div><button class="setting-row" data-tv="about">${icon("info")}<span class="setting-text">Application information<small>Version, build and licenses</small></span><span class="setting-chevron">\u203A</span></button>`, "", { panel: true });
       $(".settings-panel").dataset.tvSettings = "root";
-      (_b2 = $('[data-tv="about"]')) == null ? void 0 : _b2.focus();
+      (_b2 = $('[data-tv="setting-library"]')) == null ? void 0 : _b2.focus();
     }
     function wizardIcon(step) {
       return `<img class="wizard-material-icon ${step === "processed" ? "download-icon" : ""}" src="assets/icons/${step === "type" ? "playlist-add" : step === "processed" ? "download" : "link"}.svg" alt="">`;
@@ -2457,7 +2226,7 @@
         next = "Done";
       }
       $("#wizard").hidden = false;
-      $("#wizard").innerHTML = `<section class="wizard-left"><div class="wizard-icon">${wizardIcon(w.step)}</div><div class="wizard-heading"><h1>${esc(title)}</h1>${desc ? `<p>${esc(desc)}</p>` : ""}</div></section><section class="wizard-center"><div class="wizard-options ${kind}">${body}</div><div class="wizard-status" role="status">${esc(w.status || "")}</div></section><section class="wizard-side"><div class="wizard-controls">${w.step !== "type" ? `<button data-tv="wizard-next" ${!canNext || w.edit ? "disabled" : ""}>${next}${icon("chevron")}</button>` : ""}<button data-tv="wizard-back">${back}</button></div></section><input type="file" id="source-file" accept=".m3u,.m3u8,.txt" hidden>`;
+      $("#wizard").innerHTML = `<section class="wizard-left"><div class="wizard-icon">${wizardIcon(w.step)}</div><div class="wizard-heading"><h1>${esc(title)}</h1>${desc ? `<p>${esc(desc)}</p>` : ""}</div></section><section class="wizard-center"><div class="wizard-options ${kind}">${body}</div><div class="wizard-status" role="status">${esc(w.status || "")}</div></section><section class="wizard-side"><div class="wizard-controls">${w.step !== "type" ? `<button data-tv="wizard-next" ${!canNext ? "disabled" : ""}>${next}${icon("chevron")}</button>` : ""}<button data-tv="wizard-back">${back}</button></div></section><input type="file" id="source-file" accept=".m3u,.m3u8,.txt" hidden>`;
       if (w.edit) {
         const f = $("#wizard-field");
         f == null ? void 0 : f.focus();
@@ -3118,7 +2887,30 @@
       }
     }, true);
     document.addEventListener("input", (e) => {
-      if (wizard && e.target.dataset.wizardField) wizard[e.target.dataset.wizardField] = e.target.value;
+      if (!wizard || !e.target.dataset.wizardField) return;
+      const w = wizard, key = e.target.dataset.wizardField;
+      w[key] = e.target.value;
+      const validUrl = (value) => {
+        try {
+          const u = new URL(String(value || "").trim());
+          return (u.protocol === "http:" || u.protocol === "https:") && !!u.hostname && !u.username && !u.password;
+        } catch {
+          return false;
+        }
+      };
+      let valid = false;
+      if (w.step === "m3u") valid = !!w.file || validUrl(w.url);
+      else if (w.step === "xtream") valid = validUrl(w.server) && !!w.username.trim() && !!w.password && (w.includeTV || w.includeVOD);
+      else if (w.step === "stalker") valid = validUrl(w.server) && !!w.mac.trim();
+      else if (w.step === "processed") valid = !!w.name.trim();
+      else if (w.step === "epg") valid = !w.epg.trim() || validUrl(w.epg);
+      const next = $('#wizard [data-tv="wizard-next"]');
+      if (next) next.disabled = !valid;
+      const status = $("#wizard .wizard-status");
+      if (status && ["url", "server", "epg"].includes(key)) {
+        const value = w[key].trim();
+        status.textContent = value && !valid ? "Enter a valid HTTP or HTTPS address." : "";
+      }
     });
     document.addEventListener("change", (e) => {
       if (wizard && e.target.id === "source-file" && e.target.files[0]) {
@@ -3937,8 +3729,30 @@
       }
     }
     async function play(c, fullscreen = false, automatic = false) {
-      var _a4, _b3;
+      var _a4, _b3, _c2;
       if (!c) return;
+      if (((_a4 = window.TiviLoomNative) == null ? void 0 : _a4.openNativePlayer) && fullscreen && !c.demo) {
+        try {
+          const url = await mediaURL(c);
+          const payload = JSON.stringify({ url, userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/0.6.6", referer: c.referer || "" });
+          if (!window.TiviLoomNative.openNativePlayer(payload)) throw Error("Native player could not be opened.");
+          state.channel = c.id;
+          state.playing = c.id;
+          state.full = true;
+          state.playbackPhase = "playing";
+          state.history = [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60);
+          save("history");
+          persistResume();
+          $("#player-channel").textContent = c.name;
+          $("#player-info").textContent = c.name;
+          $("#preview-status").textContent = c.name;
+          renderInfo();
+          return;
+        } catch (error) {
+          toast("Native playback: " + error.message);
+          return;
+        }
+      }
       if (c.type !== "series") state.nextEpisodes = null;
       if (advanced.guardGroup(c.group, () => play(c, fullscreen, automatic))) return;
       if (advanced.guard("channel", () => play(c, fullscreen), c)) return;
@@ -3984,7 +3798,7 @@
             await playableStart(video.play());
           } catch (error) {
             if (!valid()) return;
-            if (!instance && ((_a4 = window.Hls) == null ? void 0 : _a4.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && (error.name === "NotSupportedError" || ((_b3 = video.error) == null ? void 0 : _b3.code) === 4)) {
+            if (!instance && ((_b3 = window.Hls) == null ? void 0 : _b3.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && (error.name === "NotSupportedError" || ((_c2 = video.error) == null ? void 0 : _c2.code) === 4)) {
               video.pause();
               video.removeAttribute("src");
               video.load();
@@ -4149,12 +3963,7 @@
     }
     const dialogStack = new DialogStack();
     let dialogOrigin = null, modalResume = null;
-    function leaveDialog() {
-      if ($("#phone-qr")) advanced.phoneClose().catch(() => {
-      });
-    }
     function closeModal() {
-      leaveDialog();
       const multi = $("#multiview");
       if (multi) {
         multis.forEach((x) => {
@@ -4178,7 +3987,6 @@
     }
     function modalBack() {
       var _a4;
-      leaveDialog();
       const frame = dialogStack.back();
       if (!frame) return closeModal();
       $("#modal-root").textContent = "";
@@ -4198,7 +4006,6 @@
         dialogStack.clear();
         dialogOrigin = document.activeElement;
       }
-      if (root.querySelector("#phone-qr") && key !== dialogStack.key) leaveDialog();
       dialogStack.enter(key, () => ({ node: root.firstElementChild, actions: menuActions, focus: document.activeElement, resume: modalResume }));
       menuActions = {};
       modalResume = opts.resume || null;
@@ -4381,7 +4188,7 @@
     function settings(section = "root") {
       let body = "", title = "Ayarlar";
       const link = (a, t, s = "") => `<button class="setting-row" data-settings="${a}"><span class="setting-text">${t}<small>${s}</small></span><span>\u203A</span></button>`;
-      if (section === "root") body = `<div class="settings-section-title">TiviLoom \xB7 0.2</div>${link("sources", "Pleylistl\u0259r v\u0259 EPG", state.source)}${link("appearance", "G\xF6r\xFCn\xFC\u015F", "C\u0259dv\u0259l s\u0131xl\u0131\u011F\u0131, m\u0259tn v\u0259 h\u0259r\u0259k\u0259t")}${link("playback", "Oynatma", "S\u0259s, ekran \xF6l\xE7\xFCs\xFC v\u0259 taymer")}${link("library", "Kitabxana", "Sevimlil\u0259r, tarix\xE7\u0259 v\u0259 xat\u0131rlatmalar")}${link("remote", "Pult v\u0259 klaviatura", "Komp\xFCterd\u0259 TV davran\u0131\u015F\u0131n\u0131 yoxla")}${link("status", "Funksiyalar\u0131n v\u0259ziyy\u0259ti", "Haz\u0131r olanlar v\u0259 n\xF6vb\u0259ti m\u0259rh\u0259l\u0259l\u0259r")}${link("about", "T\u0259tbiq haqq\u0131nda", "Versiya v\u0259 yerli s\u0131naq m\xFChiti")}<div class="panel-note">D\u0259yi\u015Fiklikl\u0259r bu komp\xFCterin brauzerind\u0259 saxlan\u0131r.</div>`;
+      if (section === "root") body = `<div class="settings-section-title">TiviLoom \xB7 ${VERSION}</div>${link("sources", "Pleylistl\u0259r v\u0259 EPG", state.source)}${link("appearance", "G\xF6r\xFCn\xFC\u015F", "C\u0259dv\u0259l s\u0131xl\u0131\u011F\u0131, m\u0259tn v\u0259 h\u0259r\u0259k\u0259t")}${link("playback", "Oynatma", "S\u0259s, ekran \xF6l\xE7\xFCs\xFC v\u0259 taymer")}${link("library", "Kitabxana", "Sevimlil\u0259r, tarix\xE7\u0259 v\u0259 xat\u0131rlatmalar")}${link("remote", "Pult v\u0259 klaviatura", "Komp\xFCterd\u0259 TV davran\u0131\u015F\u0131n\u0131 yoxla")}${link("status", "Funksiyalar\u0131n v\u0259ziyy\u0259ti", "Haz\u0131r olanlar v\u0259 n\xF6vb\u0259ti m\u0259rh\u0259l\u0259l\u0259r")}${link("about", "T\u0259tbiq haqq\u0131nda", "Versiya v\u0259 yerli s\u0131naq m\xFChiti")}<div class="panel-note">D\u0259yi\u015Fiklikl\u0259r bu komp\xFCterin brauzerind\u0259 saxlan\u0131r.</div>`;
       if (section === "sources") {
         title = "Pleylistl\u0259r v\u0259 EPG";
         body = `${row("Aktiv m\u0259nb\u0259", esc(state.source), '<span class="pill">' + state.channels.length + " m\u0259zmun</span>")}<div class="menu-list"><button data-action="import">M3U pleylist \u0259lav\u0259 et <span>\uFF0B</span></button><button data-action="epg">XMLTV EPG \u0259lav\u0259 et <span>\uFF0B</span></button><button data-action="demo">N\xFCmun\u0259 pleylistin\u0259 qay\u0131t <span>\u21BA</span></button></div><div class="panel-note">${state.programs.length} proqram qeydiyyat\u0131. TV v\u0259 filml\u0259r M3U daxilind\u0259n qrupla\u015Fd\u0131r\u0131l\u0131r. Xtream API, Stalker portal\u0131 v\u0259 serial m\xF6vs\xFCml\u0259ri sonrak\u0131 m\u0259rh\u0259l\u0259dir.</div>`;
@@ -4589,7 +4396,7 @@
       }
       if (action === "display") return tvUI.displayMenu();
       if (action === "sleep") return tvUI.sleepPanel();
-      if (action === "phone" || action === "backup" || action === "restore") return advanced.phoneOpen();
+      if (platform.native && ["backup", "restore"].includes(action)) return toast("File backup and restore are unavailable on this TV.");
       if (action === "playlists") return settings("sources");
       if (action === "last-channel") return advanced.lastChannel();
       if (["multiview", "pip"].includes(action)) return toast("This feature is not available in this webOS test version.");

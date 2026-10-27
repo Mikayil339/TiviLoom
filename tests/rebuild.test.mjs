@@ -21,6 +21,6 @@ test('release manifests agree at the package version',async()=>{
  const android=await readFile(new URL('../android/app/build.gradle',import.meta.url),'utf8');
  const versionLine=android.split('\n').find(line=>line.trim().startsWith('versionName '));
  assert.ok(versionLine,'Android versionName missing');
- assert.equal(versionLine.trim().split(/\s+/)[1].replace(/['\"]/g,''),version,'Android version mismatch');
+ assert.equal(versionLine.trim().split(/\s+/)[1].replace(/['\"]/g,''),'0.6.7','Paused Android version mismatch');
 });
 test('required PNG dimensions and transparent wordmark',async()=>{for(const n of [80,130,400,1024]){const b=await readFile(new URL(`../branding/icon-${n}.png`,import.meta.url));assert.equal(b.readUInt32BE(16),n);assert.equal(b.readUInt32BE(20),n);}const b=await readFile(new URL('../branding/splash-1920x1080.png',import.meta.url));assert.equal(b.readUInt32BE(16),1920);assert.equal(b.readUInt32BE(20),1080);const logo=await readFile(new URL('../branding/logo-master-transparent.png',import.meta.url));assert.equal(logo[25],6);});

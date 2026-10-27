@@ -1,4 +1,4 @@
-export const remoteChoices=['favorite','guide','search','context','last-channel','playlists','phone','favorites','mute'];
+export const remoteChoices=['favorite','guide','search','context','last-channel','playlists','favorites','mute'];
 export function numberKey(e){if(/^[0-9]$/.test(e.key||''))return e.key;const c=e.keyCode||e.which;return c>=48&&c<=57?String(c-48):c>=96&&c<=105?String(c-96):null;}
 export function assignNumber(numbers,id,value,favorites){if(!favorites.includes(id))throw Error('Add this channel to Favorites first.');const result={...numbers};delete result[id];if(value==='')return result;if(!/^[1-9]\d{0,3}$/.test(String(value)))throw Error('Choose a number from 1 to 9999.');const n=Number(value);if(Object.entries(result).some(([key,v])=>key!==id&&Number(v)===n))throw Error('This number is already assigned to another favorite.');result[id]=n;return result;}
 export function cleanOptions(options={},channels=[],favorites=[]){

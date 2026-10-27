@@ -252,3 +252,17 @@ html.phone{--bg:#0d1319;--panel:#17212b;--fg:#f5f7fa;--muted:#94a5b5;--accent:#7
 /* Explicit spacing also works before flex-gap support in old WebViews. */
 .phone .setting-row{gap:0}
 .phone .setting-row>.setting-leading{margin-right:12px}
+
+/* 0.6.5 responsive touch and safe-area refinements */
+.phone .rail,.phone #app[data-nav] .rail{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));padding-bottom:max(8px,env(safe-area-inset-bottom));}
+.phone .rail button,.phone #app[data-nav] .rail button{flex:1 1 0;width:0;min-width:0;max-width:none;}
+.phone .mini-actions button{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;padding:0;}
+.phone .mini-actions [data-tv="mini-expand"]{display:inline-flex;align-items:center;justify-content:center;text-align:center;}
+.phone .player-buttons{align-items:stretch;justify-content:flex-start;gap:8px;padding-bottom:max(8px,env(safe-area-inset-bottom));}
+.phone .player-buttons button{flex:0 0 64px;display:flex;align-items:center;justify-content:flex-start;text-align:center;}
+.phone .player-buttons button .tool-icon{display:flex;align-items:center;justify-content:center;margin-left:auto;margin-right:auto;}
+.phone .settings-panel .setting-row{display:flex;align-items:center;gap:14px;}
+.phone .settings-panel .setting-row>svg{width:22px;height:22px;flex:0 0 22px;stroke:currentColor;fill:none;stroke-width:1.7;}
+.phone .setting-text{min-width:0;flex:1;}
+.phone .setting-chevron{flex:none;margin-left:12px;}
+@media(max-width:360px){.phone .rail{gap:2px;padding-left:4px;padding-right:4px}.phone .rail button span{font-size:10px}.phone .rail button svg{width:21px;height:21px}}

@@ -17,3 +17,18 @@ test('phone native Back closes details, dialogs and drawer in order',async()=>{c
 test('phone channel-list tool returns to responsive guide, not TV three-column screen',async()=>{const a=await app(true);try{a.click('[data-channel="demo-0"]');await wait(40);a.click('#preview-play');assert.equal(a.w.document.querySelector('#player').hidden,false);a.click('[data-tv="channels"]');assert.equal(a.w.document.querySelector('#player').hidden,true);assert.equal(a.w.document.querySelector('#channels-screen'),null);assert.ok(a.w.document.querySelector('.channel-name'));a.click('[data-channel="demo-0"]');await wait(30);assert.equal(a.w.document.querySelector('#player').hidden,true);assert.deepEqual(a.errors,[]);}finally{await a.close();}});
 
 test('legacy WebView without replaceChildren preserves nested modal Back and navigation',async()=>{const a=await app(true);try{a.w.Element.prototype.replaceChildren=undefined;a.click('[data-tv="settings"]');a.click('[data-tv="setting-sources"]');assert.ok(a.w.document.querySelector('.playlist-row'));a.w.dispatchEvent(new a.w.Event('TiviLoomAndroidBack'));await wait(20);assert.match(a.w.document.querySelector('#modal-root').textContent,/Settings/);a.w.dispatchEvent(new a.w.Event('TiviLoomAndroidBack'));await wait(20);assert.equal(a.w.document.querySelector('#modal-root').children.length,0);a.click('[data-tv="nav-movies"]');a.click('[data-movie]');a.click('[data-tv="movie-back"]');assert.equal(a.w.document.querySelector('#movie-detail'),null);a.click('[data-tv="nav-search"]');assert.ok(a.w.document.querySelector('#search-input'));assert.deepEqual(a.errors,[]);}finally{await a.close();}});
+
+test('LG browsing never auto-plays on focus and exposes only direct playlist import',async()=>{
+ const a=await app();try{
+  const d=a.w.document,video=d.querySelector('#video');
+  assert.equal(d.querySelector('#boot').hidden,true);
+  for(const row of d.querySelectorAll('[data-channel]')){row.focus();await wait(20);}
+  await a.key('ArrowDown');await a.key('ArrowDown');
+  assert.equal(video.dataset.testPlay,undefined);
+  a.click('[data-tv="settings"]');a.click('[data-tv="setting-sources"]');
+  assert.ok(d.querySelector('[data-tv="import"]'));
+  assert.equal(d.querySelector('[data-adv="phone"],[data-action="phone"],#phone-qr'),null);
+  a.click('[data-tv="import"]');assert.ok(d.querySelector('#wizard'));
+  assert.deepEqual(a.errors,[]);
+ }finally{await a.close();}
+});

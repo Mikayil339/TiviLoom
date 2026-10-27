@@ -14,4 +14,4 @@ info.version=pkg.version;
 fs.writeFileSync('app/appinfo.json',JSON.stringify(info,null,2)+'\n');
 const service=JSON.parse(fs.readFileSync('service/package.json'));
 service.version=pkg.version;
-fs.writeFileSync('service/package.json',JSON.stringify(service,null,2)+'\n');console.log('Built TiviLoom '+pkg.version+' for webOS / phone');
+fs.writeFileSync('service/package.json',JSON.stringify(service,null,2)+'\n');console.log('Built TiviLoom '+pkg.version+' for webOS');

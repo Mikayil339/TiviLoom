@@ -5,7 +5,6 @@ import http from 'node:http';
 import {gzipSync} from 'node:zlib';
 import source from '../service/source.cjs';
 import epg from '../service/epg.cjs';
-import phone from '../service/phone.cjs';
 const root=new URL('../',import.meta.url);
 test('EPG download cap is 150 MiB (decoded), streaming EPG does not require a browser DOM',async()=>{
  assert.equal(epg.MAX_BYTES,150*1024*1024);
@@ -28,14 +27,4 @@ test('remote group focus no longer activates and rebuilds groups during ArrowDow
  assert.doesNotMatch(ui,/focusin[^\n]+selectGroup\(/);
  assert.match(ui,/closest\('\[data-tv\],\[data-group\]'\)/);
  assert.match(ui,/fastSelectGuide/);
-});
-test('local QR bridge delivers accepted playlist without PC or cloud in a local Node test',async()=>{
- const bridge=phone.createPhoneBridge({host:'127.0.0.1',port:0,addresses:['127.0.0.1']});const s=await bridge.start();const base=new URL(s.urls[0]).origin;
- try{
-  const page=await fetch(base+'/phone');assert.equal(page.status,200);
-  const reply=await fetch(base+'/api/playlist',{method:'POST',headers:{'Content-Type':'application/json','x-tiviloom-pair':s.token},body:JSON.stringify({name:'TV channels',url:'https://example.com/live.m3u'})});assert.equal(reply.status,200);
-  const queued=await reply.json();const job=(await bridge.api('phonePoll',{token:s.token})).job;assert.equal(job.id,queued.id);
-  await bridge.api('phoneComplete',{token:s.token,id:job.id,ok:true,message:'Playlist added on TV.'});
-  const status=await(await fetch(base+'/api/status?id='+job.id,{headers:{'x-tiviloom-pair':s.token}})).json();assert.equal(status.status,'done');
- }finally{await bridge.stop();}
 });

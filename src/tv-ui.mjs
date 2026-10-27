@@ -139,7 +139,7 @@ export function mountTVUI(ctx) {
   function renderMyList(){const reminders=state.group==='reminders',rows=(reminders?state.reminders:state.savedPrograms||[]).filter(p=>{const c=state.channels.find(c=>c.id===(p.channelId||p.channel));return c&&!(state.hiddenChannels||[]).includes(c.id)&&!(state.hiddenGroups||[]).includes(c.group)&&ctx.advanced.groupAccessible(c.group);});$('#content').innerHTML=`<div class="mylist-content">${rows.length?rows.map(p=>`<button class="mylist-item" data-tv="saved-program" data-bookmark="${esc(p.key)}"><strong>${esc(p.title)}</strong><small>${new Date(p.start).toLocaleString()}</small></button>`).join(''):`<div class="empty">${reminders?'No reminders':'No programs'}</div>`}</div>`;}
   function showWelcome(){welcome=true;setNav(0,false);$('#welcome').hidden=false;$('#welcome [data-tv="import"]').focus();}
   function leaveWelcome(){welcome=false;$('#welcome').hidden=true;localStorage.setItem('tl-tv-ready','true');}
-  function ready(){const remaining=Math.max(0,3000-(Date.now()-(window.__tiviloomBootStarted||Date.now())));setTimeout(()=>{const boot=$('#boot');if(boot)boot.hidden=true;if(!state.imported&&localStorage.getItem('tl-tv-ready')!=='true')showWelcome();else{leaveWelcome();setNav(0,false);}},remaining);}
+  function ready(){const boot=$('#boot');if(boot)boot.hidden=true;if(!state.imported&&localStorage.getItem('tl-tv-ready')!=='true')showWelcome();else{leaveWelcome();setNav(0,false);}}
   function settings(section='root'){
     if(ctx.advanced.guard(section==='parental'?'pin':'settings',()=>settings(section)))return;
     if(ctx.advanced.settings(section))return;

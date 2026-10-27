@@ -1,7 +1,4 @@
 'use strict';
-var createPhoneBridge=require('./relay-client.cjs').createPhoneBridge;
-var createCloudBridge=require('./cloud-client.cjs').createCloudBridge;
-var createLocalBridge=require('./phone.cjs').createPhoneBridge;
 var http=require('http'),https=require('https'),zlib=require('zlib'),crypto=require('crypto');
 var URL=require('url').URL;
 var epg=require('./epg.cjs');
@@ -57,15 +54,12 @@ async function pinAPI(method,payload){
 function createSourceAPI(options){
   options=options||{};
   var tickets=new Map(),active=0,now=options.now||Date.now,images=new Map(),imageBytes=0,imageActive=0;
-  var phone=createPhoneBridge(options.phone||{}),cloud=createCloudBridge(options.phone||{}),local=createLocalBridge(options.phone||{}),phoneClient=null;
   function imageTicket(text){prune();if(tickets.size>=24)tickets.delete(tickets.keys().next().value);var ticket=crypto.randomBytes(16).toString('hex');tickets.set(ticket,{text:text,expires:now()+180000});return {returnValue:true,ticket:ticket,length:text.length,chunks:Math.ceil(text.length/CHUNK)};}
   function prune(){tickets.forEach(function(t,key){if(t.expires<now())tickets.delete(key);});}
   function authorized(sender){return sender===APP_ID||sender===APP_ID+'.source';}
   return async function(method,payload,sender){
     payload=payload||{};prune();
     if(!authorized(sender))throw Error('Caller is not authorized.');
-    if(method==='phoneStart'){phoneClient=payload.bridgeMode==='local'?local:payload.bridgeMode==='cloud'||(payload.bridgeURL&&!payload.bridgeCode)?cloud:phone;return phoneClient.api(method,payload);}
-    if(method.startsWith('phone')){if(!phoneClient)throw Error('Open a QR pairing session first.');return phoneClient.api(method,payload);}
     if(method==='hashPIN'||method==='verifyPIN')return pinAPI(method,payload);
     if(method==='probeMedia')return probeMedia(payload.url,{userAgent:payload.userAgent||'',referer:payload.referer||''});
     var userAgent=typeof payload.userAgent==='string'?payload.userAgent:'';if(userAgent.length>200||/[\r\n]/.test(userAgent))throw Error('Invalid User-Agent.');

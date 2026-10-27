@@ -27,7 +27,7 @@ test('Disabled/deleted active playlists select another enabled list or a clean e
 });
 test('Backup restores additional lists and customization while excluding the PIN',()=>{
  const c=addPlaylist(emptyCatalog(),data,'old'),prefs={parental:{hash:'secret'},lockSettings:true,autoplay:true,longOK:'phone',remoteActions:{favorite:'last-channel',bad:'unknown'}};
- const backup=makeBackup(c,prefs);assert.equal(backup.prefs.parental,undefined);assert.equal(backup.prefs.lockSettings,undefined);assert.equal(backup.prefs.longOK,'phone');
+ const backup=makeBackup(c,prefs);assert.equal(backup.prefs.parental,undefined);assert.equal(backup.prefs.lockSettings,undefined);assert.equal(backup.prefs.longOK,undefined);
  const valid=validateBackup(JSON.parse(JSON.stringify(backup)));const merged=mergeBackup(c,valid,()=> 'new');
  assert.equal(merged.playlists.length,2);assert.equal(merged.activeId,'new');assert.deepEqual(merged.playlists[0],c.playlists[0]);assert.deepEqual(merged.playlists[1].channelNumbers,{a:7});assert.deepEqual(merged.playlists[1].lockedChannels,['b']);
  assert.throws(()=>validateBackup({format:'Other',version:2}));

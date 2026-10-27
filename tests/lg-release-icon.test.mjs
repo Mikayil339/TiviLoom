@@ -10,9 +10,3 @@ test('webOS new icon files keep approved artwork at 80, 130 and 400 pixels',()=>
   assert.equal(image.readUInt32BE(20),width);
  }
 });
-test('webOS pairing path does not silently advertise unsupported TV HTTP server',()=>{
- const code=readFileSync(new URL('../src/advanced-ui.mjs',import.meta.url),'utf8');
- assert.match(code,/platform\.native&&!state\.prefs\.bridgeURL/);
- assert.match(code,/LG webOS TV does not support receiving HTTP requests as a server/);
- assert.match(code,/phonePollFailures<5/);
-});
