@@ -1823,7 +1823,7 @@
       if (ctx.platform.isPhone) (_b3 = $('.rail [data-mobile="favorites"]')) == null ? void 0 : _b3.classList.toggle("active", state.view === "guide" && state.group === "Sevimlil\u0259r");
       (_c = $(`[data-tv="nav-${state.view === "guide" ? ctx.platform.isPhone && state.group === "Sevimlil\u0259r" ? "none" : "guide" : state.view === "mylist" ? "favorites" : state.view}"]`)) == null ? void 0 : _c.classList.add("active");
       stage.classList.toggle("mylist-view", state.view === "mylist");
-      const markup = (state.view === "mylist" ? "" : `<button class="group-button playlist-selector" data-tv="playlists" aria-label="Switch playlist"><span>${esc(state.source)}</span><span>\u2304</span></button>`) + groups().map((g) => `<button class="group-button" data-group="${esc(g)}" aria-label="${esc(groupLabel(g))}; long OK for properties"><span>${ctx.advanced.isGroupLocked(g) ? "\u{1F512} " : ""}${esc(groupLabel(g))}</span></button>`).join("") + '<div class="group-hint">Hold OK on a group: Rename / PIN</div>';
+      const markup = (ctx.platform.isPhone ? `<div class="phone-groups-heading"><div><small>TIVILOOM / LIBRARY</small><strong>Kateqoriyalar</strong></div><button data-tv="groups" aria-label="Kateqoriyalar\u0131 ba\u011Fla">\xD7</button></div>` : "") + (state.view === "mylist" ? "" : `<button class="group-button playlist-selector" data-tv="playlists" aria-label="Switch playlist"><span>${esc(state.source)}</span><span>\u2304</span></button>`) + groups().map((g) => `<button class="group-button" data-group="${esc(g)}" aria-label="${esc(groupLabel(g))}; long OK for properties"><span>${ctx.advanced.isGroupLocked(g) ? "\u{1F512} " : ""}${esc(groupLabel(g))}</span></button>`).join("") + '<div class="group-hint">Hold OK on a group: Rename / PIN</div>';
       const pane = $("#groups");
       if (markup !== lastGroupMarkup) {
         const focused = (_e = (_d = document.activeElement) == null ? void 0 : _d.closest("#groups [data-group]")) == null ? void 0 : _e.dataset.group;
@@ -5115,6 +5115,7 @@
         render();
       }
       tvUI.afterNavigate();
+      syncNativeBounds();
     };
     setInterval(tick, 15e3);
     tick();
@@ -5177,9 +5178,10 @@
       var _a5;
       if (!((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeBounds)) return;
       const r = videoSurface.host.getBoundingClientRect();
-      window.TiviLoomNative.nativeBounds(JSON.stringify({ left: r.left, top: r.top, width: r.width, height: r.height, viewport: window.innerWidth, visible: r.width > 0 && r.height > 0 && !videoSurface.host.hidden && !$("#modal-root").children.length && !!state.playing && !document.hidden }));
+      window.TiviLoomNative.nativeBounds(JSON.stringify({ left: r.left, top: r.top, width: r.width, height: r.height, viewport: window.innerWidth, visible: (state.full || state.view === "guide" && ($("#app").dataset.nav || "0") === "0") && r.width > 0 && r.height > 0 && !videoSurface.host.hidden && !$("#modal-root").children.length && !!state.playing && !document.hidden }));
     }
     new MutationObserver(syncNativeBounds).observe($("#modal-root"), { childList: true });
+    new MutationObserver(syncNativeBounds).observe($("#app"), { attributes: true, attributeFilter: ["data-nav"] });
     window.addEventListener("TiviLoomNativeExpand", enterPlayer);
     window.addEventListener("TiviLoomNativeExit", () => {
       exitPlayer();

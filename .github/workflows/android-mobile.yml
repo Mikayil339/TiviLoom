@@ -40,6 +40,6 @@ jobs:
         run: "$ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose android/app/build/outputs/apk/debug/app-debug.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: TiviLoom-0.6.11-Android-arm64-personal-test-APK
+          name: TiviLoom-0.6.12-Android-arm64-personal-test-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error

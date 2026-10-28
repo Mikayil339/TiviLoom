@@ -58,7 +58,7 @@ export function mountTVUI(ctx) {
     if(ctx.platform.isPhone)$('.rail [data-mobile="favorites"]')?.classList.toggle('active',state.view==='guide'&&state.group==='Sevimlilər');
     $(`[data-tv="nav-${state.view==='guide'?(ctx.platform.isPhone&&state.group==='Sevimlilər'?'none':'guide'):state.view==='mylist'?'favorites':state.view}"]`)?.classList.add('active');
     stage.classList.toggle('mylist-view',state.view==='mylist');
-    const markup=(state.view==='mylist'?'':`<button class="group-button playlist-selector" data-tv="playlists" aria-label="Switch playlist"><span>${esc(state.source)}</span><span>⌄</span></button>`)
+    const markup=(ctx.platform.isPhone?`<div class="phone-groups-heading"><div><small>TIVILOOM / LIBRARY</small><strong>Kateqoriyalar</strong></div><button data-tv="groups" aria-label="Kateqoriyaları bağla">×</button></div>`:'')+(state.view==='mylist'?'':`<button class="group-button playlist-selector" data-tv="playlists" aria-label="Switch playlist"><span>${esc(state.source)}</span><span>⌄</span></button>`)
        +groups().map(g=>`<button class="group-button" data-group="${esc(g)}" aria-label="${esc(groupLabel(g))}; long OK for properties"><span>${ctx.advanced.isGroupLocked(g)?'🔒 ':''}${esc(groupLabel(g))}</span></button>`).join('')+'<div class="group-hint">Hold OK on a group: Rename / PIN</div>';
     const pane=$('#groups');
     if(markup!==lastGroupMarkup){

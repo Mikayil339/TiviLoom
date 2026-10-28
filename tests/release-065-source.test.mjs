@@ -10,8 +10,8 @@ test('LG release version is consistent; Android mobile release has its own versi
  assert.equal(version.trim(), 'export const VERSION="0.6.10";');
  assert.equal(pkg.version,'0.6.10');
  assert.equal(info.version,'0.6.10');
- assert.match(gradle,/versionCode 71/);
- assert.ok(gradle.includes("versionName '0.6.11'"));
+ assert.match(gradle,/versionCode 72/);
+ assert.ok(gradle.includes("versionName '0.6.12'"));
 });
 test('playlist wizard updates validation state on input without Enter or blur',async()=>{
  const ui=await read('src/tv-ui.mjs');
