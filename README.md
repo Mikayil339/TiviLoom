@@ -27,7 +27,7 @@ npm run package
 
 The LG workflow builds, tests and packages the IPK on main. The current package and webOS app/service version is 0.6.10; Android is 0.6.11. Android version metadata is maintained separately from the webOS package.
 
-Local validation: 97/97 automated tests passed and the IPK packaged successfully. Tests dedicated to the removed transfer feature were removed; a new UI test verifies direct playlist entry and that focus navigation does not start playback.
+Local regression validation: 98/98 automated tests passed. The LG workflow packages the IPK. Tests verify direct playlist entry and that focus navigation does not start playback; Android playback validation is described in RELEASE-ANDROID-0.6.11.md.
 
 Physical LG TV acceptance is not complete. Passing tests and a package build do not establish real-device performance, codec compatibility or flawless remote navigation.
 
