@@ -6,7 +6,7 @@ test('Android Gradle project declares Media3 ExoPlayer, HLS and UI modules',()=>
  const g=read('../android/app/build.gradle');
  for(const dep of ['media3-exoplayer:1.5.1','media3-exoplayer-hls:1.5.1','media3-ui:1.5.1']) assert.ok(g.includes(dep),dep);
  const pkg=JSON.parse(read('../package.json'));
- assert.ok(g.includes("versionName '0.6.12'"));
+ assert.ok(g.includes("versionName '0.6.13'"));
 });
 test('native player accepts provider headers and has bounded startup buffering',()=>{
  const j=read('../android/app/src/main/java/com/tiviloom/mobile/NativePlayerHost.java');

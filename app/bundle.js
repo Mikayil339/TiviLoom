@@ -1,4 +1,7 @@
 (() => {
+  // src/back-button.mjs
+  var backIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20z"/></svg>';
+
   // src/version.mjs
   var VERSION = "0.6.10";
 
@@ -1601,8 +1604,22 @@
   };
   function bindRemote(handlers) {
     window.addEventListener("TiviLoomAndroidBack", () => handlers.back());
-    window.addEventListener("TiviLoomAndroidSuspend", () => handlers.suspend());
-    window.addEventListener("TiviLoomAndroidResume", () => handlers.resume());
+    let activityHidden = false, notifiedHidden = false;
+    const notifyVisibility = () => {
+      const value = activityHidden || !!(document.hidden || document.webkitHidden);
+      if (value === notifiedHidden) return;
+      notifiedHidden = value;
+      if (value) handlers.suspend();
+      else handlers.resume();
+    };
+    window.addEventListener("TiviLoomAndroidSuspend", () => {
+      activityHidden = true;
+      notifyVisibility();
+    });
+    window.addEventListener("TiviLoomAndroidResume", () => {
+      activityHidden = false;
+      notifyVisibility();
+    });
     let previewFocus = null;
     const backPress = createPressGesture({ short: () => handlers.back(), long: () => {
       var _a4;
@@ -1632,6 +1649,10 @@
     const changed = () => {
       var _a4, _b3;
       if ((_b3 = (_a4 = window.TiviLoomNative) == null ? void 0 : _a4.isPickingFile) == null ? void 0 : _b3.call(_a4)) return;
+      if (isPhone && window.TiviLoomNative) {
+        notifyVisibility();
+        return;
+      }
       const value = !!(document.hidden || document.webkitHidden);
       if (value && !hidden) {
         hidden = true;
@@ -1823,7 +1844,7 @@
       if (ctx.platform.isPhone) (_b3 = $('.rail [data-mobile="favorites"]')) == null ? void 0 : _b3.classList.toggle("active", state.view === "guide" && state.group === "Sevimlil\u0259r");
       (_c = $(`[data-tv="nav-${state.view === "guide" ? ctx.platform.isPhone && state.group === "Sevimlil\u0259r" ? "none" : "guide" : state.view === "mylist" ? "favorites" : state.view}"]`)) == null ? void 0 : _c.classList.add("active");
       stage.classList.toggle("mylist-view", state.view === "mylist");
-      const markup = (ctx.platform.isPhone ? `<div class="phone-groups-heading"><div><small>TIVILOOM / LIBRARY</small><strong>Kateqoriyalar</strong></div><button data-tv="groups" aria-label="Kateqoriyalar\u0131 ba\u011Fla">\xD7</button></div>` : "") + (state.view === "mylist" ? "" : `<button class="group-button playlist-selector" data-tv="playlists" aria-label="Switch playlist"><span>${esc(state.source)}</span><span>\u2304</span></button>`) + groups().map((g) => `<button class="group-button" data-group="${esc(g)}" aria-label="${esc(groupLabel(g))}; long OK for properties"><span>${ctx.advanced.isGroupLocked(g) ? "\u{1F512} " : ""}${esc(groupLabel(g))}</span></button>`).join("") + '<div class="group-hint">Hold OK on a group: Rename / PIN</div>';
+      const markup = (ctx.platform.isPhone ? `<div class="phone-groups-heading"><div><small>TIVILOOM / LIBRARY</small><strong>Kateqoriyalar</strong></div><button data-tv="groups" aria-label="Geri">${backIcon}</button></div>` : "") + (state.view === "mylist" ? "" : `<button class="group-button playlist-selector" data-tv="playlists" aria-label="Switch playlist"><span>${esc(state.source)}</span><span>\u2304</span></button>`) + groups().map((g) => `<button class="group-button" data-group="${esc(g)}" aria-label="${esc(groupLabel(g))}; long OK for properties"><span>${ctx.advanced.isGroupLocked(g) ? "\u{1F512} " : ""}${esc(groupLabel(g))}</span></button>`).join("") + '<div class="group-hint">Hold OK on a group: Rename / PIN</div>';
       const pane = $("#groups");
       if (markup !== lastGroupMarkup) {
         const focused = (_e = (_d = document.activeElement) == null ? void 0 : _d.closest("#groups [data-group]")) == null ? void 0 : _e.dataset.group;
@@ -2043,7 +2064,7 @@
       el.id = "movie-detail";
       el.dataset.mediaId = c.id;
       el.className = "movie-detail";
-      el.innerHTML = `${ctx.platform.isPhone ? '<button class="mobile-detail-back" data-tv="movie-back" aria-label="Back to movies">\u2039</button>' : ""}<div class="movie-detail-backdrop"><img src="${ctx.safeImage(c.poster || c.logo || "assets/poster-0.svg")}" alt=""></div><h1>${esc(c.name)}${c.year ? " (" + c.year + ")" : ""}</h1><p class="movie-description">${esc(c.description || "")}</p><div class="movie-detail-actions"><button data-tv="movie-play">${icon("play")}Play</button><button data-tv="movie-check">${icon("link")}Check source</button><button data-tv="movie-folder">${icon("bookmark")}Favorite folder</button><button disabled>${icon("screen")}Open in external player</button><button disabled>${icon("film")}Trailer</button><button data-tv="movie-favorite">${icon("bookmark")}${state.favorites.includes(c.id) ? "Remove from My list" : "Add to My list"}</button></div>`;
+      el.innerHTML = `${ctx.platform.isPhone ? `<button class="mobile-detail-back" data-tv="movie-back" aria-label="Back to movies">${backIcon}</button>` : ""}<div class="movie-detail-backdrop"><img src="${ctx.safeImage(c.poster || c.logo || "assets/poster-0.svg")}" alt=""></div><h1>${esc(c.name)}${c.year ? " (" + c.year + ")" : ""}</h1><p class="movie-description">${esc(c.description || "")}</p><div class="movie-detail-actions"><button data-tv="movie-play">${icon("play")}Play</button><button data-tv="movie-check">${icon("link")}Check source</button><button data-tv="movie-folder">${icon("bookmark")}Favorite folder</button><button disabled>${icon("screen")}Open in external player</button><button disabled>${icon("film")}Trailer</button><button data-tv="movie-favorite">${icon("bookmark")}${state.favorites.includes(c.id) ? "Remove from My list" : "Add to My list"}</button></div>`;
       stage.append(el);
       el.querySelector("button").focus();
     }
@@ -2226,7 +2247,7 @@
         next = "Done";
       }
       $("#wizard").hidden = false;
-      $("#wizard").innerHTML = `<section class="wizard-left"><div class="wizard-icon">${wizardIcon(w.step)}</div><div class="wizard-heading"><h1>${esc(title)}</h1>${desc ? `<p>${esc(desc)}</p>` : ""}</div></section><section class="wizard-center"><div class="wizard-options ${kind}">${body}</div><div class="wizard-status" role="status">${esc(w.status || "")}</div></section><section class="wizard-side"><div class="wizard-controls">${w.step !== "type" ? `<button data-tv="wizard-next" ${!canNext ? "disabled" : ""}>${next}${icon("chevron")}</button>` : ""}<button data-tv="wizard-back">${back}</button></div></section><input type="file" id="source-file" accept=".m3u,.m3u8,.txt" hidden>`;
+      $("#wizard").innerHTML = `<section class="wizard-left"><div class="wizard-icon">${wizardIcon(w.step)}</div><div class="wizard-heading"><h1>${esc(title)}</h1>${desc ? `<p>${esc(desc)}</p>` : ""}</div></section><section class="wizard-center"><div class="wizard-options ${kind}">${body}</div><div class="wizard-status" role="status">${esc(w.status || "")}</div></section><section class="wizard-side"><div class="wizard-controls">${w.step !== "type" ? `<button data-tv="wizard-next" ${!canNext ? "disabled" : ""}>${next}${icon("chevron")}</button>` : ""}<button data-tv="wizard-back">${ctx.platform.isPhone ? backIcon : ""}<span>${back}</span></button></div></section><input type="file" id="source-file" accept=".m3u,.m3u8,.txt" hidden>`;
       if (w.edit) {
         const f = $("#wizard-field");
         f == null ? void 0 : f.focus();
@@ -3216,6 +3237,7 @@
       if (document.hidden) press.cancel();
     });
     function longBack() {
+      if (ctx.platform.isPhone) return webOSBack();
       if (!$("#modal-root").children.length && !wizard && !welcome && !state.full && state.playing) {
         ctx.enterPlayer();
         return;
@@ -3223,8 +3245,9 @@
       webOSBack();
     }
     function webOSBack() {
+      var _a4;
       ctx.persistResume();
-      if ($("#movie-detail")) return closeMovie();
+      if ($("#modal-root").children.length || $("#multiview")) return ctx.modalBack();
       if (wizard) {
         if (wizard.edit) {
           wizard.edit = null;
@@ -3232,9 +3255,10 @@
         } else wizardBack();
         return;
       }
-      if ($("#modal-root").children.length || $("#multiview")) return ctx.modalBack();
+      if ($("#movie-detail")) return closeMovie();
       if (listMode) return closeList();
       if (state.full) {
+        if (ctx.platform.isPhone && ((_a4 = ctx.nativeBack) == null ? void 0 : _a4.call(ctx))) return;
         if (!ctx.platform.isPhone && state.controls && state.playerMode === "tools") {
           state.controls = false;
           $("#player-controls").classList.add("hidden-controls");
@@ -3315,6 +3339,7 @@
         return fallback;
       }
     }
+    const phoneNavigationAtLoad = read("phone-navigation", {});
     const state = { channels: initial.channels, programs: initial.programs, epgNames: {}, source: "TiviLoom n\xFCmun\u0259l\u0259ri", imported: false, view: "guide", group: "Ham\u0131s\u0131", query: "", channel: "demo-0", selected: null, playing: null, window: Math.floor(Date.now() / 18e5) * 18e5, full: false, controls: true, favorites: read("favorites", []), history: read("history", []), reminders: read("reminders", []), prefs: read("prefs", { compact: false, large: false, motion: true, groups: true, muted: platform.isPhone ? false : !platform.native, autoplay: false, fit: "contain" }), sleep: 0, watchProgress: read("watch-progress", read("watchProgress", {})), favCollections: read("fav-collections", read("favCollections", {})) };
     let resumeReady = false, resumeState = read("session-v1", {}), lastResumeJSON = "";
     let catalog = emptyCatalog(), libraryWrites = Promise.resolve(), libraryBusy = false;
@@ -3328,6 +3353,10 @@
     function persistResume() {
       if (!resumeReady) return;
       const next = captureResume(state, resumeState), json = JSON.stringify(next);
+      if (platform.isPhone) try {
+        localStorage.setItem("tl-phone-navigation", JSON.stringify({ view: state.view, group: state.group, channel: state.channel, query: state.query }));
+      } catch {
+      }
       if (json === lastResumeJSON) return;
       try {
         localStorage.setItem("tl-session-v1", json);
@@ -4058,7 +4087,7 @@
       menuActions = {};
       modalResume = opts.resume || null;
       modalLastFocus = document.activeElement;
-      root.innerHTML = `<div class="overlay ${opts.panel ? "panel-overlay" : ""} ${opts.choice ? "choice-overlay" : ""} ${opts.context ? "context-overlay" : ""} ${opts.program ? "program-overlay" : ""}"><section role="dialog" aria-modal="true" aria-label="${esc(title)}" class="${opts.panel ? "settings-panel" : "dialog"} ${opts.choice ? "choice-dialog" : ""} ${opts.context ? "context-dialog" : ""} ${opts.program ? "program-dialog" : ""}"><div class="dialog-header"><h2>${esc(title)}</h2><button data-action="modal-back" aria-label="Back" title="Back">\u2039</button></div>${opts.panel ? `<div class="settings-body">${body}</div>` : `<div class="dialog-body">${body}</div>${actions ? `<div class="dialog-actions">${actions}</div>` : ""}`}</section></div>`;
+      root.innerHTML = `<div class="overlay ${opts.panel ? "panel-overlay" : ""} ${opts.choice ? "choice-overlay" : ""} ${opts.context ? "context-overlay" : ""} ${opts.program ? "program-overlay" : ""}"><section role="dialog" aria-modal="true" aria-label="${esc(title)}" class="${opts.panel ? "settings-panel" : "dialog"} ${opts.choice ? "choice-dialog" : ""} ${opts.context ? "context-dialog" : ""} ${opts.program ? "program-dialog" : ""}"><div class="dialog-header"><h2>${esc(title)}</h2><button data-action="modal-back" aria-label="Back" title="Back">${platform.isPhone ? backIcon : "\u2039"}</button></div>${opts.panel ? `<div class="settings-body">${body}</div>` : `<div class="dialog-body">${body}</div>${actions ? `<div class="dialog-actions">${actions}</div>` : ""}`}</section></div>`;
       (_a5 = root.querySelector("input:not([type=file]):not([type=checkbox])") || root.querySelector(".primary") || root.querySelector(".settings-body button:not(:disabled)") || root.querySelector("button")) == null ? void 0 : _a5.focus();
     }
     function menu(title, items, opts = {}) {
@@ -5055,6 +5084,14 @@
       },
       closeModal: (...a) => closeModal(...a),
       modalBack: () => modalBack(),
+      nativeBack: () => {
+        var _a5;
+        if (document.documentElement.classList.contains("native-preview") && ((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeBack)) {
+          window.TiviLoomNative.nativeBack();
+          return true;
+        }
+        return false;
+      },
       modal: (...a) => modal(...a),
       resetDemo: (...a) => resetDemo(...a),
       play: (...a) => play(...a),
@@ -5145,7 +5182,16 @@
       toast("Yerli yadda\u015F \u0259l\xE7atan deyil; n\xFCmun\u0259 rejimi a\xE7\u0131ld\u0131.");
     }
     tvUI.ready();
-    const startup = resumePlan(state.channels, resumeState, state.prefs, state.favorites, state.history);
+    let startup = resumePlan(state.channels, resumeState, state.prefs, state.favorites, state.history);
+    if (platform.isPhone && new URLSearchParams(location.search).get("restore") === "1") {
+      const nav = phoneNavigationAtLoad;
+      if (["guide", "movies", "series", "search", "history", "mylist"].includes(nav.view)) {
+        startup = { ...startup, view: nav.view, autoplay: false, fullscreen: false };
+        if (state.channels.some((c) => c.id === nav.channel)) startup.channel = nav.channel;
+        startup.group = typeof nav.group === "string" ? nav.group : startup.group;
+        state.query = typeof nav.query === "string" ? nav.query : "";
+      }
+    }
     state.channel = startup.channel;
     state.group = ((_b3 = state.groupPins) == null ? void 0 : _b3[startup.group]) ? "Ham\u0131s\u0131" : startup.group;
     state.view = state.channels.some((c) => c.type === "tv") ? startup.view : "movies";
@@ -5178,7 +5224,7 @@
       var _a5;
       if (!((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeBounds)) return;
       const r = videoSurface.host.getBoundingClientRect();
-      window.TiviLoomNative.nativeBounds(JSON.stringify({ left: r.left, top: r.top, width: r.width, height: r.height, viewport: window.innerWidth, visible: (state.full || state.view === "guide" && ($("#app").dataset.nav || "0") === "0") && r.width > 0 && r.height > 0 && !videoSurface.host.hidden && !$("#modal-root").children.length && !!state.playing && !document.hidden }));
+      window.TiviLoomNative.nativeBounds(JSON.stringify({ left: r.left, top: r.top, width: r.width, height: r.height, viewport: window.innerWidth, pause: !(state.full || state.view === "guide" && ($("#app").dataset.nav || "0") === "0") || !!$("#modal-root").children.length, visible: (state.full || state.view === "guide" && ($("#app").dataset.nav || "0") === "0") && r.width > 0 && r.height > 0 && !videoSurface.host.hidden && !$("#modal-root").children.length && !!state.playing && !document.hidden }));
     }
     new MutationObserver(syncNativeBounds).observe($("#modal-root"), { childList: true });
     new MutationObserver(syncNativeBounds).observe($("#app"), { attributes: true, attributeFilter: ["data-nav"] });
@@ -5244,9 +5290,26 @@
       videoSurface.place($("#preview"));
       toast("Player a\xE7\u0131la bilm\u0259di. Kanal\u0131 yenid\u0259n se\xE7in.");
     });
-    let suspended = false;
+    let suspended = false, phoneWasPlaying = false;
     function tvSuspend() {
-      var _a5, _b4;
+      var _a5, _b4, _c2, _d, _e;
+      if (platform.isPhone) {
+        if (suspended) return;
+        suspended = true;
+        advanced.suspend();
+        const protectedChannel = state.channels.find((c) => c.id === state.playing);
+        if (protectedChannel && (!advanced.groupAccessible(protectedChannel.group) || state.prefs.parental && ((_a5 = state.lockedChannels) == null ? void 0 : _a5.includes(protectedChannel.id)))) {
+          if (state.full) exitPlayer();
+          stopMedia();
+        }
+        phoneWasPlaying = !!state.playing && !video.paused;
+        persistResume();
+        (_c2 = (_b4 = window.TiviLoomNative) == null ? void 0 : _b4.suspendNativePlayer) == null ? void 0 : _c2.call(_b4);
+        if (!document.documentElement.classList.contains("native-preview")) video.pause();
+        clearTimeout(reconnectTimer);
+        clearTimeout(stallTimer);
+        return;
+      }
       if ($("#mini-player") && !$("#mini-player").hidden) toggleMini(true);
       advanced.suspend();
       clearTimeout(reconnectTimer);
@@ -5255,7 +5318,7 @@
       if (suspended) return;
       suspended = true;
       persistResume();
-      (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
+      (_e = (_d = window.TiviLoomNative) == null ? void 0 : _d.stopNativePlayer) == null ? void 0 : _e.call(_d);
       document.documentElement.classList.remove("native-preview");
       ++playGeneration;
       hls == null ? void 0 : hls.destroy();
@@ -5271,14 +5334,22 @@
       $("#video-error").hidden = true;
     }
     function tvResume() {
-      var _a5;
+      var _a5, _b4, _c2, _d;
       if (!suspended) return;
       suspended = false;
+      if (platform.isPhone) {
+        syncNativeBounds();
+        (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.resumeNativePlayer) == null ? void 0 : _b4.call(_a5);
+        if (phoneWasPlaying && !((_c2 = window.TiviLoomNative) == null ? void 0 : _c2.openNativePlayer) && state.playing && (state.full || state.view === "guide") && !$("#modal-root").children.length) video.play().catch(() => {
+        });
+        phoneWasPlaying = false;
+        return;
+      }
       closeModal();
       tvUI.resetTransient();
       if (state.full) exitPlayer();
       const plan = resumePlan(state.channels, resumeState, state.prefs, state.favorites, state.history);
-      Object.assign(state, { channel: plan.channel, group: ((_a5 = state.groupPins) == null ? void 0 : _a5[plan.group]) ? "Ham\u0131s\u0131" : plan.group, view: plan.view, window: plan.window, selected: null });
+      Object.assign(state, { channel: plan.channel, group: ((_d = state.groupPins) == null ? void 0 : _d[plan.group]) ? "Ham\u0131s\u0131" : plan.group, view: plan.view, window: plan.window, selected: null });
       render();
       tvUI.ready();
       if (plan.autoplay && (state.imported || localStorage.getItem("tl-tv-ready") === "true")) play(currentChannel(), true);
@@ -5310,6 +5381,9 @@
       if (action === "next" || action === "previous") return channelStep(action === "next" ? 1 : -1);
       doAction(action);
     } });
+    document.addEventListener("input", (e) => {
+      if (platform.isPhone && e.target.id === "search-input") persistResume();
+    });
     advanced.start();
     if ($("#welcome").hidden) (_c = $(".programme.selected")) == null ? void 0 : _c.focus({ preventScroll: true });
   }

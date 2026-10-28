@@ -1,0 +1,13 @@
+# Android 0.6.13 — Back and foreground recovery
+
+Returning from screen lock or Home previously ran the cold-start resume plan. With startup autoplay enabled this discarded the current section and could enter fullscreen. Android now pauses the existing native host while preserving the live UI. Foreground return keeps the section, query, open menus and fullscreen/preview mode. Playback resumes only when it was requested before backgrounding, the player is visible, the Activity/dialog has focus and the device is interactive and unlocked. A deliberately paused video stays paused. Live Media3 playback seeks its current live edge; VOD retains its position. Pending errors/startup retries cannot start a background stream.
+
+Android visibility and Activity events are coalesced so duplicate pause/resume signals do not rebuild the UI. An Activity recreated by Android restores its last durable section, selection and Search query without applying cold-start autoplay. A deliberate fresh launch still uses the existing startup preference. Temporary PIN unlocks expire as before; protected playback is stopped rather than resumed without authorization.
+
+Phone Back affordances now use the same arrow geometry, 48 dp target and branded surface. Hardware Back follows the top UI layer: keyboard, native/HTML menu, screen lock, fullscreen, category/detail/section, then exit confirmation as applicable. A modal above a movie detail closes before the detail. A long Back on the phone behaves like Back and does not expand the preview. Native popup Back first hides an open keyboard. The exit confirmation uses the branded native sheet.
+
+The 0.6.11 broadcast extraction/recovery and 0.6.12 menus, preview controls and volume/brightness gestures remain. Backgrounding restores system-window brightness; returning to a visible fullscreen restores that player's prior brightness. Approved artwork, no autoplay on focus and removed phone-to-TV relay behavior are preserved.
+
+Android version 0.6.13/code73, personal debug-signed arm64 package. Root/LG remains 0.6.10. Automated and disposable-emulator results are reported separately; physical Samsung S23 Ultra and LG acceptance is not claimed. Process recreation restores durable navigation, not serialized popup widgets; normal Home/lock preserves the live popup stack.
+
+Preview layout visibility and intentional pause are separate: temporary zero-sized/orientation frames may hide the surface without changing playback intent. Actual section/modal navigation still pauses it. A real WebView document reload releases the previous document's native host and ignores queued open requests from that document.

@@ -294,3 +294,9 @@ html.phone{--bg:#0d1319;--panel:#17212b;--fg:#f5f7fa;--muted:#94a5b5;--accent:#7
 .phone .groups .playlist-selector{justify-content:space-between;gap:12px;background:#0c192b;font-size:13px;margin-bottom:14px}
 .phone .groups .group-hint{display:none}
 .phone #phone-group-scrim{background:#030a16b8;backdrop-filter:blur(8px)}
+
+/* One back affordance across phone pages, sheets and wizard steps. */
+.phone .dialog-header [data-action="modal-back"],.phone .mobile-detail-back,.phone .phone-groups-heading button{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;flex:none;width:48px;height:48px;min-width:48px;min-height:48px;padding:14px;border:1px solid #31455f;border-radius:14px;color:#f1f6ff;background:#203249;font-size:0}
+.phone .dialog-header [data-action="modal-back"] svg,.phone .mobile-detail-back svg,.phone .phone-groups-heading button svg{display:block;width:20px;height:20px;flex:none;fill:currentColor;stroke:none}
+.phone .wizard [data-tv="wizard-back"]{display:flex;align-items:center;justify-content:center;gap:10px;border-radius:14px;background:#203249;color:#f1f6ff}
+.phone .wizard [data-tv="wizard-back"] svg{width:20px;height:20px;flex:none;fill:currentColor;stroke:none}

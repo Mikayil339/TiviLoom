@@ -1,6 +1,6 @@
 # TiviLoom — LG webOS and Android phone
 
-Android phone release: 0.6.12; LG webOS remains 0.6.10. Android preview and fullscreen share one native player host; unsupported platform formats use a LibVLC compatibility decoder. Branded menus, explicit preview pause and fullscreen volume/brightness gestures preserve the 0.6.11 broadcaster compatibility changes. See RELEASE-ANDROID-0.6.12.md and RELEASE-ANDROID-0.6.11.md for scope and limitations.
+Android phone release: 0.6.13; LG webOS remains 0.6.10. Android preview and fullscreen share one native player host; unsupported platform formats use a LibVLC compatibility decoder. Back handling and foreground recovery preserve the current UI and paused state. Branded menus and gestures retain the 0.6.11 broadcaster compatibility changes. See RELEASE-ANDROID-0.6.13.md for scope and limitations.
 
 ## Install
 
@@ -25,9 +25,9 @@ npm test
 npm run package
 ```
 
-The LG workflow builds, tests and packages the IPK on main. The current package and webOS app/service version is 0.6.10; Android is 0.6.12. Android version metadata is maintained separately from the webOS package.
+The LG workflow builds, tests and packages the IPK on main. The current package and webOS app/service version is 0.6.10; Android is 0.6.13. Android version metadata is maintained separately from the webOS package.
 
-Local regression validation: 99/99 automated tests passed. The LG workflow packages the IPK. Tests verify direct playlist entry, no playback on focus and Android preview visibility across navigation; Android playback validation is described in the Android release notes.
+Local regression validation: 105/105 automated tests passed. The LG workflow packages the IPK. Tests verify direct playlist entry, no playback on focus, Android preview visibility and foreground navigation; Android playback validation is described in the Android release notes.
 
 Physical LG TV acceptance is not complete. Passing tests and a package build do not establish real-device performance, codec compatibility or flawless remote navigation.
 

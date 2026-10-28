@@ -1,7 +1,7 @@
 package com.tiviloom.mobile.test;
 import android.app.*;import android.content.*;import android.os.*;import android.webkit.*;import org.json.*;import java.lang.reflect.*;import java.util.concurrent.*;
 /** Real MainActivity bridge and orientation transitions, using a local fixture only. */
-public final class UnifiedPlayerTest extends NativePlayerTest {
+public class UnifiedPlayerTest extends NativePlayerTest {
  Bundle arguments;WebView web;
  @Override public void onCreate(Bundle args){arguments=args;super.onCreate(args);}
  Object decoder()throws Exception{Object compat=field("compatibility");return compat!=null?compat:field("player");}
@@ -14,7 +14,7 @@ public final class UnifiedPlayerTest extends NativePlayerTest {
  @Override public void onStart(){try{
  activity=startActivitySync(new Intent().setClassName("com.tiviloom.mobile","com.tiviloom.mobile.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));Field wf=activity.getClass().getDeclaredField("web");wf.setAccessible(true);web=(WebView)wf.get(activity);waitJS("document.querySelector('#boot')?.hidden===true");
  eval("window.__fixturePending=true;localStorage.setItem('tl-tv-ready','true');localStorage.setItem('tl-prefs',JSON.stringify({autoplay:false,muted:false,motion:false}));const r=indexedDB.open('TiviLoom',1);r.onsuccess=()=>{const tx=r.result.transaction('library','readwrite');tx.objectStore('library').put({version:2,activeId:'fixture',playlists:[{id:'fixture',name:'Local fixture',imported:true,channels:[{id:'one',name:'Fixture One',type:'tv',group:'QA',url:"+JSONObject.quote(arguments.getString("url","http://10.0.2.2:18888/demo.mp4"))+"}],programs:[],favorites:[],history:[]}]},'active');tx.oncomplete=()=>{r.result.close();window.__fixtureReady=true}};");
- waitJS("window.__fixtureReady===true");eval("window.__reloadPending=true;location.reload()");
+ waitJS("window.__fixtureReady===true");eval("window.__reloadPending=true;location.replace(location.pathname+'?layout=phone')");
  waitJS("!window.__reloadPending && !!document.querySelector('[data-channel=one]')&&document.querySelector('#boot').hidden");eval("document.querySelector('[data-channel=one]').click()");
  check("MainActivity native preview decodes",()->waitFor(()->host()!=null&&playing()&&renderedPlayback()));
  Object original=decoder();onMain(()->{Object p=field("player");if(p!=null)Class.forName("androidx.media3.common.Player",true,activity.getClassLoader()).getMethod("setRepeatMode",int.class).invoke(p,1);return true;});

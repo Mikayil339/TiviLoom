@@ -47,8 +47,10 @@ export const platform={isTV:!isPhone,isPhone,native,fileSupport:isPhone,get nati
 };
 export function bindRemote(handlers){
   window.addEventListener('TiviLoomAndroidBack',()=>handlers.back());
-  window.addEventListener('TiviLoomAndroidSuspend',()=>handlers.suspend());
-  window.addEventListener('TiviLoomAndroidResume',()=>handlers.resume());
+  let activityHidden=false,notifiedHidden=false;
+  const notifyVisibility=()=>{const value=activityHidden||!!(document.hidden||document.webkitHidden);if(value===notifiedHidden)return;notifiedHidden=value;if(value)handlers.suspend();else handlers.resume();};
+  window.addEventListener('TiviLoomAndroidSuspend',()=>{activityHidden=true;notifyVisibility();});
+  window.addEventListener('TiviLoomAndroidResume',()=>{activityHidden=false;notifyVisibility();});
   let previewFocus=null;const backPress=createPressGesture({short:()=>handlers.back(),long:()=>handlers.longBack?.()||undefined});
   if(!native)document.addEventListener('focusin',event=>{if(event.target.matches('button,input,select,textarea'))previewFocus=event.target;});
   window.addEventListener('keydown',event=>{
@@ -60,7 +62,7 @@ export function bindRemote(handlers){
   window.addEventListener('keyup',event=>{if(remoteAction(event.keyCode||event.which)==='back'||(!native&&event.key==='Escape')){event.preventDefault();event.stopImmediatePropagation();backPress.up('back');}},true);
   window.addEventListener('blur',()=>backPress.cancel());
   let hidden=false;
-  const changed=()=>{if(window.TiviLoomNative?.isPickingFile?.())return;const value=!!(document.hidden||document.webkitHidden);if(value&&!hidden){hidden=true;backPress.cancel();handlers.suspend();}else if(!value&&hidden){hidden=false;handlers.resume();}};
+  const changed=()=>{if(window.TiviLoomNative?.isPickingFile?.())return;if(isPhone&&window.TiviLoomNative){notifyVisibility();return;}const value=!!(document.hidden||document.webkitHidden);if(value&&!hidden){hidden=true;backPress.cancel();handlers.suspend();}else if(!value&&hidden){hidden=false;handlers.resume();}};
   document.addEventListener('visibilitychange',changed);
   document.addEventListener('webkitvisibilitychange',changed);
   document.addEventListener('webOSRelaunch',()=>{if(hidden){hidden=false;handlers.resume();}});
