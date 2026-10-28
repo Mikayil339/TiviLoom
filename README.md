@@ -1,6 +1,6 @@
 # TiviLoom — LG webOS and Android phone
 
-LG webOS and Android phone release: 0.6.10. Android preview and fullscreen share one native player host; unsupported platform formats use a LibVLC compatibility decoder. See RELEASE-0.6.10.md for validation scope and limitations.
+Android phone release: 0.6.11; LG webOS remains 0.6.10. Android preview and fullscreen share one native player host; unsupported platform formats use a LibVLC compatibility decoder. Android 0.6.11 accepts broadcaster non-IDR keyframes and bounds silent startup recovery. See RELEASE-ANDROID-0.6.11.md and RELEASE-0.6.10.md for scope and limitations.
 
 ## Install
 
@@ -25,7 +25,7 @@ npm test
 npm run package
 ```
 
-The LG workflow builds, tests and packages the IPK on main. The current package, webOS app/service and Android release are 0.6.10. Android version metadata is maintained separately from the webOS package.
+The LG workflow builds, tests and packages the IPK on main. The current package and webOS app/service version is 0.6.10; Android is 0.6.11. Android version metadata is maintained separately from the webOS package.
 
 Local validation: 97/97 automated tests passed and the IPK packaged successfully. Tests dedicated to the removed transfer feature were removed; a new UI test verifies direct playlist entry and that focus navigation does not start playback.
 

@@ -118,7 +118,7 @@ async function play(c,fullscreen=false,automatic=false){if(!c)return;if(advanced
     const generation=++playGeneration;
     try{
       const url=await mediaURL(c);if(generation!==playGeneration)return;
-      const payload=JSON.stringify({url,name:c.name,fullscreen,muted:!!state.prefs.muted,autoReconnect:state.prefs.autoReconnect!==false,fit:state.prefs.fit||'contain',userAgent:c.userAgent||state.userAgent||'TiviLoom-Android/0.6.10',referer:c.referer||'',catalogue:state.channels.filter(x=>!state.hiddenChannels?.includes(x.id)&&!state.hiddenGroups?.includes(x.group)&&advanced.groupAccessible(x.group)).map(({id,name,group})=>({id,name,group})),history:[c.id,...state.history.filter(id=>id!==c.id)].slice(0,60)});
+      const payload=JSON.stringify({url,name:c.name,fullscreen,muted:!!state.prefs.muted,autoReconnect:state.prefs.autoReconnect!==false,fit:state.prefs.fit||'contain',userAgent:c.userAgent||state.userAgent||('TiviLoom-Android/'+VERSION),referer:c.referer||'',catalogue:state.channels.filter(x=>!state.hiddenChannels?.includes(x.id)&&!state.hiddenGroups?.includes(x.group)&&advanced.groupAccessible(x.group)).map(({id,name,group})=>({id,name,group})),history:[c.id,...state.history.filter(id=>id!==c.id)].slice(0,60)});
       if(!window.TiviLoomNative.openNativePlayer(payload))throw Error('Native player could not be opened.');
       video.pause();if(hls){hls.destroy();hls=null;}if(video.hasAttribute('src')){video.removeAttribute('src');video.load();}
       state.channel=c.id;state.playing=c.id;state.full=fullscreen;state.playbackPhase='loading';

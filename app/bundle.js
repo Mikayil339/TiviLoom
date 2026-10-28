@@ -3746,7 +3746,7 @@
         try {
           const url = await mediaURL(c);
           if (generation2 !== playGeneration) return;
-          const payload = JSON.stringify({ url, name: c.name, fullscreen, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/0.6.10", referer: c.referer || "", catalogue: state.channels.filter((x) => {
+          const payload = JSON.stringify({ url, name: c.name, fullscreen, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/" + VERSION2, referer: c.referer || "", catalogue: state.channels.filter((x) => {
             var _a6, _b5;
             return !((_a6 = state.hiddenChannels) == null ? void 0 : _a6.includes(x.id)) && !((_b5 = state.hiddenGroups) == null ? void 0 : _b5.includes(x.group)) && advanced.groupAccessible(x.group);
           }).map(({ id, name, group }) => ({ id, name, group })), history: [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60) });
