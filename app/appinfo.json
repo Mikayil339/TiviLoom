@@ -1,13 +1,13 @@
 {
   "id": "com.tiviloom.app",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "vendor": "TiviLoom",
   "type": "web",
   "main": "index.html",
   "title": "TiviLoom",
   "appDescription": "TV playlists and programme guide",
-  "icon": "icon-v0.6.10.png",
-  "largeIcon": "largeIcon-v0.6.10.png",
+  "icon": "icon-v0.6.11.png",
+  "largeIcon": "largeIcon-v0.6.11.png",
   "iconColor": "#031029",
   "bgColor": "#031029",
   "resolution": "1920x1080",
@@ -16,5 +16,5 @@
     "activity.operation"
   ],
   "handlesRelaunch": false,
-  "storeIcon": "storeIcon-v0.6.10.png"
+  "storeIcon": "storeIcon-v0.6.11.png"
 }

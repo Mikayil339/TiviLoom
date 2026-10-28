@@ -7,9 +7,9 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=rel=>readFile(path.join(root,rel),'utf8');
 test('LG release version is consistent; Android mobile release has its own version',async()=>{
  const version=await read('src/version.mjs'); const pkg=JSON.parse(await read('package.json')); const info=JSON.parse(await read('app/appinfo.json')); const gradle=await read('android/app/build.gradle');
- assert.equal(version.trim(), 'export const VERSION="0.6.10";');
- assert.equal(pkg.version,'0.6.10');
- assert.equal(info.version,'0.6.10');
+ assert.equal(version.trim(), 'export const VERSION="0.6.11";');
+ assert.equal(pkg.version,'0.6.11');
+ assert.equal(info.version,'0.6.11');
  assert.match(gradle,/versionCode 73/);
  assert.ok(gradle.includes("versionName '0.6.13'"));
 });

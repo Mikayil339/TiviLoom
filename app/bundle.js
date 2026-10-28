@@ -3,7 +3,7 @@
   var backIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20z"/></svg>';
 
   // src/version.mjs
-  var VERSION = "0.6.10";
+  var VERSION = "0.6.11";
 
   // src/library-store.mjs
   function createLibraryStore({ indexedDB: indexedDB2, storage, timeout = 5e3 } = {}) {
@@ -2683,6 +2683,7 @@
     }
     function keyControl(key) {
       var _a4, _b3, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+      if ($("#modal-root").children.length) return ctx.keyLegacy(key);
       if (wizard) {
         wizardKey(key);
         return;
@@ -2887,6 +2888,7 @@
         (_b3 = $(".result")) == null ? void 0 : _b3.focus();
         return;
       }
+      if ($("#modal-root").children.length) return;
       if (wizard) {
         if (e.target.matches("input") && !["Enter", "Escape"].includes(e.key)) return;
         e.preventDefault();
@@ -3182,7 +3184,7 @@
     }
     function activateOK(target) {
       if ($("#modal-root").children.length) {
-        if ((target == null ? void 0 : target.isConnected) && target.matches("button")) target.click();
+        if ((target == null ? void 0 : target.isConnected) && $("#modal-root").contains(target) && target.matches("button")) target.click();
         return;
       }
       if (wizard) return wizardKey("Enter");
@@ -3246,6 +3248,7 @@
     }
     function webOSBack() {
       var _a4;
+      press.cancel();
       ctx.persistResume();
       if ($("#modal-root").children.length || $("#multiview")) return ctx.modalBack();
       if (wizard) {

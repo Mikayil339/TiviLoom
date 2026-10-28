@@ -239,7 +239,7 @@ export function mountTVUI(ctx) {
    else for(let i=0;i<video.textTracks.length;i++){const t=video.textTracks[i];items.push([t.label||t.language||'Subtitles '+(i+1),()=>{for(const x of video.textTracks)x.mode='disabled';t.mode='showing';ctx.modalBack();},t.mode==='showing'?'Selected':'']);}choicePanel('Closed captions',items);
   }
   function videoTracks(){const h=ctx.getHls();if(h?.levels?.length){choicePanel('Video tracks',[['Auto',()=>{h.currentLevel=-1;ctx.closeModal();}],...h.levels.map((l,i)=>[(l.height?l.height+'p':'Level '+(i+1))+(l.bitrate?' · '+(l.bitrate/1000000).toFixed(2)+' Mbps':''),()=>{h.currentLevel=i;ctx.closeModal();}])]);}else choicePanel('Video tracks',[[video.videoWidth?video.videoWidth+' × '+video.videoHeight:'Default video track',()=>ctx.closeModal(),'Selected']]);}
-  function keyControl(key){if(wizard){wizardKey(key);return;}if(welcome){welcomeKey(key);return;}if(listMode){listKey(key);return;}
+  function keyControl(key){if($('#modal-root').children.length)return ctx.keyLegacy(key);if(wizard){wizardKey(key);return;}if(welcome){welcomeKey(key);return;}if(listMode){listKey(key);return;}
     if($('#movie-detail')){const a=$$('#movie-detail button:not(:disabled)'),i=a.indexOf(document.activeElement);if(key==='ArrowLeft'||key==='ArrowRight')a[Math.max(0,Math.min(a.length-1,i+(key==='ArrowRight'?1:-1)))]?.focus();if(key==='Escape'||key==='Backspace')closeMovie();return;}
     if(!$('#modal-root').children.length&&!state.full&&['guide','movies','search','history','mylist','series'].includes(state.view)){
       if(key==='Escape'||key==='Backspace'){setNav(nav>0?nav-1:1);return;}
@@ -273,7 +273,7 @@ export function mountTVUI(ctx) {
     if(key==='Escape'||key==='Backspace')return wizardBack();const opts=$$('#wizard .wizard-option:not(:disabled)'),side=$$('#wizard .wizard-controls button:not(:disabled)'),active=document.activeElement,arr=active?.closest('.wizard-side')?side:opts;
     if(key==='ArrowDown'||key==='ArrowUp'){const i=arr.indexOf(active);arr[(i+(key==='ArrowDown'?1:-1)+arr.length)%arr.length]?.focus();}if(key==='ArrowRight')(side[0]||active)?.focus();if(key==='ArrowLeft')(opts[0]||active)?.focus();if(key==='Enter')active?.click();}
   function listKey(key){if(key==='Escape'||key==='Backspace')return closeList();const a=$$(document.activeElement?.closest('.list-program-column')?'.list-program-column button':'.list-channel'),i=a.indexOf(document.activeElement);if(key==='ArrowDown'||key==='ArrowUp'){const n=a[Math.max(0,Math.min(a.length-1,i+(key==='ArrowDown'?1:-1)))];n?.focus({preventScroll:true});n?.scrollIntoView({block:'nearest'});if(n?.dataset.id){state.channel=n.dataset.id;state.selected=null;renderList();$(`[data-tv="list-channel"][data-id="${CSS.escape(state.channel)}"]`)?.focus({preventScroll:true});}return;}if(key==='ArrowRight')return $('.list-program-column button.current')?.focus();if(key==='ArrowLeft')return $('.list-channel.selected')?.focus();if(key==='Enter')document.activeElement?.click();}
-  document.addEventListener('keydown',e=>{if(e.target.id==='search-input'&&e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();if(state.query.trim()){searchHistory=[state.query.trim(),...searchHistory.filter(q=>q!==state.query.trim())].slice(0,20);localStorage.setItem('tl-search-history',JSON.stringify(searchHistory));}$('.result')?.focus();return;}if(!wizard&&e.target.id==='search-input'&&e.key==='ArrowDown'){e.preventDefault();e.stopImmediatePropagation();$('.result')?.focus();return;}if(wizard){if(e.target.matches('input')&&!['Enter','Escape'].includes(e.key))return;e.preventDefault();e.stopImmediatePropagation();wizardKey(e.key);return;}if(welcome&&!$('#modal-root').children.length&&['ArrowLeft','ArrowRight','Enter','Escape','Backspace'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();welcomeKey(e.key);return;}if(listMode&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Enter','Escape','Backspace'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();listKey(e.key);return;}
+  document.addEventListener('keydown',e=>{if(e.target.id==='search-input'&&e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();if(state.query.trim()){searchHistory=[state.query.trim(),...searchHistory.filter(q=>q!==state.query.trim())].slice(0,20);localStorage.setItem('tl-search-history',JSON.stringify(searchHistory));}$('.result')?.focus();return;}if(!wizard&&e.target.id==='search-input'&&e.key==='ArrowDown'){e.preventDefault();e.stopImmediatePropagation();$('.result')?.focus();return;}if($('#modal-root').children.length)return;if(wizard){if(e.target.matches('input')&&!['Enter','Escape'].includes(e.key))return;e.preventDefault();e.stopImmediatePropagation();wizardKey(e.key);return;}if(welcome&&!$('#modal-root').children.length&&['ArrowLeft','ArrowRight','Enter','Escape','Backspace'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();welcomeKey(e.key);return;}if(listMode&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Enter','Escape','Backspace'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();listKey(e.key);return;}
   },true);
   document.addEventListener('input',e=>{
     if(!wizard||!e.target.dataset.wizardField)return;
@@ -299,7 +299,7 @@ export function mountTVUI(ctx) {
   function afterNavigate(){leaveWelcome();setNav(0,false);if(state.view==='movies'||state.view==='series'||state.view==='history')$('.movie-card')?.focus({preventScroll:true});else if(state.view==='mylist')setNav(1);else if(state.view==='guide')$('.programme.selected')?.focus({preventScroll:true});}
   function resetTransient(){if(wizard)closeWizard();if(listMode)closeList();setNav(0,false);}
   function activateOK(target){
-   if($('#modal-root').children.length){if(target?.isConnected&&target.matches('button'))target.click();return;}
+   if($('#modal-root').children.length){if(target?.isConnected&&$('#modal-root').contains(target)&&target.matches('button'))target.click();return;}
    if(wizard)return wizardKey('Enter');if(welcome)return welcomeKey('Enter');if(listMode)return listKey('Enter');
    if(state.full){if(state.controls&&target?.closest('.player-buttons,#player-recents'))target.click();else showControls('info');return;}
    if(target?.isConnected&&target.matches('button'))return target.click();return keyControl('Enter');
@@ -320,6 +320,7 @@ export function mountTVUI(ctx) {
   window.addEventListener('blur',()=>press.cancel());document.addEventListener('visibilitychange',()=>{if(document.hidden)press.cancel();});
   function longBack(){if(ctx.platform.isPhone)return webOSBack();if(!$('#modal-root').children.length&&!wizard&&!welcome&&!state.full&&state.playing){ctx.enterPlayer();return;}webOSBack();}
   function webOSBack(){
+    press.cancel();
     ctx.persistResume();
     if($('#modal-root').children.length||$('#multiview'))return ctx.modalBack();
     if(wizard){if(wizard.edit){wizard.edit=null;renderWizard();}else wizardBack();return;}
