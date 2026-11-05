@@ -1,9 +1,184 @@
 (() => {
+  // src/i18n.mjs
+  var az = {
+    "Live TV": "Canl\u0131 TV",
+    "TV": "TV",
+    "Series": "Seriallar",
+    "Movies": "Filml\u0259r",
+    "Search": "Axtar\u0131\u015F",
+    "Settings": "Ayarlar",
+    "General": "\xDCmumi",
+    "Playlists": "Pleylistl\u0259r",
+    "EPG": "EPG",
+    "Appearance": "G\xF6r\xFCn\xFC\u015F",
+    "Playback": "Oynatma",
+    "Remote control": "Pult",
+    "Parental controls": "Valideyn n\u0259zar\u0259ti",
+    "Other": "Dig\u0259r",
+    "About": "Haqq\u0131nda",
+    "Application Information": "T\u0259tbiq m\u0259lumat\u0131",
+    "My list": "Siyah\u0131m",
+    "Favorites": "Sevimlil\u0259r",
+    "History": "Tarix\xE7\u0259",
+    "Back": "Geri",
+    "Close": "Ba\u011Fla",
+    "Cancel": "L\u0259\u011Fv et",
+    "OK": "Oldu",
+    "Save": "Saxla",
+    "Delete": "Sil",
+    "Remove": "Sil",
+    "Restore": "B\u0259rpa et",
+    "Import": "\u0130dxal et",
+    "Export": "\u0130xrac et",
+    "Next": "N\xF6vb\u0259ti",
+    "Previous": "\u018Fvv\u0259lki",
+    "Continue": "Davam et",
+    "Back to settings": "Ayarlara qay\u0131t",
+    "Turn on last channel on app start": "A\xE7\u0131l\u0131\u015Fda son kanal\u0131 oynat",
+    "Manage favorites and numbers": "Sevimlil\u0259r v\u0259 kanal n\xF6mr\u0259l\u0259ri",
+    "Favorite folders": "Sevimli qovluqlar\u0131",
+    "Channel Health Check": "Kanal diaqnostikas\u0131",
+    "Channel health check": "Kanal diaqnostikas\u0131",
+    "Channels and groups": "Kanallar v\u0259 kateqoriyalar",
+    "Last watched channel": "Son bax\u0131lan kanal",
+    "Clear history": "Tarix\xE7\u0259ni t\u0259mizl\u0259",
+    "Back up data": "Ehtiyat n\xFCsx\u0259 yarat",
+    "Restore data": "N\xFCsx\u0259ni b\u0259rpa et",
+    "Interface language": "\u0130nterfeys dili",
+    "Background reminders": "Fon xat\u0131rlatmalar\u0131",
+    "Allow notifications for programme reminders": "Proqramlar \xFC\xE7\xFCn bildiri\u015Fl\u0259r\u0259 icaz\u0259 ver",
+    "Auto reconnect": "Avtomatik yenid\u0259n ba\u011Flan",
+    "Retry interrupted streams up to 3 times": "K\u0259sil\u0259n yay\u0131m\u0131 \u0259n \xE7ox 3 d\u0259f\u0259 yenid\u0259n yoxla",
+    "Mute playback": "S\u0259ssiz oynat",
+    "Display mode": "G\xF6r\xFCnt\xFC rejimi",
+    "Sleep timer": "Yuxu taymeri",
+    "Normal": "Normal",
+    "Zoom": "Yax\u0131nla\u015Fd\u0131r",
+    "Full": "Tam",
+    "Reduced": "Ki\xE7ildilmi\u015F",
+    "Add playlist": "Pleylist \u0259lav\u0259 et",
+    "\uFF0B Add playlist": "\uFF0B Pleylist \u0259lav\u0259 et",
+    "Load sample playlist": "N\xFCmun\u0259 pleylisti a\xE7",
+    "EPG for active playlist": "Aktiv pleylist \xFC\xE7\xFCn EPG",
+    "Watch channel": "Kanal\u0131 oynat",
+    "Play channel": "Kanal\u0131 oynat",
+    "Program description": "Proqram t\u0259sviri",
+    "Description": "T\u0259svir",
+    "Add to My list": "Siyah\u0131ma \u0259lav\u0259 et",
+    "Remind": "Xat\u0131rlat",
+    "Reminders": "Xat\u0131rlatmalar",
+    "Show reminders": "Xat\u0131rlatmalar\u0131 g\xF6st\u0259r",
+    "No channels here": "Burada kanal yoxdur",
+    "No favorites yet": "H\u0259l\u0259 sevimli kanal yoxdur",
+    "Browse channels": "Kanallara bax",
+    "Choose another group or add a playlist.": "Ba\u015Fqa kateqoriya se\xE7 v\u0259 ya pleylist \u0259lav\u0259 et.",
+    "Audio and subtitles": "S\u0259s v\u0259 altyaz\u0131",
+    "Audio tracks": "S\u0259s trekl\u0259ri",
+    "Closed captions": "Altyaz\u0131lar",
+    "Video tracks": "Video trekl\u0259ri",
+    "Off": "S\xF6nd\xFCr\xFCl\xFCb",
+    "On": "Aktiv",
+    "Auto": "Avtomatik",
+    "Selected": "Se\xE7ilib",
+    "All channels": "B\xFCt\xFCn kanallar",
+    "All movies": "B\xFCt\xFCn filml\u0259r",
+    "All series": "B\xFCt\xFCn seriallar",
+    "Channel groups": "Kanal kateqoriyalar\u0131",
+    "Full screen": "Tam ekran",
+    "Pause": "Pauza",
+    "Play": "Oynat",
+    "Mute": "S\u0259ssiz",
+    "Unmute": "S\u0259si a\xE7",
+    "Selected channel": "Se\xE7ilmi\u015F kanal",
+    "Current category": "Cari kateqoriya",
+    "All TV channels": "B\xFCt\xFCn TV kanallar\u0131",
+    "Export last diagnostics": "Son diaqnostikan\u0131 ixrac et",
+    "Export diagnostics": "Diaqnostikan\u0131 ixrac et",
+    "Stop": "Dayand\u0131r",
+    "Stopped": "Dayand\u0131r\u0131ld\u0131",
+    "Export backup": "N\xFCsx\u0259ni ixrac et",
+    "Include playlist addresses and account data": "Pleylist \xFCnvanlar\u0131 v\u0259 hesab m\u0259lumatlar\u0131n\u0131 daxil et",
+    "English": "English",
+    "No programme information": "Proqram m\u0259lumat\u0131 yoxdur",
+    "Channel list": "Kanal siyah\u0131s\u0131",
+    "TV guide": "TV b\u0259l\u0259d\xE7isi",
+    "My TV programs": "Proqramlar\u0131m",
+    "My reminders": "Xat\u0131rlatmalar\u0131m",
+    "Enter PIN": "PIN daxil et",
+    "Unlock": "Kilidi a\xE7",
+    "Incorrect PIN.": "PIN yanl\u0131\u015Fd\u0131r.",
+    "Feature status": "Funksiyalar\u0131n v\u0259ziyy\u0259ti",
+    "Available in this build": "Bu versiyada m\xF6vcuddur",
+    "Planned features": "Planla\u015Fd\u0131r\u0131lan funksiyalar",
+    "Enabled": "Aktiv",
+    "Disabled": "S\xF6nd\xFCr\xFCl\xFCb",
+    "Check source": "M\u0259nb\u0259ni yoxla",
+    "Source diagnostics": "M\u0259nb\u0259 diaqnostikas\u0131",
+    "Export data": "M\u0259lumat\u0131 ixrac et",
+    "JSON file": "JSON fayl\u0131",
+    "Paste backup JSON": "N\xFCsx\u0259nin JSON m\u0259tnini daxil et",
+    "Export JSON": "\u0130xrac JSON",
+    "Copy this JSON to a private file. It stays on your device.": "JSON m\u0259tnini \u015F\u0259xsi fayla k\xF6\xE7\xFCr. M\u0259lumat cihazda qal\u0131r.",
+    "The active playlist backup contains provider addresses and may contain account credentials. Keep the file private.": "Aktiv pleylistin n\xFCsx\u0259sind\u0259 provayder \xFCnvanlar\u0131 v\u0259 hesab m\u0259lumatlar\u0131 ola bil\u0259r. Fayl\u0131 m\u0259xfi saxla.",
+    "Import your own TiviLoom backup. This replaces the active playlist.": "\xD6z TiviLoom n\xFCsx\u0259ni idxal et. Aktiv pleylist \u0259v\u0259zl\u0259n\u0259c\u0259k.",
+    "Server reachability only; this does not verify video/audio decoding.": "Yaln\u0131z server ba\u011Flant\u0131s\u0131 yoxlan\u0131l\u0131r; video v\u0259 s\u0259s dekodlanmas\u0131 t\u0259sdiql\u0259nmir."
+  };
+  function mountLanguage(root, language, legacy = {}) {
+    function translated(value, isAz) {
+      var _a4;
+      const suffix = ((_a4 = /\s*[›↑↓]$/.exec(value)) == null ? void 0 : _a4[0]) || "";
+      const key = suffix ? value.slice(0, -suffix.length).trim() : value;
+      return (isAz ? az[key] || inverse[key] || key : legacy[key] || key) + suffix;
+    }
+    const originals = /* @__PURE__ */ new WeakMap(), inverse = Object.fromEntries(Object.entries(legacy).map(([a, b]) => [b, a]));
+    let queued = false, previousLanguage = "en";
+    function apply() {
+      var _a4;
+      queued = false;
+      const value = language();
+      if (value !== "az" && previousLanguage !== "az") return;
+      previousLanguage = value;
+      const isAz = value === "az";
+      root.ownerDocument.documentElement.lang = isAz ? "az" : "en";
+      const walker = root.ownerDocument.createTreeWalker(root, 4);
+      let node;
+      while (node = walker.nextNode()) {
+        if ((_a4 = node.parentElement) == null ? void 0 : _a4.closest('[data-row],.result,.movie-card,.list-channel,.program-info,#player-channel,input,textarea,script,style,.playlist-name,.playlist-selector,.playlist-row .setting-text,.program-dialog h2,.program-dialog .eyebrow,.program-dialog .dialog-body p,.context-dialog h2,.context-dialog .menu-section,#movie-detail h1,#movie-detail .movie-description,[data-group]:not([data-group="Ham\u0131s\u0131"]):not([data-group="Sevimlil\u0259r"]):not([data-group="programs"]):not([data-group="reminders"])')) continue;
+        const raw = node.textContent, old = originals.get(node), source = old && raw === old.rendered ? old.source : raw, trim = source.trim();
+        const rendered = source.replace(trim, translated(trim, isAz));
+        originals.set(node, { source, rendered });
+        if (raw !== rendered) node.textContent = rendered;
+      }
+      for (const el of root.querySelectorAll("[aria-label],[placeholder],[title]")) {
+        if (el.closest("[data-row],.result,.movie-card,.program-info")) continue;
+        for (const attr of ["aria-label", "placeholder", "title"]) {
+          if (!el.hasAttribute(attr)) continue;
+          const key = "data-i18n-" + attr;
+          let source = el.getAttribute(key);
+          if (!source) {
+            source = el.getAttribute(attr);
+            el.setAttribute(key, source);
+          }
+          const value2 = isAz ? az[source] || inverse[source] || source : legacy[source] || source;
+          if (el.getAttribute(attr) !== value2) el.setAttribute(attr, value2);
+        }
+      }
+    }
+    const observer = new MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      Promise.resolve().then(apply);
+    });
+    observer.observe(root, { childList: true, subtree: true, characterData: true });
+    apply();
+    return { apply, disconnect: () => observer.disconnect() };
+  }
+
   // src/back-button.mjs
   var backIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20z"/></svg>';
 
   // src/version.mjs
-  var VERSION = "0.6.11";
+  var VERSION = "0.6.15";
 
   // src/library-store.mjs
   function createLibraryStore({ indexedDB: indexedDB2, storage, timeout = 5e3 } = {}) {
@@ -681,7 +856,7 @@
         return true;
       }
       if (section === "library") {
-        panel("General", button("Back to settings", "settings-root") + `<label class="setting-row startup-setting"><span class="setting-text">Turn on last channel on app start</span><input type="checkbox" data-pref="autoplay" ${state.prefs.autoplay ? "checked" : ""}></label>` + button("Manage favorites and numbers", "favorites") + '<button class="setting-row" data-tv="favorite-folders">Favorite folders \u203A</button><button class="setting-row" data-tv="health-check">Channel Health Check \u203A</button>' + button("Channels and groups", "visibility") + button("Last watched channel", "last-channel") + `<div class="menu-list"><button data-action="clear-history">Clear history</button></div>`, "library");
+        panel("General", button("Back to settings", "settings-root") + `<label class="setting-row"><span>Interface language</span><select data-pref="language"><option value="en" ${state.prefs.language !== "az" ? "selected" : ""}>English</option><option value="az" ${state.prefs.language === "az" ? "selected" : ""}>Az\u0259rbaycan dili</option></select></label>${platform2.isPhone ? `<label class="setting-row startup-setting"><span class="setting-text">Background reminders<small>Allow notifications for programme reminders</small></span><input type="checkbox" data-pref="notifications" ${state.prefs.notifications ? "checked" : ""}></label>` : ""}<label class="setting-row startup-setting"><span class="setting-text">Turn on last channel on app start</span><input type="checkbox" data-pref="autoplay" ${state.prefs.autoplay ? "checked" : ""}></label>` + button("Manage favorites and numbers", "favorites") + '<button class="setting-row" data-tv="favorite-folders">Favorite folders \u203A</button><button class="setting-row" data-tv="health-check">Channel Health Check \u203A</button>' + button("Channels and groups", "visibility") + button("Last watched channel", "last-channel") + `<div class="menu-list"><button data-action="backup">Back up data</button><button data-action="restore">Restore data</button><button data-action="clear-history">Clear history</button></div>`, "library");
         return true;
       }
       if (section === "playback") {
@@ -1805,7 +1980,15 @@
       if (!ctx.platform.isPhone && nav === 1 && !state.prefs.groups) nav = 2;
       app.dataset.nav = nav;
       const scrim = $("#phone-group-scrim");
-      if (scrim) scrim.hidden = nav === 0;
+      if (scrim) {
+        if (nav) {
+          scrim.hidden = false;
+          requestAnimationFrame(() => scrim.classList.add("visible"));
+        } else {
+          scrim.classList.remove("visible");
+          scrim.hidden = true;
+        }
+      }
       if (focus) {
         if (nav === 1) (_a4 = $("#groups .group-button.active") || $("#groups .group-button")) == null ? void 0 : _a4.focus({ preventScroll: true });
         if (nav === 2) (_b3 = $(".rail button.active")) == null ? void 0 : _b3.focus({ preventScroll: true });
@@ -1976,6 +2159,53 @@
           });
         }
       });
+      renderInfo();
+    }
+    let lastLiveTick = Date.now(), pendingLiveSelection = null;
+    function refreshLiveGuide(now = Date.now()) {
+      var _a4, _b3, _c, _d, _e, _f;
+      if (state.view !== "guide" || !(guideActive == null ? void 0 : guideActive.scroll.isConnected)) return;
+      const unit = 213.333333, start = state.window;
+      const chosen = state.selected;
+      if (chosen && chosen.start <= lastLiveTick && chosen.end > lastLiveTick && chosen.end <= now) pendingLiveSelection = chosen.start;
+      if (pendingLiveSelection !== null && (chosen == null ? void 0 : chosen.start) !== pendingLiveSelection) pendingLiveSelection = null;
+      let follow = false;
+      if (pendingLiveSelection !== null && !$("#modal-root").children.length) {
+        follow = (_a4 = document.activeElement) == null ? void 0 : _a4.matches(".programme.selected");
+        state.selected = programAt(currentChannel(), now);
+        pendingLiveSelection = null;
+      }
+      lastLiveTick = now;
+      if (now >= start + 108e5 && ((_b3 = state.selected) == null ? void 0 : _b3.start) <= now && ((_c = state.selected) == null ? void 0 : _c.end) > now && !$("#modal-root").children.length) {
+        state.window = Math.floor(now / 18e5) * 18e5;
+        renderGuide();
+        if (follow) (_d = $(".programme.selected")) == null ? void 0 : _d.focus({ preventScroll: true });
+        return;
+      }
+      for (const row of $$(".guide-row[data-row]")) {
+        const c = state.channels.find((c2) => c2.id === row.dataset.row);
+        if (!c) continue;
+        const current = programAt(c, now);
+        for (const el of row.querySelectorAll(".programme")) {
+          const p = channelPrograms(c).find((p2) => p2.start === Number(el.dataset.program));
+          el.classList.toggle("current", !!p && p.start <= now && p.end > now);
+          if (c.id === state.channel) el.classList.toggle("selected", Number(el.dataset.program) === ((_e = state.selected) == null ? void 0 : _e.start));
+          if (ctx.platform.isPhone && el.classList.contains("current")) el.querySelector("span").textContent = p.title;
+        }
+        if (ctx.platform.isPhone && !row.querySelector(".programme.current")) {
+          const el = row.querySelector(".programme");
+          if (el) {
+            el.dataset.program = current.start;
+            el.querySelector("span").textContent = current.empty ? "No information" : current.title;
+            el.classList.add("current");
+          }
+        }
+        const line = row.querySelector(".now-line");
+        if (line) line.style.left = (now - start) / 18e5 * unit + "px";
+      }
+      if (follow) (_f = $(".programme.selected")) == null ? void 0 : _f.focus({ preventScroll: true });
+      const head = $(".now-head");
+      if (head) head.style.left = 340 + (now - start) / 18e5 * unit + "px";
       renderInfo();
     }
     function fastSelectGuide(c, p, focus) {
@@ -2161,7 +2391,7 @@
         return;
       }
       if (section === "library") {
-        ctx.modal("General", `<button class="setting-row" data-tv="setting-root"><span>Back to settings</span></button><label class="setting-row startup-setting"><span class="setting-text">Turn on last channel on app start<small>Open the last TV channel in the player</small></span><input type="checkbox" data-pref="autoplay" aria-label="Turn on last channel on app start" ${state.prefs.autoplay ? "checked" : ""}></label><div class="panel-note">By default the TV guide opens without playback. Channel selection, group, favorites and settings are kept.</div><div class="menu-list"><button disabled>Back up data</button><button disabled>Restore data</button><button data-tv="health-check">Channel health check</button><button data-tv="favorite-folders">Favorite folders</button><button data-action="clear-history">Clear history</button></div>`, "", { panel: true });
+        ctx.modal("General", `<button class="setting-row" data-tv="setting-root"><span>Back to settings</span></button><label class="setting-row startup-setting"><span class="setting-text">Turn on last channel on app start<small>Open the last TV channel in the player</small></span><input type="checkbox" data-pref="autoplay" aria-label="Turn on last channel on app start" ${state.prefs.autoplay ? "checked" : ""}></label><div class="panel-note">By default the TV guide opens without playback. Channel selection, group, favorites and settings are kept.</div><div class="menu-list"><button data-action="backup">Back up data</button><button data-action="restore">Restore data</button><button data-tv="health-check">Channel health check</button><button data-tv="favorite-folders">Favorite folders</button><button data-action="clear-history">Clear history</button></div>`, "", { panel: true });
         $(".settings-panel").dataset.tvSettings = "library";
         return;
       }
@@ -2556,7 +2786,7 @@
       const bar = $(".player-buttons");
       if (!bar.dataset.tvTools) {
         const tools = [["tv", "search", "search", "Search"], ["tv", "channels", "list", "Channels list"], ["action", "multiview", "grid", "Multiview"], ["tv", "toggle-mini", "pip", "Mini Player"], ["tv", "player-video", "film", "Video track"], ["tv", "player-audio", "volume", "Audio"], ["tv", "player-offset", "history", "0 ms"], ["tv", "player-subtitles", "captions", "Subtitles"], ["action", "display", "screen", "Display mode"], ["action", "sleep", "clock", "Sleep timer"], ["action", "favorite", "star", "Favorites"], ["tv", "settings", "settings", "Settings"], ["action", "previous", "history", "Previous channel"], ["action", "pause", "pause", "Pause"], ["action", "next", "play", "Next channel"], ["action", "mute", "volume", "Mute"]];
-        bar.innerHTML = tools.map(([kind, action, ic, label]) => `<button data-${kind}="${action}" ${["multiview", "player-offset"].includes(action) ? "disabled" : ""} ${action === "pause" ? 'id="pause-button"' : action === "mute" ? 'id="mute-button"' : ""}><span class="tool-icon">${icon(ic)}</span><span class="tool-label">${label}</span></button>`).join("");
+        bar.innerHTML = tools.map(([kind, action, ic, label]) => `<button data-${kind}="${action}" ${["multiview", "player-offset"].includes(action) ? 'aria-disabled="true"' : ""} ${action === "pause" ? 'id="pause-button"' : action === "mute" ? 'id="mute-button"' : ""}><span class="tool-icon">${icon(ic)}</span><span class="tool-label">${label}</span></button>`).join("");
         bar.dataset.tvTools = "true";
       }
       const playing = state.channels.find((c) => c.id === state.playing);
@@ -3062,6 +3292,7 @@
           ctx.refresh();
           return;
         }
+        if (a === "multiview") return ctx.modal("Multiview", "<p>This TV build uses one decoder. Simultaneous streams are unavailable on this device.</p>", '<button class="primary" data-action="close">Close</button>');
         if (a === "toggle-mini") {
           ctx.toggleMini();
           return;
@@ -3279,7 +3510,7 @@
       if (state.view !== "guide") return ctx.navigate("guide");
       ctx.platform.exit();
     }
-    return { syncPlaybackStatus, webOSBack, longBack, activateOK, displayMenu, sleepPanel, movieDetails, resetTransient, renderGroups, renderGuide, renderInfo, renderCards, renderSearch, openImport, keyControl, settings, showControls, context, ready, openSeriesItem, afterNavigate, showWelcome, leaveWelcome, openList, fastSelectGuide };
+    return { refreshLiveGuide, syncPlaybackStatus, webOSBack, longBack, activateOK, displayMenu, sleepPanel, movieDetails, resetTransient, renderGroups, renderGuide, renderInfo, renderCards, renderSearch, openImport, keyControl, settings, showControls, context, ready, openSeriesItem, afterNavigate, showWelcome, leaveWelcome, openList, fastSelectGuide };
   }
 
   // src/startup.mjs
@@ -3343,7 +3574,7 @@
       }
     }
     const phoneNavigationAtLoad = read("phone-navigation", {});
-    const state = { channels: initial.channels, programs: initial.programs, epgNames: {}, source: "TiviLoom n\xFCmun\u0259l\u0259ri", imported: false, view: "guide", group: "Ham\u0131s\u0131", query: "", channel: "demo-0", selected: null, playing: null, window: Math.floor(Date.now() / 18e5) * 18e5, full: false, controls: true, favorites: read("favorites", []), history: read("history", []), reminders: read("reminders", []), prefs: read("prefs", { compact: false, large: false, motion: true, groups: true, muted: platform.isPhone ? false : !platform.native, autoplay: false, fit: "contain" }), sleep: 0, watchProgress: read("watch-progress", read("watchProgress", {})), favCollections: read("fav-collections", read("favCollections", {})) };
+    const state = { channels: initial.channels, programs: initial.programs, epgNames: {}, source: "TiviLoom n\xFCmun\u0259l\u0259ri", imported: false, view: "guide", group: "Ham\u0131s\u0131", query: "", channel: "demo-0", selected: null, playing: null, window: Math.floor(Date.now() / 18e5) * 18e5, full: false, controls: true, favorites: read("favorites", []), history: read("history", []), reminders: read("reminders", []), prefs: { ...{ compact: false, large: false, motion: true, groups: true, muted: platform.isPhone ? false : !platform.native, autoplay: false, fit: "contain" }, ...read("prefs", {}) }, sleep: 0, watchProgress: read("watch-progress", read("watchProgress", {})), favCollections: read("fav-collections", read("favCollections", {})) };
     let resumeReady = false, resumeState = read("session-v1", {}), lastResumeJSON = "";
     let catalog = emptyCatalog(), libraryWrites = Promise.resolve(), libraryBusy = false;
     function persistPlaylistState() {
@@ -3375,6 +3606,7 @@
       state.playbackPhase = state.playing ? phase : "idle";
       if (playbackUIReady) tvUI.syncPlaybackStatus();
     }
+    let languageUI = null;
     let hls = null, playGeneration = 0, hlsFallbackGeneration = -1, controlTimer, toastTimer, sleepTimer, modalLastFocus, sessionToken, menuActions = {}, multis = [];
     let indexedPrograms = null, epgIndex = /* @__PURE__ */ new Map(), epgNameIndex = /* @__PURE__ */ new Map();
     const video = $("#video");
@@ -3619,6 +3851,10 @@
       return `<span class="channel-logo" style="${/^#[0-9a-f]{3,8}$/i.test(c.color) ? "color:" + c.color : ""}">${c.logo ? `<img src="${safeImage(c.logo)}" alt="" loading="lazy">` : esc(initials(c.name))}</span>`;
     }
     function applyPrefs() {
+      var _a5, _b4, _c2, _d;
+      languageUI == null ? void 0 : languageUI.apply();
+      (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.setMotion) == null ? void 0 : _b4.call(_a5, state.prefs.motion !== false);
+      (_d = (_c2 = window.TiviLoomNative) == null ? void 0 : _c2.nativePreferences) == null ? void 0 : _d.call(_c2, JSON.stringify({ motion: state.prefs.motion !== false, language: state.prefs.language || "en", muted: !!state.prefs.muted, fit: state.prefs.fit || "contain", autoReconnect: state.prefs.autoReconnect !== false }));
       document.body.classList.toggle("compact", state.prefs.compact);
       document.body.classList.toggle("large-text", state.prefs.large);
       document.body.classList.toggle("no-motion", !state.prefs.motion);
@@ -3778,10 +4014,7 @@
         try {
           const url = await mediaURL(c);
           if (generation2 !== playGeneration) return;
-          const payload = JSON.stringify({ url, name: c.name, fullscreen, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/" + VERSION2, referer: c.referer || "", catalogue: state.channels.filter((x) => {
-            var _a6, _b5;
-            return !((_a6 = state.hiddenChannels) == null ? void 0 : _a6.includes(x.id)) && !((_b5 = state.hiddenGroups) == null ? void 0 : _b5.includes(x.group)) && advanced.groupAccessible(x.group);
-          }).map(({ id, name, group }) => ({ id, name, group })), history: [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60) });
+          const payload = JSON.stringify({ url, id: c.id, name: c.name, motion: state.prefs.motion !== false, language: state.prefs.language || "en", fullscreen, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/" + VERSION2, referer: c.referer || "", history: [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60) });
           if (!window.TiviLoomNative.openNativePlayer(payload)) throw Error("Native player could not be opened.");
           video.pause();
           if (hls) {
@@ -3947,30 +4180,50 @@
     async function checkSource(c) {
       if (!c || !c.url || c.demo) return toast("Select a provider channel or movie first.");
       modal("Source diagnostics", "<p>Checking connection to the content provider\u2026</p>", "");
+      const panel = $("#modal-root").firstElementChild;
       try {
         const result = await api("probe", { url: c.url, userAgent: c.userAgent || state.userAgent || "", referer: c.referer || "" });
-        if ($("#modal-root").children.length) modal("Source diagnostics", `<p>${esc(c.name)}</p><p>${esc(describeProbe(result))}</p><p class="note">HTTP reachability does not guarantee the TV supports the video codec. A playlist URL cannot be verified without the provider responding.</p>`, '<button data-action="close" class="secondary">Close</button>');
+        if (panel.isConnected) modal("Source diagnostics", `<p>${esc(c.name)}</p><p>${esc(describeProbe(result))}</p><p class="note">HTTP reachability does not guarantee the TV supports the video codec. A playlist URL cannot be verified without the provider responding.</p>`, '<button data-action="close" class="secondary">Close</button>');
       } catch (e) {
         toast(e.message);
       }
     }
-    async function healthCheck() {
-      const channels = channelsFor("tv").slice(0, 12);
+    let healthToken = 0, healthReport = [];
+    function healthCheck() {
+      menu("Channel Health Check", [
+        ["Selected channel", () => runHealthCheck([currentChannel()].filter(Boolean))],
+        ["Current category", () => runHealthCheck(visibleChannels().filter((c) => c.type === "tv"))],
+        ["All TV channels", () => runHealthCheck(channelsFor("tv"))],
+        ["Export last diagnostics", () => exportDocument("TiviLoom-diagnostics.json", { app: VERSION2, platform: platform.isPhone ? "Android" : "webOS", scope: "HTTP reachability only; no codec certification", results: healthReport })]
+      ], { key: "health-scope" });
+    }
+    async function runHealthCheck(channels) {
       if (!channels.length) return toast("No channels to test.");
-      modal("Channel Health Check", "<p>Testing first " + channels.length + ' TV channels (server reachability, not codec decoding)\u2026</p><div id="health-results"></div>', "", { panel: true });
+      const token = ++healthToken;
+      healthReport = [];
+      modal("Channel Health Check", '<p>Server reachability only; this does not verify video/audio decoding.</p><p id="health-progress" role="status"></p><div id="health-results" aria-live="polite"></div>', '<button class="primary" data-action="health-stop">Stop</button><button data-action="health-export">Export diagnostics</button><button data-action="close">Close</button>', { key: "health-run" });
+      const panel = $("#modal-root").firstElementChild;
       for (const c of channels) {
-        let info;
+        if (token !== healthToken || !panel.isConnected) break;
+        const progress = $("#health-progress");
+        progress.textContent = healthReport.length + 1 + " / " + channels.length + " \xB7 " + c.name;
+        let code = 0;
         try {
-          info = await api("probe", { url: c.url, userAgent: c.userAgent || state.userAgent || "", referer: c.referer || "" });
-        } catch (e) {
-          info = { status: 0, message: e.message };
+          code = Number((await api("probe", { url: c.url, userAgent: c.userAgent || state.userAgent || "", referer: c.referer || "" })).status) || 0;
+        } catch {
         }
-        const results = $("#health-results");
-        if (!results) break;
+        if (token !== healthToken || !panel.isConnected) break;
+        const item = { channel: c.name.replace(/https?:\/\/\S+/gi, "[redacted]"), status: code, result: code >= 200 && code < 400 ? "reachable" : code ? "HTTP refusal" : "unreachable" };
+        healthReport.push(item);
         const row2 = document.createElement("div");
-        row2.className = "health-row " + (info.status >= 200 && info.status < 400 ? "health-good" : "health-bad");
-        row2.textContent = c.name + " \u2014 " + describeProbe(info);
-        results.append(row2);
+        row2.className = "health-row " + (code >= 200 && code < 400 ? "health-good" : "health-bad");
+        row2.textContent = c.name + " \u2014 " + (code ? "HTTP " + code : "Connection failed");
+        $("#health-results").append(row2);
+        if ($("#health-results").children.length > 200) $("#health-results").firstElementChild.remove();
+      }
+      if (panel.isConnected && token === healthToken) {
+        $("#health-progress").textContent = healthReport.length + " / " + channels.length + " completed";
+        $('[data-action="health-stop"]').disabled = true;
       }
     }
     function favoriteFolders() {
@@ -4018,8 +4271,6 @@
       $("#player").hidden = false;
       videoSurface.place($("#player"), true);
       showControls("info");
-      if (state.playing && video.paused && !video.error) video.play().catch(() => {
-      });
     }
     function exitPlayer() {
       var _a5, _b4;
@@ -4044,11 +4295,13 @@
     const dialogStack = new DialogStack();
     let dialogOrigin = null, modalResume = null;
     function closeModal() {
+      var _a5, _b4;
+      modalResume = null;
       const multi = $("#multiview");
       if (multi) {
         multis.forEach((x) => {
-          var _a5;
-          (_a5 = x.h) == null ? void 0 : _a5.destroy();
+          var _a6;
+          (_a6 = x.h) == null ? void 0 : _a6.destroy();
           x.v.pause();
           x.v.removeAttribute("src");
           x.v.load();
@@ -4058,11 +4311,23 @@
         if (state.playing) video.play().catch(() => {
         });
       }
+      const closing = $("#modal-root").firstElementChild;
+      if (closing && state.prefs.motion !== false && !document.hidden && !((_a5 = window.matchMedia) == null ? void 0 : _a5.call(window, "(prefers-reduced-motion: reduce)").matches)) {
+        const ghost = closing.cloneNode(true);
+        ghost.querySelectorAll("[id]").forEach((x) => x.removeAttribute("id"));
+        ghost.classList.add("modal-exit");
+        ghost.setAttribute("aria-hidden", "true");
+        ghost.inert = true;
+        ghost.addEventListener("click", (e) => e.stopImmediatePropagation(), true);
+        $("#tv-screen").append(ghost);
+        setTimeout(() => ghost.remove(), 150);
+      }
       $("#modal-root").textContent = "";
       dialogStack.clear();
       menuActions = {};
       if (dialogOrigin == null ? void 0 : dialogOrigin.isConnected) dialogOrigin.focus({ preventScroll: true });
       dialogOrigin = null;
+      if (playbackUIReady) (_b4 = tvUI.refreshLiveGuide) == null ? void 0 : _b4.call(tvUI, Date.now());
       if (state.full) showControls();
     }
     function modalBack() {
@@ -4136,14 +4401,16 @@
       render();
     }
     function reminder(p, c) {
+      var _a5;
       if (!p || p.empty) return toast("Bu proqram \xFC\xE7\xFCn vaxt m\u0259lumat\u0131 yoxdur.");
       if (p.start <= Date.now()) return toast("Yaln\u0131z g\u0259l\u0259c\u0259k proqram \xFC\xE7\xFCn xat\u0131rlatma qurulur.");
       const key = p.channel + "|" + p.start;
       state.reminders = state.reminders.filter((r) => r.key !== key);
       state.reminders.push({ key, title: p.title, start: p.start, channel: c == null ? void 0 : c.id });
       save("reminders");
+      if (state.prefs.notifications && ((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.scheduleReminder)) window.TiviLoomNative.scheduleReminder(key, p.title, p.start);
       closeModal();
-      toast("Xat\u0131rlatma quruldu. T\u0259tbiq a\xE7\u0131q qalmal\u0131d\u0131r.");
+      toast(state.prefs.notifications && platform.isPhone ? "Reminder saved. Android may delay background notifications." : "Xat\u0131rlatma quruldu. T\u0259tbiq a\xE7\u0131q qalmal\u0131d\u0131r.");
     }
     function context() {
       const c = currentChannel();
@@ -4293,14 +4560,25 @@
         body = `<div class="panel-note">\u2191 \u2193 \u2014 kanal se\xE7imi<br>\u2190 \u2192 \u2014 proqram / vaxt se\xE7imi<br>Enter \u2014 \xF6nizl\u0259m\u0259, t\u0259krar Enter \u2014 tam ekran<br>Enter bas\u0131l\u0131 \u2014 kanal menyusu<br>M v\u0259 ya sa\u011F klik \u2014 kanal menyusu<br>Esc / Backspace \u2014 geri<br>F \u2014 brauzerin tam ekran\u0131<br>Space \u2014 oynat / fasil\u0259<br>Ctrl+F \u2014 axtar\u0131\u015F<br><br>Tam ekranda \u2191 m\u0259lumat\u0131 v\u0259 son kanallar\u0131, \u2193 idar\u0259etm\u0259l\u0259ri a\xE7\u0131r. Q\u0131sa OK m\u0259lumat\u0131, uzun OK idar\u0259etm\u0259l\u0259ri g\xF6st\u0259rir. Si\xE7anla b\xFCt\xFCn idar\u0259etm\u0259l\u0259r \u0259l\xE7atand\u0131r.</div><div class="menu-list"><button data-action="remote">Ekran pultunu a\xE7 <span>\u2318</span></button></div>`;
       }
       if (section === "status") {
-        title = "Funksiyalar\u0131n v\u0259ziyy\u0259ti";
-        body = `<div class="settings-section-title">Bu versiyada i\u015Fl\u0259yir</div><div class="panel-note">M3U URL / fayl \u2022 XMLTV URL / fayl \u2022 Kanal qruplar\u0131 \u2022 C\u0259dv\u0259l / vaxt naviqasiyas\u0131 \u2022 Sevimlil\u0259r \u2022 Kanal s\u0131ralama \u2022 Axtar\u0131\u015F \u2022 \xD6nizl\u0259m\u0259 / tam ekran \u2022 MP4 / HLS \u2022 Filml\u0259r \u2022 Bax\u0131\u015F tarix\xE7\u0259si \u2022 Yuxu taymeri \u2022 Yerli xat\u0131rlatma \u2022 HLS audio / altyaz\u0131 trekl\u0259ri \u2022 Ayarlar\u0131n saxlanmas\u0131 \u2022 Ehtiyat n\xFCsx\u0259</div><div class="settings-section-title">Sonrak\u0131 m\u0259rh\u0259l\u0259</div><div class="panel-note">DVR / catch-up \u2022 Tam Xtream / Stalker \u2022 Serial m\xF6vs\xFCml\u0259ri \u2022 Provayder arxivi / catch-up \u2022 DVR yazma v\u0259 planlama \u2022 Valideyn PIN-i \u2022 Bulud hesab\u0131 v\u0259 sinxronizasiya \u2022 Ma\u011Faza \xF6d\u0259ni\u015Fl\u0259ri / abun\u0259 \u2022 Platformaya uy\u011Fun pult x\u0259rit\u0259l\u0259ri<br><br>Bu s\u0131naqda \xF6d\u0259ni\u015F divar\u0131 yoxdur. TiviMate-d\u0259 Free / Premium olaraq m\xFC\u015Fahid\u0259 edil\u0259n b\xF6lg\xFC ayr\u0131ca ara\u015Fd\u0131rma hesabat\u0131ndad\u0131r; TiviLoom \xFC\xE7\xFCn sat\u0131\u015F paketi h\u0259l\u0259 t\u0259yin edilm\u0259yib.</div>`;
+        title = "Feature status";
+        body = '<div class="panel-note">Playback, playlists, programme guide, favorites, search and parental PIN are available. Catch-up requires provider support.<br><br>Multiview, recording and audio offset are unavailable in this release. One decoder is used for reliable playback.<br><br>Diagnostics checks HTTP reachability, not video/audio decoding.<br><br>' + (platform.isPhone ? "Background reminder notifications are optional. Android may delay them; enable them in General and allow notification permission." : "Reminders are shown while the app is open. webOS background notifications are unavailable.") + "</div>";
       }
       if (section === "about") {
         title = "TiviLoom haqq\u0131nda";
         body = `<div class="panel-note" style="text-align:center"><img src="assets/logo.png" style="width:480px;max-width:90%;height:auto" alt="TiviLoom loqosu"><h2 style="font-weight:400;color:#dcebe2">TiviLoom</h2>${VERSION2} \xB7 ${platform.isPhone ? "Android" : "webOS TV<br>LG webOS 6.0+"}<br><br>M\xFCst\u0259qil brend v\u0259 yeni t\u0259tbiq. Kanal xidm\u0259ti v\u0259 kommersiya m\u0259zmunu daxil deyil. ${platform.isPhone ? "\u015E\u0259xsi pleylistl\u0259rinizd\u0259n canl\u0131 TV v\u0259 film izl\u0259yin." : "webOS TV \xFC\xE7\xFCn yerli qura\u015Fd\u0131r\u0131lan s\u0131naq paketi."}<br><br>Yay\u0131m\u0131n a\xE7\u0131lmas\u0131 cihaz\u0131n format v\u0259 kodek d\u0259st\u0259yind\u0259n as\u0131l\u0131d\u0131r.${window.TiviLoomNative ? '<br><br>Media3 \xB7 Apache 2.0<br>VideoLAN LibVLC 3.7.6 \xB7 LGPL 2.1+<br><button class="secondary" data-action="licenses">A\xE7\u0131q m\u0259nb\u0259 lisenziyalar\u0131</button>' : ""}</div>`;
       }
       modal(title, body, "", { panel: true, key: "settings:" + section });
+      if (section === "about") {
+        const panel = $("#modal-root").firstElementChild;
+        fetch("release-info.json").then((r) => r.json()).then((info) => {
+          if (!panel.isConnected || !info.sourceFingerprint) return;
+          const line = document.createElement("p");
+          line.className = "panel-note";
+          line.textContent = "Package " + VERSION2 + " \xB7 Web " + info.webVersion + " \xB7 Source " + info.sourceFingerprint.slice(0, 12);
+          panel.querySelector(".settings-body").append(line);
+        }).catch(() => {
+        });
+      }
     }
     function sleepMenu() {
       menu("Yuxu taymeri", [["S\xF6nd\xFCr", () => setSleep(0)], ...[15, 30, 45, 60, 90, 120, 180, 240].map((n) => [n + " d\u0259qiq\u0259", () => setSleep(n)])]);
@@ -4405,29 +4683,48 @@
       navigate("guide");
       toast("N\xFCmun\u0259 pleylisti a\xE7\u0131ld\u0131. Dig\u0259r pleylistl\u0259r saxlan\u0131l\u0131b.");
     }
-    function exportBackup() {
-      const data = { format: "TiviLoom", version: 1, source: state.source, channels: state.channels, programs: state.programs, epgNames: state.epgNames, imported: state.imported, favorites: state.favorites, prefs: state.prefs };
-      const url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
+    function exportDocument(name, data) {
+      var _a5;
+      const text = JSON.stringify(data, null, 2);
+      if (text.length > 3e7) return toast("Export is too large.");
+      if ((_a5 = window.TiviLoomNative) == null ? void 0 : _a5.exportDocument) {
+        window.TiviLoomNative.exportDocument(name, text);
+        return;
+      }
+      if (platform.native) {
+        modal("Export data", '<p>Copy this JSON to a private file. It stays on your device.</p><textarea id="export-json" rows="8" aria-label="Export JSON"></textarea>', '<button data-action="close">Close</button>');
+        $("#export-json").value = text;
+        return;
+      }
+      const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
       const a = document.createElement("a");
       a.href = url;
-      a.download = "TiviLoom-ehtiyat.json";
+      a.download = name;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1e3);
-      toast("Ehtiyat n\xFCsx\u0259 endirilir");
+    }
+    function exportBackup() {
+      modal("Back up data", '<p>The active playlist backup contains provider addresses and may contain account credentials. Keep the file private.</p><label><input id="backup-include-source" type="checkbox"> Include playlist addresses and account data</label>', '<button class="primary" data-action="backup-confirm">Export backup</button><button data-action="close">Cancel</button>');
+    }
+    function backupConfirmed() {
+      var _a5;
+      if (!((_a5 = $("#backup-include-source")) == null ? void 0 : _a5.checked)) return toast("Select Include playlist addresses to create a restorable backup.");
+      exportDocument("TiviLoom-backup.json", { format: "TiviLoom", version: 1, source: state.source, channels: state.channels, programs: state.programs, epgNames: state.epgNames, imported: state.imported, favorites: state.favorites, prefs: state.prefs, history: state.history, savedPrograms: state.savedPrograms, reminders: state.reminders });
     }
     function restoreBackup() {
-      modal("Ehtiyat n\xFCsx\u0259ni b\u0259rpa et", '<p>Yaln\u0131z \xF6z TiviLoom ehtiyat n\xFCsx\u0259nizi se\xE7in. Aktiv pleylist v\u0259 ayarlar \u0259v\u0259z edil\u0259c\u0259k.</p><label>JSON fayl\u0131<input type="file" id="backup-file" accept=".json"></label><p id="backup-status"></p>', '<button data-action="restore-submit" class="primary">B\u0259rpa et</button><button data-action="close" class="secondary">L\u0259\u011Fv et</button>');
+      modal("Restore data", "<p>Import your own TiviLoom backup. This replaces the active playlist.</p>" + (!platform.native ? '<label>JSON file<input type="file" id="backup-file" accept=".json"></label>' : '<label>Paste backup JSON<textarea id="backup-text" rows="8"></textarea></label>') + '<p id="backup-status" role="status"></p>', '<button data-action="restore-submit" class="primary">Restore</button><button data-action="close">Cancel</button>');
     }
     async function restoreSubmit() {
-      var _a5, _b4;
+      var _a5, _b4, _c2, _d;
       try {
-        const f = $("#backup-file").files[0];
-        if (!f) throw Error("Fayl se\xE7in.");
-        if (f.size > 3e7) throw Error("Fayl \xE7ox b\xF6y\xFCkd\xFCr.");
-        const b = JSON.parse(await f.text());
+        const f = (_a5 = $("#backup-file")) == null ? void 0 : _a5.files[0], raw = (_b4 = $("#backup-text")) == null ? void 0 : _b4.value;
+        if (!f && !raw) throw Error("Select a file or paste JSON.");
+        if (((f == null ? void 0 : f.size) || (raw == null ? void 0 : raw.length) || 0) > 3e7) throw Error("Backup is too large.");
+        const b = JSON.parse(f ? await f.text() : raw);
         if (b.format !== "TiviLoom" || b.version !== 1 || !Array.isArray(b.channels) || !b.channels.length) throw Error("Bu TiviLoom ehtiyat n\xFCsx\u0259si deyil.");
         for (const c of b.channels) {
-          if (typeof c.id !== "string" || typeof c.name !== "string" || !["tv", "movie"].includes(c.type)) throw Error("Kanal m\u0259lumat\u0131 d\xFCzg\xFCn deyil.");
+          if (typeof c.id !== "string" || typeof c.name !== "string" || !["tv", "movie", "series"].includes(c.type)) throw Error("Kanal m\u0259lumat\u0131 d\xFCzg\xFCn deyil.");
+          if (c.type === "series" && !c.url && c.xtream) continue;
           if (!c.demo || c.url !== "/assets/demo.mp4") {
             const u = new URL(c.url);
             if (!["https:", "http:"].includes(u.protocol)) throw Error("Etibars\u0131z kanal \xFCnvan\u0131.");
@@ -4440,14 +4737,18 @@
         state.source = String(b.source || "B\u0259rpa olunmu\u015F pleylist");
         state.imported = !!b.imported;
         state.favorites = Array.isArray(b.favorites) ? b.favorites : [];
+        state.history = Array.isArray(b.history) ? b.history : [];
+        state.savedPrograms = Array.isArray(b.savedPrograms) ? b.savedPrograms : [];
+        state.reminders = Array.isArray(b.reminders) ? b.reminders : [];
         if (b.prefs) {
           for (const key of ["compact", "large", "motion", "groups", "muted", "autoplay"]) if (typeof b.prefs[key] === "boolean") state.prefs[key] = b.prefs[key];
+          if (["az", "en"].includes(b.prefs.language)) state.prefs.language = b.prefs.language;
           if (["contain", "cover", "fill"].includes(b.prefs.fit)) state.prefs.fit = b.prefs.fit;
         }
         state.channel = state.channels[0].id;
         state.selected = null;
         state.playing = null;
-        (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
+        (_d = (_c2 = window.TiviLoomNative) == null ? void 0 : _c2.stopNativePlayer) == null ? void 0 : _d.call(_c2);
         document.documentElement.classList.remove("native-preview");
         ++playGeneration;
         hls == null ? void 0 : hls.destroy();
@@ -4456,6 +4757,9 @@
         video.removeAttribute("src");
         video.load();
         save("favorites");
+        save("history");
+        save("savedPrograms");
+        save("reminders");
         save("prefs");
         applyPrefs();
         await persistLibrary();
@@ -4468,13 +4772,23 @@
     }
     function listReminders() {
       menu("Xat\u0131rlatmalar", state.reminders.length ? state.reminders.map((r) => [r.title + " \xB7 " + fmt(r.start), () => {
+        var _a5, _b4;
         state.reminders = state.reminders.filter((x) => x.key !== r.key);
+        (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.cancelReminder) == null ? void 0 : _b4.call(_a5, r.key);
         save("reminders");
         listReminders();
       }, "Sil"]) : [["Aktiv xat\u0131rlatma yoxdur", () => closeModal()]]);
     }
     async function doAction(action) {
       const c = currentChannel();
+      if (action === "backup-confirm") return backupConfirmed();
+      if (action === "health-stop") {
+        healthToken++;
+        const el = $("#health-progress");
+        if (el) el.textContent = "Stopped";
+        return;
+      }
+      if (action === "health-export") return exportDocument("TiviLoom-diagnostics.json", { app: VERSION2, results: healthReport });
       if (action === "expand-player") {
         if (state.playing) enterPlayer();
         else toast("Select a channel first.");
@@ -4492,10 +4806,9 @@
       }
       if (action === "display") return tvUI.displayMenu();
       if (action === "sleep") return tvUI.sleepPanel();
-      if (platform.native && ["backup", "restore"].includes(action)) return toast("File backup and restore are unavailable on this TV.");
       if (action === "playlists") return settings("sources");
       if (action === "last-channel") return advanced.lastChannel();
-      if (["multiview", "pip"].includes(action)) return toast("This feature is not available in this webOS test version.");
+      if (["multiview", "pip"].includes(action)) return modal("Feature unavailable", "<p>This release uses one decoder. Multiview and system picture-in-picture are unavailable. Preview and fullscreen playback remain available.</p>", '<button class="primary" data-action="close">Close</button>');
       if (action === "preview" && !$("#video-error").hidden) {
         state.playing = null;
         return play(c, state.full);
@@ -4727,11 +5040,16 @@
       }
     });
     document.addEventListener("change", (e) => {
+      var _a5, _b4, _c2, _d;
       if (e.target.dataset.pref) {
         const key = e.target.dataset.pref;
         state.prefs[key] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
         save("prefs");
         applyPrefs();
+        if (key === "notifications") {
+          (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.reminderPermission) == null ? void 0 : _b4.call(_a5, !!state.prefs.notifications);
+          if (state.prefs.notifications) for (const r of state.reminders) (_d = (_c2 = window.TiviLoomNative) == null ? void 0 : _c2.scheduleReminder) == null ? void 0 : _d.call(_c2, r.key, r.title, r.start);
+        }
         persistResume();
       }
     });
@@ -4938,7 +5256,9 @@
       if (e.target === video || e.target.id === "player") showControls();
     });
     function tick() {
+      var _a5;
       const now = Date.now();
+      (_a5 = tvUI.refreshLiveGuide) == null ? void 0 : _a5.call(tvUI, now);
       $("#clock").textContent = fmt(now);
       state.reminders.filter((r) => r.start <= now && r.start > now - 6e4).forEach((r) => toast("\u0130ndi ba\u015Flay\u0131r: " + r.title));
       const old = state.reminders.length;
@@ -4963,6 +5283,7 @@
     modal = (...args) => {
       legacyModal(...args);
       translateDialog();
+      languageUI == null ? void 0 : languageUI.apply();
     };
     const legacyNavigate = navigate;
     function getCatalog() {
@@ -5157,6 +5478,7 @@
       tvUI.afterNavigate();
       syncNativeBounds();
     };
+    languageUI = mountLanguage($("#tv-screen"), () => state.prefs.language || "en", tvDialogLabels);
     setInterval(tick, 15e3);
     tick();
     applyPrefs();
@@ -5186,6 +5508,7 @@
     }
     tvUI.ready();
     let startup = resumePlan(state.channels, resumeState, state.prefs, state.favorites, state.history);
+    if (platform.isPhone) startup.fullscreen = false;
     if (platform.isPhone && new URLSearchParams(location.search).get("restore") === "1") {
       const nav = phoneNavigationAtLoad;
       if (["guide", "movies", "series", "search", "history", "mylist"].includes(nav.view)) {
@@ -5241,10 +5564,13 @@
       const [action, ...parts] = String(e.detail || "").split(":");
       const value = parts.join(":");
       if (action === "panel") {
-        (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeCatalogue) == null ? void 0 : _b4.call(_a5, JSON.stringify({ mode: value, catalogue: state.channels.filter((x) => {
+        (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.nativeCatalogue) == null ? void 0 : _b4.call(_a5, JSON.stringify({ mode: parts[0], requestToken: Number(parts[1] || 0), activeId: state.playing, catalogue: state.channels.filter((x) => {
           var _a6, _b5;
           return !((_a6 = state.hiddenChannels) == null ? void 0 : _a6.includes(x.id)) && !((_b5 = state.hiddenGroups) == null ? void 0 : _b5.includes(x.group)) && advanced.groupAccessible(x.group);
-        }).map(({ id, name, group }) => ({ id, name, group })), history: state.history }));
+        }).map((c) => {
+          var _a6;
+          return { id: c.id, name: c.name, group: c.group, logo: typeof c.logo === "string" ? c.logo : "", now: programAt(c).empty ? "" : programAt(c).title, next: ((_a6 = channelPrograms(c).find((p) => p.start >= programAt(c).end)) == null ? void 0 : _a6.title) || "" };
+        }), history: state.history }));
         return;
       }
       if (action === "fit") {
@@ -5281,6 +5607,14 @@
         else if (value === "sleep") tvUI.sleepPanel();
       }
     });
+    window.addEventListener("TiviLoomExportResult", (e) => toast(e.detail === "saved" ? "File saved" : "File could not be saved"));
+    window.addEventListener("TiviLoomReminderPermission", (e) => {
+      state.prefs.notifications = !!e.detail;
+      save("prefs");
+      const box = $('[data-pref="notifications"]');
+      if (box) box.checked = !!e.detail;
+      if (!e.detail) toast("Notification permission was not granted. In-app reminders remain available.");
+    });
     window.addEventListener("TiviLoomNativePlayerError", () => {
       var _a5, _b4;
       (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
@@ -5293,7 +5627,7 @@
       videoSurface.place($("#preview"));
       toast("Player a\xE7\u0131la bilm\u0259di. Kanal\u0131 yenid\u0259n se\xE7in.");
     });
-    let suspended = false, phoneWasPlaying = false;
+    let suspended = false, phoneWasPlaying = false, tvWarm = null;
     function tvSuspend() {
       var _a5, _b4, _c2, _d, _e;
       if (platform.isPhone) {
@@ -5313,6 +5647,8 @@
         clearTimeout(stallTimer);
         return;
       }
+      if (suspended) return;
+      tvWarm = { playing: state.playing, full: state.full, channel: state.channel, selected: state.selected, wants: !!state.playing && !video.paused, position: Number.isFinite(video.currentTime) ? video.currentTime : 0 };
       if ($("#mini-player") && !$("#mini-player").hidden) toggleMini(true);
       advanced.suspend();
       clearTimeout(reconnectTimer);
@@ -5348,14 +5684,47 @@
         phoneWasPlaying = false;
         return;
       }
-      closeModal();
-      tvUI.resetTransient();
-      if (state.full) exitPlayer();
-      const plan = resumePlan(state.channels, resumeState, state.prefs, state.favorites, state.history);
-      Object.assign(state, { channel: plan.channel, group: ((_d = state.groupPins) == null ? void 0 : _d[plan.group]) ? "Ham\u0131s\u0131" : plan.group, view: plan.view, window: plan.window, selected: null });
-      render();
-      tvUI.ready();
-      if (plan.autoplay && (state.imported || localStorage.getItem("tl-tv-ready") === "true")) play(currentChannel(), true);
+      const snapshot = tvWarm;
+      tvWarm = null;
+      if (!snapshot) return;
+      const c = state.channels.find((c2) => c2.id === snapshot.playing);
+      const allowed = c && advanced.groupAccessible(c.group) && !(state.prefs.parental && ((_d = state.lockedChannels) == null ? void 0 : _d.includes(c.id)));
+      if (!allowed || !snapshot.full && state.view !== "guide" || $("#modal-root").children.length) return;
+      if (!snapshot.wants) {
+        const generation2 = ++playGeneration;
+        state.playing = c.id;
+        setPlaybackPhase("paused");
+        attachVideo(video, c, false, () => generation2 === playGeneration && !suspended).then((instance) => {
+          if (generation2 !== playGeneration || suspended) {
+            instance == null ? void 0 : instance.destroy();
+            return;
+          }
+          hls = instance;
+          video.dataset.tiviSource = c.url;
+          video.pause();
+          if (c.type !== "tv" && snapshot.position > 0) {
+            const restorePosition = () => {
+              if (generation2 === playGeneration) video.currentTime = snapshot.position;
+            };
+            if (video.readyState) restorePosition();
+            else video.addEventListener("loadedmetadata", restorePosition, { once: true });
+          }
+        }).catch(() => {
+          if (generation2 === playGeneration) {
+            state.playing = null;
+            setPlaybackPhase("idle");
+          }
+        });
+        return;
+      }
+      const generation = playGeneration;
+      play(c, snapshot.full, true).then(() => {
+        if (suspended || playGeneration !== generation + 1) return;
+        if (c.type !== "tv" && snapshot.position > 0 && Number.isFinite(video.duration)) video.currentTime = Math.min(snapshot.position, video.duration);
+        state.channel = snapshot.channel;
+        state.selected = snapshot.selected;
+        renderInfo();
+      });
     }
     bindRemote({ back: () => tvUI.webOSBack(), longBack: () => tvUI.longBack(), suspend: tvSuspend, resume: tvResume, action: (action) => {
       if (advanced.remoteAction(action)) return;

@@ -4,11 +4,11 @@ import android.app.*;import android.content.*;import android.os.*;import android
 public final class StartupRecoveryTest extends NativePlayerTest {
  void set(String name,Object value)throws Exception{Field f=host().getClass().getDeclaredField(name);f.setAccessible(true);f.set(host(),value);}
  void invoke(String name,Class<?>[] types,Object... values)throws Exception{Method m=host().getClass().getDeclaredMethod(name,types);m.setAccessible(true);m.invoke(host(),values);}
- void load(String name)throws Exception{host().getClass().getMethod("load",String.class).invoke(host(),"{\"url\":\"http://10.0.2.2:18888/demo.mp4?case="+name+"\",\"name\":\"Recovery fixture\"}");}
+ void load(String name)throws Exception{host().getClass().getMethod("load",String.class).invoke(host(),"{\"url\":\"http://127.0.0.1:18888/demo.mp4?case="+name+"\",\"name\":\"Recovery fixture\"}");}
  void expired()throws Exception{set("attemptStarted",SystemClock.elapsedRealtime()-13000);invoke("checkStartup",new Class<?>[]{});}
  boolean decoded()throws Exception{Object c=field("compatibility");if(c==null)return false;Method m=c.getClass().getDeclaredMethod("frame");m.setAccessible(true);return (boolean)m.invoke(c);}
  void rawPause()throws Exception{Object c=field("compatibility");Field f=c.getClass().getDeclaredField("mp");f.setAccessible(true);Object mp=f.get(c);mp.getClass().getMethod("pause").invoke(mp);}
- @Override public void onStart(){try{activity=startActivitySync(new Intent().setClassName("com.tiviloom.mobile","com.tiviloom.mobile.NativePlaybackActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("payload","{\"url\":\"http://10.0.2.2:18888/demo.mp4?case=initial\"}"));
+ @Override public void onStart(){try{activity=startActivitySync(new Intent().setClassName("com.tiviloom.mobile","com.tiviloom.mobile.NativePlaybackActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("payload","{\"url\":\"http://127.0.0.1:18888/demo.mp4?case=initial\"}"));
  check("AudioTrack 5001 selects compatibility engine",()->{onMain(()->{Object p=field("player");invoke("handlePlayerError",new Class<?>[]{ExoPlayer.class,PlaybackException.class},p,new PlaybackException("Injected AudioTrack failure",null,5001));return true;});waitFor(()->decoded());});
  check("silent platform startup recovers without an error callback",()->{onMain(()->{load("silent");ExoPlayer p=(ExoPlayer)field("player");p.stop();p.setPlayWhenReady(true);expired();return true;});waitFor(()->decoded());});
  check("hardware no-frame recovers with software decoding",()->{require(onMain(()->{load("software");invoke("startCompatibility",new Class<?>[]{});rawPause();expired();return (boolean)field("compatibilitySoftware");}),"Software engine was not selected");waitFor(()->decoded());});

@@ -88,7 +88,7 @@ html.low-power-tv .playback-indicator[data-phase="buffering"],html.low-power-tv 
 #groups{overscroll-behavior:contain;}
 #groups .group-button:focus{outline:3px solid #8ac8f1;outline-offset:-3px;z-index:2;}
 
-html.low-power-tv *,html.low-power-tv *::before,html.low-power-tv *::after{transition-duration:0s!important;animation-duration:0s!important;scroll-behavior:auto!important;}
+html.low-power-tv .rail,html.low-power-tv .groups,html.low-power-tv #main,html.low-power-tv .movie-card{transition-duration:0s!important;animation-duration:0s!important;scroll-behavior:auto!important;}
 
 /* Visible reminder for on-TV long-press group properties */
 #groups .group-hint{padding:14px 12px;font:14px/20px Roboto,sans-serif;color:#aeb5bb;opacity:.85}
@@ -124,3 +124,17 @@ body.no-motion #boot .brand-reveal{animation:none;opacity:1;transform:none}body.
 #mini-player .mini-actions button{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;padding:0;}
 
 .startup-setting input{box-sizing:border-box;min-width:42px;max-width:42px;min-height:24px;max-height:24px;padding:0;border:0;overflow:hidden}
+
+/* 0.6.15: shared brand and interruptible overlay motion. Never animate video geometry. */
+:root{--brand-accent:#29d8ee;--brand-panel:#14263d;--motion-fast:150ms}
+.overlay{animation:loom-modal-in var(--motion-fast) ease-out both}
+.overlay.modal-exit{pointer-events:none!important;z-index:80;animation:loom-modal-out 130ms ease-in both}
+@keyframes loom-modal-in{from{opacity:0}to{opacity:1}}
+@keyframes loom-modal-out{from{opacity:1}to{opacity:0}}
+.dialog-header button,.setting-row,.menu-list>button{transition:background-color 120ms,color 120ms}
+.dialog-header button:focus-visible,.menu-list>button:focus-visible{box-shadow:inset 0 0 0 2px var(--brand-accent)}
+#export-json,#backup-text{display:block;width:100%;max-height:280px;background:#0b1528;color:#e8f5ff;border:1px solid #31455f;border-radius:10px;padding:12px;font:14px/1.5 monospace}
+#health-results{max-height:360px;overflow:auto}.health-row{padding:8px 12px;border-bottom:1px solid #ffffff12}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.overlay .dialog,.overlay .settings-panel{background:linear-gradient(145deg,#14263d,#0b1528);border:1px solid #31455f}.choice-dialog .menu-list>button.selected{background:#164459}

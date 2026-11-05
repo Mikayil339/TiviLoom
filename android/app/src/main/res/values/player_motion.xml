@@ -1,0 +1,1 @@
+<resources><style name="PlayerSheetMotion"><item name="android:windowEnterAnimation">@anim/player_sheet_enter</item><item name="android:windowExitAnimation">@anim/player_sheet_exit</item></style></resources>

@@ -1,6 +1,6 @@
 {
   "name": "tiviloom-webos",
-  "version": "0.6.11",
+  "version": "0.6.15",
   "private": true,
   "type": "module",
   "scripts": {

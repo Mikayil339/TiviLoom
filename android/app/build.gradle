@@ -2,6 +2,7 @@ plugins { id 'com.android.application' }
 
 android {
     namespace 'com.tiviloom.mobile'
+    buildFeatures { buildConfig true }
     compileSdk 36
     ndkVersion "27.1.12297006"
     defaultConfig {
@@ -9,8 +10,8 @@ android {
         minSdk 26
         targetSdk 35
         ndk { abiFilters.addAll((project.findProperty("targetAbis") ?: "arm64-v8a,x86_64").split(",")) }
-        versionCode 73
-        versionName '0.6.13'
+        versionCode 75
+        versionName '0.6.15'
         testInstrumentationRunner 'com.tiviloom.mobile.test.NativePlayerTest'
     }
     sourceSets { androidTest { java.srcDirs = ['../instrumentation/src']; manifest.srcFile '../instrumentation/AndroidManifest.xml' } }

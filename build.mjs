@@ -15,3 +15,8 @@ fs.writeFileSync('app/appinfo.json',JSON.stringify(info,null,2)+'\n');
 const service=JSON.parse(fs.readFileSync('service/package.json'));
 service.version=pkg.version;
 fs.writeFileSync('service/package.json',JSON.stringify(service,null,2)+'\n');console.log('Built TiviLoom '+pkg.version+' for webOS');
+
+const {createHash}=await import('node:crypto');const digest=createHash('sha256');
+function fingerprint(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){const path=dir+'/'+entry.name;if(entry.isDirectory())fingerprint(path);else if(/\.(mjs|css|java|xml|gradle)$/.test(path)){digest.update(path);digest.update(fs.readFileSync(path));}}}
+fingerprint('src');fingerprint('android/app/src/main/java');fingerprint('android/app/src/main/res');
+fs.writeFileSync('app/release-info.json',JSON.stringify({webVersion:pkg.version,sourceFingerprint:digest.digest('hex'),platforms:['webOS','Android phone']},null,2)+'\n');

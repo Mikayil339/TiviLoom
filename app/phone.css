@@ -1,5 +1,5 @@
 /* Phone layout is activated by the Android host, independent of the TV canvas. */
-.phone [data-adv="phone"],.phone [data-action="phone"],.phone [data-action="backup"],.phone [data-action="restore"]{display:none!important}
+.phone [data-adv="phone"],.phone [data-action="phone"]{display:none!important}
 html.phone{--bg:#0d1319;--panel:#17212b;--fg:#f5f7fa;--muted:#94a5b5;--accent:#7ed7cf;--row:76px;color-scheme:dark}
 .phone body{font-family:Roboto,system-ui,sans-serif;font-size:16px;margin:0;background:var(--bg);overflow:hidden;-webkit-tap-highlight-color:transparent}
 .phone *{box-sizing:border-box;touch-action:manipulation}
@@ -300,3 +300,17 @@ html.phone{--bg:#0d1319;--panel:#17212b;--fg:#f5f7fa;--muted:#94a5b5;--accent:#7
 .phone .dialog-header [data-action="modal-back"] svg,.phone .mobile-detail-back svg,.phone .phone-groups-heading button svg{display:block;width:20px;height:20px;flex:none;fill:currentColor;stroke:none}
 .phone .wizard [data-tv="wizard-back"]{display:flex;align-items:center;justify-content:center;gap:10px;border-radius:14px;background:#203249;color:#f1f6ff}
 .phone .wizard [data-tv="wizard-back"] svg{width:20px;height:20px;flex:none;fill:currentColor;stroke:none}
+
+/* Shared palette, responsive sheets and lightweight transitions. */
+html.phone{--accent:#29d8ee;--panel:#14263d}
+.phone .rail button.active{color:#9cecf7;background:#153b49}
+.phone .group-button.active{background:#164459;color:#e5fbff}
+.phone #phone-group-scrim{opacity:0;transition:opacity 180ms ease;backdrop-filter:none;background:#030a16b8}
+.phone #phone-group-scrim.visible{opacity:1}
+.phone .dialog,.phone .settings-panel{background:linear-gradient(145deg,#14263d,#0b1528);border:1px solid #31455f}
+.phone .overlay:not(.modal-exit)>.dialog,.phone .overlay:not(.modal-exit)>.settings-panel{animation:loom-sheet-in 160ms ease-out both}
+.phone .modal-exit{position:fixed;inset:0;display:flex;justify-content:center;align-items:flex-end;background:#03090fc2}
+.phone #content>.card-grid,.phone #content>.search-wrap{animation:loom-modal-in 140ms ease-out both}
+.phone button:active{filter:brightness(1.12)}
+@keyframes loom-sheet-in{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(max-height:420px){.phone .dialog,.phone .settings-panel{max-height:calc(100dvh - 8px)}.phone .dialog-header,.phone .settings-header{min-height:52px;padding:2px 12px}}

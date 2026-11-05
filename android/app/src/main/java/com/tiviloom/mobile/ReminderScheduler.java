@@ -1,0 +1,9 @@
+package com.tiviloom.mobile;
+import android.app.*;import android.content.*;import android.net.Uri;import org.json.*;
+final class ReminderScheduler {
+ static android.content.SharedPreferences prefs(Context c){return c.getSharedPreferences("reminders",0);}
+ static PendingIntent intent(Context c,String key,String title,long at){Intent i=new Intent(c,ReminderReceiver.class).setData(Uri.parse("tiviloom://reminder/"+Uri.encode(key))).putExtra("key",key).putExtra("title",title).putExtra("at",at);return PendingIntent.getBroadcast(c,0,i,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);}
+ static void schedule(Context c,String key,String title,long at){if(!prefs(c).getBoolean("enabled",false)||key==null||key.length()>500||title==null||title.length()>1000||at<=System.currentTimeMillis()||at>System.currentTimeMillis()+366L*86400000)return;try{if(prefs(c).getAll().size()>257&&!prefs(c).contains(key))return;JSONObject item=new JSONObject().put("title",title).put("at",at);prefs(c).edit().putString(key,item.toString()).apply();((AlarmManager)c.getSystemService(Context.ALARM_SERVICE)).setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,at,intent(c,key,title,at));}catch(Exception ignored){}}
+ static void restore(Context c){for(java.util.Map.Entry<String,?> e:prefs(c).getAll().entrySet())if(e.getValue() instanceof String)try{JSONObject item=new JSONObject((String)e.getValue());if(item.getLong("at")>System.currentTimeMillis())schedule(c,e.getKey(),item.getString("title"),item.getLong("at"));else prefs(c).edit().remove(e.getKey()).apply();}catch(Exception ignored){}}
+ static void cancelAll(Context c){for(java.util.Map.Entry<String,?> e:prefs(c).getAll().entrySet())if(e.getValue() instanceof String){((AlarmManager)c.getSystemService(Context.ALARM_SERVICE)).cancel(intent(c,e.getKey(),"",0));prefs(c).edit().remove(e.getKey()).apply();}}
+}
