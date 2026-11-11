@@ -43,7 +43,7 @@ let indexedPrograms=null,epgIndex=new Map(),epgNameIndex=new Map();
 const video=$('#video');video.muted=state.prefs.muted;
 let lastWatchWrite=0;
 video.addEventListener('timeupdate',()=>{const c=state.channels.find(x=>x.id===state.playing);if(!c||!['movie','series'].includes(c.type)||!canSeek(video)||Date.now()-lastWatchWrite<5000)return;lastWatchWrite=Date.now();state.watchProgress[c.id]={time:video.currentTime,duration:video.duration,updated:Date.now()};save('watchProgress');});
-video.addEventListener('ended',()=>{if(isLiveChannel(webSource)&&state.playing===webSource.id){showVideoError('Canlı yayım bağlantısı bağlandı.');return;}const next=nextEpisode(state.nextEpisodes||[],state.playing);if(next){menu('Next episode',[['▶ '+next.name,()=>{closeModal();play(next,true);}],['Cancel',()=>closeModal()]],{choice:true});}});
+video.addEventListener('ended',()=>{if(isLiveChannel(webSource)&&state.playing===webSource.id){showVideoError('Canlı yayım kəsildi.');return;}const next=nextEpisode(state.nextEpisodes||[],state.playing);if(next){menu('Next episode',[['▶ '+next.name,()=>{closeModal();play(next,true);}],['Cancel',()=>closeModal()]],{choice:true});}});
 video.addEventListener('loadedmetadata',()=>{const c=state.channels.find(x=>x.id===state.playing);if(!c||!['movie','series'].includes(c.type)||!canSeek(video))return;const offset=resumeOffset(state.watchProgress[c.id]?.time,video.duration);if(offset&&video.currentTime<3)try{video.currentTime=offset;}catch{}});
 
 const videoSurface=createVideoSurface(video,$('#tv-screen'),$('#video-error'),()=>{applyDisplayMode(video,videoSurface.host,state.prefs.fit);syncNativeBounds();});
@@ -126,7 +126,7 @@ function showVideoError(message){
   $('#video-error').hidden=false;
   $('#preview-play').classList.remove('playing');
   stablePlaybackStart=null;
-  if(state.prefs.autoReconnect===false||document.hidden||!isLiveChannel(webSource)||state.playing!==webSource.id||reconnectTimer||/401|403|404|kodek|format|OK \/ Play/.test(message))return;
+  if(state.prefs.autoReconnect===false||document.hidden||!webSource||state.playing!==webSource.id||reconnectTimer||/401|403|404|kodek|format|OK \/ Play/.test(message))return;
   const delay=reconnectDelay(reconnectAttempts+1);
   if(delay===null)return;
   const source=webSource,generation=playGeneration;

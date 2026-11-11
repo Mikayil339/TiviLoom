@@ -3622,7 +3622,7 @@
     });
     video.addEventListener("ended", () => {
       if (isLiveChannel(webSource) && state.playing === webSource.id) {
-        showVideoError("Canl\u0131 yay\u0131m ba\u011Flant\u0131s\u0131 ba\u011Fland\u0131.");
+        showVideoError("Canl\u0131 yay\u0131m k\u0259sildi.");
         return;
       }
       const next = nextEpisode(state.nextEpisodes || [], state.playing);
@@ -3995,7 +3995,7 @@
       $("#video-error").hidden = false;
       $("#preview-play").classList.remove("playing");
       stablePlaybackStart = null;
-      if (state.prefs.autoReconnect === false || document.hidden || !isLiveChannel(webSource) || state.playing !== webSource.id || reconnectTimer || /401|403|404|kodek|format|OK \/ Play/.test(message)) return;
+      if (state.prefs.autoReconnect === false || document.hidden || !webSource || state.playing !== webSource.id || reconnectTimer || /401|403|404|kodek|format|OK \/ Play/.test(message)) return;
       const delay = reconnectDelay(reconnectAttempts + 1);
       if (delay === null) return;
       const source = webSource, generation = playGeneration;
