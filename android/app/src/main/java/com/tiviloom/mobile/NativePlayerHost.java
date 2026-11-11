@@ -53,7 +53,45 @@ public final class NativePlayerHost {
  private String channelName="TiviLoom",channelId="";private boolean audioRendered=false;private LinearLayout toolsRow;private Runnable pendingFilter;
  private final Runnable hide=()->{if(!dragging&&!dialogOpen&&isPlaying()){UiMotion.visibility(controls,false);if(!locked)UiMotion.visibility(lockButton,false);}};
  private final Runnable progress=new Runnable(){public void run(){if(released)return;sync();rememberSuccessfulEngine();handler.postDelayed(this,backgroundSuspended?4000:1000);}};
- private final Runnable retry=()->{if(!released&&!backgroundSuspended&&player!=null){firstFrameRendered=false;player.prepare();player.play();armStartup();}};
+ private boolean liveSource=false,retryPending=false,stablePlaybackPending=false;
+ private final Runnable stablePlayback=()->{if(isPlaying()&&!backgroundSuspended)retries=0;};
+ private final Runnable retry=()->{
+  retryPending=false;
+  if(released||backgroundSuspended||!allowReconnect)return;
+  if(compatibility!=null){
+   compatibility.restartLive();
+   armStartup();
+  }else if(player!=null){
+   firstFrameRendered=false;
+   audioRendered=false;
+   if(liveSource||player.isCurrentMediaItemLive())player.seekToDefaultPosition();
+   player.prepare();
+   player.play();
+   armStartup();
+  }
+ };
+ private void cancelRetry(){
+  handler.removeCallbacks(retry);
+  retryPending=false;
+ }
+ private void monitorStablePlayback(boolean playing){
+  if(playing==stablePlaybackPending)return;
+  stablePlaybackPending=playing;
+  handler.removeCallbacks(stablePlayback);
+  if(playing)handler.postDelayed(stablePlayback,20000);
+ }
+ private boolean scheduleReconnect(){
+  if(!allowReconnect||backgroundSuspended||released||retries>=3)return false;
+  if(retryPending)return true;
+  monitorStablePlayback(false);
+  retries++;
+  event.accept("phase:buffering");
+  status.setVisibility(View.VISIBLE);
+  setStatus("Bağlantı yenilənir · "+retries+"/3");
+  retryPending=true;
+  handler.postDelayed(retry,new long[]{1500,3500,7000}[retries-1]);
+  return true;
+ }
  private int dp(int n){return Math.round(n*owner.getResources().getDisplayMetrics().density);}
  public NativePlayerHost(Activity owner,Runnable expand,Runnable exit,java.util.function.Consumer<String> event){
   this.owner=owner;this.expand=expand;this.exit=exit;this.event=event;
@@ -107,18 +145,19 @@ public final class NativePlayerHost {
   JSONObject data=new JSONObject(payload);catalogue=data.optJSONArray("catalogue");history=data.optJSONArray("history");if(catalogue==null)catalogue=new org.json.JSONArray();if(history==null)history=new org.json.JSONArray();
   Uri checked=Uri.parse(data.getString("url"));if(!Arrays.asList("http","https").contains(checked.getScheme())||checked.getUserInfo()!=null)throw new IllegalArgumentException();
   String headerValues=data.optString("userAgent")+data.optString("referer");if(headerValues.contains("\r")||headerValues.contains("\n"))throw new IllegalArgumentException();
+  liveSource=data.optBoolean("live",false);
   String key=data.getString("url")+"\n"+data.optString("userAgent")+"\n"+data.optString("referer");
   channelId=data.optString("id");UiMotion.enabled=data.optBoolean("motion",true);UiStrings.language(owner,data.optString("language","az"));UiStrings.apply(root);channelName=data.optString("name","TiviLoom");title.setText(channelName);
   if(compatibility!=null&&sourceKey.equals(key)){compatibility.setMuted(data.optBoolean("muted",false));return;}
   if(player!=null&&sourceKey.equals(key)){if(player.getPlayerError()!=null){retries=0;player.prepare();}player.setVolume(data.optBoolean("muted",false)?0:1);return;}
   if(compatibility!=null){root.removeView(compatibility.view);compatibility.release();compatibility=null;}compatibilityAttempted=false;sourceData=data;playerView.setVisibility(View.VISIBLE);
-  handler.removeCallbacks(startupCheck);handler.removeCallbacks(retry);if(player!=null){playerView.setPlayer(null);player.release();player=null;}backgroundSuspended=false;backgroundWantsPlayback=false;firstFrameRendered=false;audioRendered=false;terminalError=false;expectsVideo=true;expectsAudio=true;retries=0;resumePosition=0;savedTracks=null;resumePlayback=true;sourceKey=key;
+  handler.removeCallbacks(startupCheck);cancelRetry();monitorStablePlayback(false);if(player!=null){playerView.setPlayer(null);player.release();player=null;}backgroundSuspended=false;backgroundWantsPlayback=false;firstFrameRendered=false;audioRendered=false;terminalError=false;expectsVideo=true;expectsAudio=true;retries=0;resumePosition=0;savedTracks=null;resumePlayback=true;sourceKey=key;
   allowReconnect=data.optBoolean("autoReconnect",true);if(!fitConfigured){String mode=data.optString("fit","contain");fit=mode.equals("fill")?2:mode.equals("cover")||mode.equals("cinema-zoom")?1:0;fitConfigured=true;}
   Integer preferred=successfulEngines.get(key);if(preferred!=null){startCompatibility(preferred==2);return;}start(payload);
  }
  public void release(){catalogueGeneration++;filterGeneration++;catalogueWorker.shutdownNow();channelLogos.close();if(compatibility!=null){compatibility.release();compatibility=null;}released=true;if(activeDialog!=null){activeDialog.dismiss();activeDialog=null;}restoreBrightness();handler.removeCallbacksAndMessages(null);playerView.setPlayer(null);if(player!=null){player.release();player=null;}}
  public void preferences(String payload)throws Exception{JSONObject data=new JSONObject(payload);UiMotion.enabled=data.optBoolean("motion",true);UiStrings.language(owner,data.optString("language","az"));UiStrings.apply(root);allowReconnect=data.optBoolean("autoReconnect",true);boolean muted=data.optBoolean("muted",false);if(compatibility!=null)compatibility.setMuted(muted);if(player!=null)player.setVolume(muted?0:1);String mode=data.optString("fit","contain");fit=mode.equals("fill")?2:mode.equals("cover")||mode.equals("cinema-zoom")?1:0;playerView.setResizeMode(new int[]{AspectRatioFrameLayout.RESIZE_MODE_FIT,AspectRatioFrameLayout.RESIZE_MODE_ZOOM,AspectRatioFrameLayout.RESIZE_MODE_FILL}[fit]);if(compatibility!=null)compatibility.fit(fit);}
- public void pause(){handler.removeCallbacks(startupCheck);if(compatibility!=null)compatibility.mpPause();handler.removeCallbacks(retry);if(player!=null)player.pause();}
+ public void pause(){monitorStablePlayback(false);handler.removeCallbacks(startupCheck);if(compatibility!=null)compatibility.mpPause();cancelRetry();if(player!=null)player.pause();}
  public boolean dialogHasFocus(){return activeDialog!=null&&activeDialog.isShowing()&&activeDialog.getWindow()!=null&&activeDialog.getWindow().getDecorView().hasWindowFocus();}
  public void suspendForBackground(){if(released||backgroundSuspended)return;backgroundWantsPlayback=compatibility!=null?compatibility.wantsPlayback()&&!terminalError:player!=null&&player.getPlayWhenReady()&&player.getPlaybackState()!=Player.STATE_ENDED;backgroundSuspended=true;backgroundBrightness=owner.getWindow().getAttributes().screenBrightness;pause();restoreBrightness();}
  public void resumeFromBackground(boolean visible){if(released||!backgroundSuspended)return;boolean wanted=backgroundWantsPlayback; backgroundSuspended=false;backgroundWantsPlayback=false;if(visible&&fullscreen){WindowManager.LayoutParams p=owner.getWindow().getAttributes();p.screenBrightness=backgroundBrightness;owner.getWindow().setAttributes(p);}if(!wanted||!visible)return;if(compatibility!=null){compatibility.play();armStartup();}else if(player!=null){if(player.isCurrentMediaItemLive())player.seekToDefaultPosition();if(player.getPlayerError()!=null)player.prepare();player.play();if(!firstFrameRendered)armStartup();}sync();}
@@ -135,15 +174,15 @@ public final class NativePlayerHost {
   String referer=data.optString("referer","");if((agent+referer).contains("\r")||(agent+referer).contains("\n"))throw new IllegalArgumentException();
   Map<String,String> headers=new HashMap<>();headers.put("User-Agent",agent);if(!referer.isEmpty())headers.put("Referer",referer);
   DefaultHttpDataSource.Factory http=new DefaultHttpDataSource.Factory().setUserAgent(agent).setConnectTimeoutMs(8000).setReadTimeoutMs(12000).setAllowCrossProtocolRedirects(true).setDefaultRequestProperties(headers);
-  DefaultLoadControl loadControl=new DefaultLoadControl.Builder().setBufferDurationsMs(1500,15000,500,1500).setPrioritizeTimeOverSizeThresholds(true).build();
+  DefaultLoadControl loadControl=new DefaultLoadControl.Builder().setBufferDurationsMs(liveSource?12000:1500,liveSource?30000:15000,500,liveSource?3000:1500).setPrioritizeTimeOverSizeThresholds(true).build();
   player=new ExoPlayer.Builder(owner).setRenderersFactory(new DefaultRenderersFactory(owner).setEnableDecoderFallback(true)).setMediaSourceFactory(new androidx.media3.exoplayer.source.DefaultMediaSourceFactory(http,new androidx.media3.extractor.DefaultExtractorsFactory().setTsExtractorFlags(androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES))).setLoadControl(loadControl).build();
   player.setAudioAttributes(new AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(),true);player.setHandleAudioBecomingNoisy(true);player.setVolume(data.optBoolean("muted",false)?0f:1f);playerView.setPlayer(player);
   final ExoPlayer activePlayer=player;
   player.addListener(new Player.Listener(){
    @Override public void onTracksChanged(Tracks tracks){if(player!=activePlayer||compatibilityAttempted||released)return;if(!tracks.getGroups().isEmpty()){expectsVideo=tracks.getGroups().stream().anyMatch(g->g.getType()==C.TRACK_TYPE_VIDEO);expectsAudio=tracks.getGroups().stream().anyMatch(g->g.getType()==C.TRACK_TYPE_AUDIO);}boolean unsupported=false;for(int type:new int[]{C.TRACK_TYPE_AUDIO,C.TRACK_TYPE_VIDEO}){boolean present=false,supported=false;for(Tracks.Group g:tracks.getGroups())if(g.getType()==type){present=true;supported|=g.isSupported();}if(present&&!supported)unsupported=true;}if(unsupported){ExoPlayer expected=player;handler.post(()->{if(player==expected)startCompatibility();});}}
 
-   @Override public void onPlaybackStateChanged(int state){if(player!=activePlayer||released)return;if(state==Player.STATE_BUFFERING){event.accept("phase:buffering");status.setVisibility(View.VISIBLE);setStatus("Yayım yüklənir…");}else if(state==Player.STATE_READY){event.accept(firstFrameRendered||!expectsVideo?"phase:playing":"phase:buffering");handler.removeCallbacks(retry);retries=0;status.setVisibility(firstFrameRendered||!expectsVideo?View.GONE:View.VISIBLE);}else if(state==Player.STATE_ENDED){status.setVisibility(View.VISIBLE);setStatus("Yayım bitdi");showControls();}sync();}
-   @Override public void onIsPlayingChanged(boolean value){if(player!=activePlayer||released)return;if(!player.getPlayWhenReady())event.accept("phase:paused");else if(value&&(firstFrameRendered||!expectsVideo))event.accept("phase:playing");sync();if(!value)showControls();else showControls();}
+   @Override public void onPlaybackStateChanged(int state){if(player!=activePlayer||released)return;if(state==Player.STATE_BUFFERING){event.accept("phase:buffering");status.setVisibility(View.VISIBLE);setStatus("Yayım yüklənir…");}else if(state==Player.STATE_READY){event.accept(firstFrameRendered||!expectsVideo?"phase:playing":"phase:buffering");cancelRetry();status.setVisibility(firstFrameRendered||!expectsVideo?View.GONE:View.VISIBLE);}else if(state==Player.STATE_ENDED){if(liveSource&&player.getPlayWhenReady()&&scheduleReconnect())return;status.setVisibility(View.VISIBLE);setStatus("Yayım bitdi");showControls();}sync();}
+   @Override public void onIsPlayingChanged(boolean value){if(player!=activePlayer||released)return;monitorStablePlayback(value);if(!player.getPlayWhenReady())event.accept("phase:paused");else if(value&&(firstFrameRendered||!expectsVideo))event.accept("phase:playing");sync();if(!value)showControls();else showControls();}
    @Override public void onPlayerError(PlaybackException e){handlePlayerError(activePlayer,e);}
   });
   player.addAnalyticsListener(new AnalyticsListener(){@Override public void onAudioPositionAdvancing(AnalyticsListener.EventTime e,long systemTimeMs){if(player!=activePlayer||released)return;audioRendered=true;if(firstFrameRendered||!expectsVideo)handler.removeCallbacks(startupCheck);}
@@ -151,9 +190,33 @@ public final class NativePlayerHost {
   MediaItem item=new MediaItem.Builder().setUri(uri).build();
   player.setMediaSource(BroadcastMediaSources.create(http,item));if(savedTracks!=null)player.setTrackSelectionParameters(savedTracks);if(resumePosition>0)player.seekTo(resumePosition);player.prepare();player.setPlayWhenReady(resumePlayback);armStartup();showControls();
  }
- private void handlePlayerError(ExoPlayer activePlayer,PlaybackException e){if(player!=activePlayer||released||backgroundSuspended)return;handler.removeCallbacks(startupCheck);if(e.errorCode==PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW&&allowReconnect&&retries++<2){firstFrameRendered=false;player.seekToDefaultPosition();player.prepare();player.play();armStartup();return;}if(e.errorCode>=3000&&e.errorCode<6000&&!compatibilityAttempted){{ExoPlayer expected=player;handler.post(()->{if(player==expected)startCompatibility();});}return;}event.accept("phase:error");status.setVisibility(View.VISIBLE);boolean network=e.errorCode>=2000&&e.errorCode<3000&&e.errorCode!=PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS;if(allowReconnect&&network&&resumePlayback&&retries<2){retries++;setStatus("Bağlantı yenilənir · "+retries+"/2");handler.postDelayed(retry,retries*1000L);}else{setStatus(e.errorCode>=4000&&e.errorCode<5000?"Bu cihaz yayım formatını aça bilmədi":e.errorCode==PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS?httpFailure(e):"Yayım açıla bilmədi. Yenidən sınamaq üçün Oynat düyməsinə toxunun.");showControls();}}
+ private void handlePlayerError(ExoPlayer activePlayer,PlaybackException error){
+  if(player!=activePlayer||released||backgroundSuspended)return;
+  handler.removeCallbacks(startupCheck);
+  int code=error.errorCode;
+  if(code>=3000&&code<6000&&!compatibilityAttempted){
+   handler.post(()->{if(player==activePlayer)startCompatibility();});
+   return;
+  }
+  int statusCode=httpStatus(error);
+  boolean transientHttp=statusCode==408||statusCode==429||statusCode>=500;
+  boolean network=code>=2000&&code<3000&&code!=PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS;
+  if(activePlayer.getPlayWhenReady()&&(network||transientHttp||code==PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW)&&scheduleReconnect())return;
+  event.accept("phase:error");
+  status.setVisibility(View.VISIBLE);
+  setStatus(code>=4000&&code<5000?"Bu cihaz yayım formatını aça bilmədi":code==PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS?httpFailure(error):"Yayım açıla bilmədi. Yenidən sınamaq üçün Oynat düyməsinə toxunun.");
+  showControls();
+ }
+ private int httpStatus(Throwable error){
+  for(Throwable cause=error;cause!=null;cause=cause.getCause()){
+   if(cause instanceof androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException){
+    return ((androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException)cause).responseCode;
+   }
+  }
+  return 0;
+ }
  private void setStatus(String value){UiStrings.text(status,value);}
- private String httpFailure(Throwable error){for(Throwable cause=error;cause!=null;cause=cause.getCause())if(cause instanceof androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException)return "Provayder HTTP "+((androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException)cause).responseCode+" qaytardı";return "Provayder yayımı təqdim etmədi";}
+ private String httpFailure(Throwable error){int status=httpStatus(error);return status==0?"Provayder yayımı təqdim etmədi":"Provayder HTTP "+status+" qaytardı";}
  private void more(){String[] labels={"Əvvəlki kanal","Növbəti kanal","Sevimlilərə əlavə et / çıxar","Ayarlar","Yuxu taymeri","Səsi aç / bağla","Səs dili","Altyazı","Görüntü ölçüsü","Tam ekrandan çıx"};String[] commands={"previous","next","favorite","settings","sleep","mute","audio","subtitles","fit","exit"};dialogOpen=true;showTrackDialog(PlayerSheets.choices(owner,"Digər funksiyalar",channelName,labels,-1,which->{if(commands[which].equals("mute")&&(player!=null||compatibility!=null)){boolean muted=compatibility!=null?compatibility.mp.getVolume()>0:player.getVolume()>0;if(compatibility!=null)compatibility.setMuted(muted);else player.setVolume(muted?0:1);event.accept("muted:"+muted);}else if(commands[which].equals("audio"))tracks(C.TRACK_TYPE_AUDIO,"Səs");else if(commands[which].equals("subtitles"))tracks(C.TRACK_TYPE_TEXT,"Altyazı");else if(commands[which].equals("fit")){fit=(fit+1)%3;if(compatibility!=null)compatibility.fit(fit);playerView.setResizeMode(new int[]{AspectRatioFrameLayout.RESIZE_MODE_FIT,AspectRatioFrameLayout.RESIZE_MODE_ZOOM,AspectRatioFrameLayout.RESIZE_MODE_FILL}[fit]);event.accept("fit:"+new String[]{"contain","cover","fill"}[fit]);}else if(commands[which].equals("exit"))exit.run();else event.accept("command:"+commands[which]);}));}
 
  public void catalogue(String payload)throws Exception{if(released)return;JSONObject envelope=new JSONObject(payload);if(envelope.optInt("requestToken",0)!=0&&envelope.optInt("requestToken")!=requestToken)return;catalogueLoading=true;final int generation=++catalogueGeneration;catalogueWorker.execute(()->{try{JSONObject data=new JSONObject(payload);org.json.JSONArray list=data.getJSONArray("catalogue"),recent=data.getJSONArray("history");java.util.Map<String,String> keys=new java.util.HashMap<>();for(int i=0;i<list.length();i++){JSONObject c=list.optJSONObject(i);if(c!=null)keys.put(c.optString("id"),searchKey(c.optString("name")+" "+c.optString("group")));}handler.post(()->{if(released||generation!=catalogueGeneration)return;catalogueLoading=false;status.setVisibility(View.GONE);catalogue=list;history=recent;searchKeys=keys;channelId=data.optString("activeId",channelId);channelPanel(data.optString("mode","channels"));});}catch(Exception ignored){handler.post(()->{if(!released&&generation==catalogueGeneration){catalogueLoading=false;status.setVisibility(View.GONE);Toast.makeText(owner,"Channel list could not be loaded",Toast.LENGTH_SHORT).show();}});}});}
@@ -212,11 +275,11 @@ public final class NativePlayerHost {
  private void startCompatibility(){startCompatibility(false);}
  private void startCompatibility(boolean software){
   if(released||backgroundSuspended||sourceData==null||(!software&&compatibilityAttempted))return;
-  compatibilityAttempted=true;compatibilitySoftware=software;handler.removeCallbacks(retry);handler.removeCallbacks(startupCheck);
+  compatibilityAttempted=true;compatibilitySoftware=software;cancelRetry();handler.removeCallbacks(startupCheck);
   if(player!=null){playerView.setPlayer(null);player.release();player=null;}
   if(compatibility!=null){root.removeView(compatibility.view);compatibility.release();compatibility=null;}
   playerView.setVisibility(View.GONE);status.setVisibility(View.VISIBLE);setStatus(software?"Proqram dekoderi yoxlanılır…":"Uyğunluq pleyeri yoxlanılır…");
-  try{compatibility=new CompatibilityPlayer(owner,sourceData,software,phase->{if(phase.equals("error")&&!compatibilitySoftware&&compatibility!=null&&compatibility.hasMediaData()){CompatibilityPlayer failed=compatibility;handler.removeCallbacks(startupCheck);handler.post(()->{if(compatibility==failed&&!released)startCompatibility(true);});return;}if(phase.equals("error")||phase.equals("ended")){terminalError=true;handler.removeCallbacks(startupCheck);successfulEngines.remove(sourceKey);}event.accept("phase:"+phase);status.setVisibility(phase.equals("playing")||phase.equals("paused")?View.GONE:View.VISIBLE);setStatus(phase.equals("error")?"Yayım açıla bilmədi":phase.equals("ended")?"Yayım bitdi":"Yayım yüklənir…");sync();});root.addView(compatibility.view,0,new FrameLayout.LayoutParams(-1,-1));compatibility.view.setOnClickListener(v->toggleControls());compatibility.fit(fit);compatibility.play();armStartup();}catch(Exception e){terminalError=true;successfulEngines.remove(sourceKey);status.setVisibility(View.VISIBLE);setStatus("Uyğunluq pleyeri açıla bilmədi");event.accept("phase:error");}
+  try{compatibility=new CompatibilityPlayer(owner,sourceData,software,phase->{if(phase.equals("error")&&!compatibilitySoftware&&compatibility!=null&&compatibility.hasMediaData()){CompatibilityPlayer failed=compatibility;handler.removeCallbacks(startupCheck);handler.post(()->{if(compatibility==failed&&!released)startCompatibility(true);});return;}if(phase.equals("ended")&&liveSource&&compatibility!=null&&compatibility.wantsPlayback()&&scheduleReconnect()){handler.removeCallbacks(startupCheck);return;}monitorStablePlayback(phase.equals("playing"));if(phase.equals("error")||phase.equals("ended")){terminalError=true;handler.removeCallbacks(startupCheck);successfulEngines.remove(sourceKey);}event.accept("phase:"+phase);status.setVisibility(phase.equals("playing")||phase.equals("paused")?View.GONE:View.VISIBLE);setStatus(phase.equals("error")?"Yayım açıla bilmədi":phase.equals("ended")?"Yayım bitdi":"Yayım yüklənir…");sync();});root.addView(compatibility.view,0,new FrameLayout.LayoutParams(-1,-1));compatibility.view.setOnClickListener(v->toggleControls());compatibility.fit(fit);compatibility.play();armStartup();}catch(Exception e){terminalError=true;successfulEngines.remove(sourceKey);status.setVisibility(View.VISIBLE);setStatus("Uyğunluq pleyeri açıla bilmədi");event.accept("phase:error");}
  }
  private void sync(){if((player==null&&compatibility==null)||released)return;boolean playing=compatibility!=null?compatibility.wantsPlayback()&&!terminalError:player.getPlayerError()==null&&player.getPlayWhenReady()&&player.getPlaybackState()!=Player.STATE_ENDED;playButton.setImageResource(playing?R.drawable.player_pause:R.drawable.player_play);previewPause.setImageResource(playing?R.drawable.player_pause:R.drawable.player_play);UiStrings.label(previewPause,playing?"Önizləməni pauza et":"Önizləməni oynat");UiStrings.label(playButton,playing?"Fasilə":"Oynat");boolean canSeek=seekable();rewind.setEnabled(canSeek);forward.setEnabled(canSeek);rewind.setAlpha(canSeek?1f:.35f);forward.setAlpha(canSeek?1f:.35f);seek.setVisibility(canSeek?View.VISIBLE:View.GONE);if(!dragging){if(canSeek){seek.setProgress((int)(10000L*position()/duration()));time.setText(clock(position())+" / "+clock(duration()));}else time.setText("CANLI");}}
  private void toggleControls(){if(!fullscreen){togglePlayback();return;}if(locked)return;if(controls.getVisibility()==View.VISIBLE){UiMotion.visibility(controls,false);UiMotion.visibility(lockButton,false);}else showControls();}
@@ -226,6 +289,6 @@ public final class NativePlayerHost {
  private final Runnable hideGesture=()->{if(gestureHud!=null)UiMotion.visibility(gestureHud,false);};
  private void restoreBrightness(){WindowManager.LayoutParams p=owner.getWindow().getAttributes();p.screenBrightness=originalBrightness;owner.getWindow().setAttributes(p);}
  private void adjustGesture(float delta){float value=Math.max(gestureVolume?0:.02f,Math.min(1,gestureStart+delta));if(gestureVolume){int max=audioManager.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC);audioManager.setStreamVolume(android.media.AudioManager.STREAM_MUSIC,Math.round(value*max),0);}else{WindowManager.LayoutParams p=owner.getWindow().getAttributes();p.screenBrightness=value;owner.getWindow().setAttributes(p);}int steps=Math.round(value*10);gestureHud.setText((gestureVolume?"♫ "+UiStrings.t("Səs"):"☀ "+UiStrings.t("Parlaqlıq"))+"  "+Math.round(value*100)+"%\n"+"━━━━━━━━━━".substring(0,steps)+"──────────".substring(steps));UiMotion.visibility(gestureHud,true);}
- private void togglePlayback(){if(compatibility!=null){if(compatibility.wantsPlayback())compatibility.mpPause();else{compatibility.play();armStartup();}sync();return;}if(player==null)return;handler.removeCallbacks(retry);if(player.getPlayWhenReady()&&player.getPlayerError()==null)player.pause();else{if(player.getPlayerError()!=null){retries=0;player.prepare();}else if(player.getPlaybackState()==Player.STATE_ENDED)player.seekToDefaultPosition();player.play();if(!firstFrameRendered)armStartup();}sync();showControls();}
+ private void togglePlayback(){if(retryPending){pause();sync();showControls();return;}if(compatibility!=null){if(compatibility.wantsPlayback())compatibility.mpPause();else{compatibility.play();armStartup();}sync();return;}if(player==null)return;cancelRetry();if(player.getPlayWhenReady()&&player.getPlayerError()==null)player.pause();else{if(player.getPlayerError()!=null){retries=0;player.prepare();}else if(player.getPlaybackState()==Player.STATE_ENDED)player.seekToDefaultPosition();player.play();if(!firstFrameRendered)armStartup();}sync();showControls();}
 
 }

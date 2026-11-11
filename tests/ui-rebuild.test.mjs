@@ -2,7 +2,7 @@ import {VERSION} from '../src/version.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {JSDOM,VirtualConsole} from 'jsdom';import {IDBFactory,IDBKeyRange} from 'fake-indexeddb';import {webcrypto} from 'node:crypto';import {demoData} from '../src/core.mjs';import {addPlaylist,emptyCatalog} from '../src/playlists.mjs';
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const until=async test=>{const deadline=Date.now()+5000;while(!test()){if(Date.now()>deadline)throw Error("UI condition timed out");await wait(25);}};
-async function app(phone=false,nativePlayer=false,restore=null){const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e.message));vc.on('error',e=>errors.push(String(e)));const html=(await readFile(new URL('../app/index.html',import.meta.url),'utf8')).replace(/<script[\s\S]*?<\/script>/g,'');const dom=new JSDOM(html,{url:'https://local.test/'+(phone?'?layout=phone'+(restore?'&restore=1':''):''),runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc}),w=dom.window,observers=[],MO=w.MutationObserver;w.MutationObserver=class extends MO{constructor(fn){super(fn);observers.push(this)}};w.indexedDB=new IDBFactory();w.IDBKeyRange=IDBKeyRange;Object.defineProperty(w,'crypto',{value:webcrypto});w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;w.ResizeObserver=class{observe(){}};w.IntersectionObserver=class{observe(){}unobserve(){}disconnect(){}};w.CSS={escape:String};w.HTMLElement.prototype.scrollIntoView=function(){};const realInterval=w.setInterval.bind(w);w.setInterval=(fn,ms)=>{if(ms===15000)w.__testTick=fn;return realInterval(fn,ms);};w.__tiviloomBootStarted=Date.now()-4000;w.localStorage.setItem('tl-tv-ready','true');w.fetch=async(url,opts)=>({ok:true,json:async()=>{if(url.endsWith('/fetchSource'))return {ticket:'fixture',chunks:1};if(url.endsWith('/readSource'))return {text:JSON.stringify({episodes:{2:[{id:21,title:'Episode',episode_num:1}]}})};return {returnValue:true,status:403};}});w.nativePlayerCalls=[];w.fullscreenChanges=[];if(nativePlayer)w.TiviLoomNative={appVersion:()=> '0.6.9',nativeFullscreen:full=>w.fullscreenChanges.push(full),suspendNativePlayer:()=>{w.suspendCalls=(w.suspendCalls||0)+1;},resumeNativePlayer:()=>{w.resumeCalls=(w.resumeCalls||0)+1;},nativeBack:()=>{w.nativeBackCalls=(w.nativeBackCalls||0)+1;},nativeBounds:payload=>{(w.nativeBoundsCalls??=[]).push(JSON.parse(payload));},stopNativePlayer:()=>{},openNativePlayer:payload=>{w.nativePlayerCalls.push(JSON.parse(payload));return true;},invoke:(id,method,json)=>{const params=JSON.parse(json);setTimeout(()=>w.dispatchEvent(new w.CustomEvent('TiviLoomNativeResult',{detail:{id,result:method==='prepareMedia'?{url:params.url}:{returnValue:true}}})),0);}};w.HTMLMediaElement.prototype.load=function(){};w.HTMLMediaElement.prototype.pause=function(){this.dispatchEvent(new w.Event('pause'));};w.HTMLMediaElement.prototype.play=function(){this.dataset.testPlay='true';this.dispatchEvent(new w.Event('playing'));return Promise.resolve();};await new Promise((resolve,reject)=>{const r=w.indexedDB.open('TiviLoom',1);r.onupgradeneeded=()=>r.result.createObjectStore('library');r.onerror=()=>reject(r.error);r.onsuccess=()=>{const tx=r.result.transaction('library','readwrite');const d=demoData();if(nativePlayer)d.channels[0]={...d.channels[0],demo:false,url:'https://media.test/channel.m3u8'};tx.objectStore('library').put(addPlaylist(emptyCatalog(),{...d,channels:[...d.channels,{id:'show',name:'Test Show',type:'series',group:'Series',url:'',xtream:{server:'https://p.test',username:'u',password:'p',seriesId:1}}],name:'Fixture',imported:true},'fixture'),'active');tx.oncomplete=()=>{r.result.close();resolve();};};});if(restore){w.localStorage.setItem('tl-phone-navigation',JSON.stringify(restore));w.localStorage.setItem('tl-prefs',JSON.stringify({autoplay:true}));}w.eval(await readFile(new URL('../app/bundle.js',import.meta.url),'utf8'));await until(()=>w.document.querySelector('#boot').hidden||errors.length);return {w,errors,click:s=>{const n=w.document.querySelector(s);assert.ok(n,'Missing '+s+'; '+errors.join(';'));n.click();return n;},key:async(key,hold=0)=>{const n=w.document.activeElement;n.dispatchEvent(new w.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));if(hold)await wait(hold);n.dispatchEvent(new w.KeyboardEvent('keyup',{key,bubbles:true,cancelable:true}));await wait(20);},close:async()=>{for(const o of observers)o.disconnect();await wait(100);w.close();}};}
+async function app(phone=false,nativePlayer=false,restore=null,liveFixture=false){const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e.message));vc.on('error',e=>errors.push(String(e)));const html=(await readFile(new URL('../app/index.html',import.meta.url),'utf8')).replace(/<script[\s\S]*?<\/script>/g,'');const dom=new JSDOM(html,{url:'https://local.test/'+(phone?'?layout=phone'+(restore?'&restore=1':''):''),runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc}),w=dom.window,observers=[],MO=w.MutationObserver;w.MutationObserver=class extends MO{constructor(fn){super(fn);observers.push(this)}};w.indexedDB=new IDBFactory();w.IDBKeyRange=IDBKeyRange;Object.defineProperty(w,'crypto',{value:webcrypto});w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;w.ResizeObserver=class{observe(){}};w.IntersectionObserver=class{observe(){}unobserve(){}disconnect(){}};w.CSS={escape:String};w.HTMLElement.prototype.scrollIntoView=function(){};const realInterval=w.setInterval.bind(w);w.setInterval=(fn,ms)=>{if(ms===15000)w.__testTick=fn;return realInterval(fn,ms);};w.__tiviloomBootStarted=Date.now()-4000;w.localStorage.setItem('tl-tv-ready','true');w.fetch=async(url,opts)=>({ok:true,json:async()=>{if(url.endsWith('/fetchSource'))return {ticket:'fixture',chunks:1};if(url.endsWith('/readSource'))return {text:JSON.stringify({episodes:{2:[{id:21,title:'Episode',episode_num:1}]}})};return {returnValue:true,status:403};}});w.nativePlayerCalls=[];w.fullscreenChanges=[];if(nativePlayer)w.TiviLoomNative={appVersion:()=> '0.6.9',nativeFullscreen:full=>w.fullscreenChanges.push(full),suspendNativePlayer:()=>{w.suspendCalls=(w.suspendCalls||0)+1;},resumeNativePlayer:()=>{w.resumeCalls=(w.resumeCalls||0)+1;},nativeBack:()=>{w.nativeBackCalls=(w.nativeBackCalls||0)+1;},nativeBounds:payload=>{(w.nativeBoundsCalls??=[]).push(JSON.parse(payload));},stopNativePlayer:()=>{},openNativePlayer:payload=>{w.nativePlayerCalls.push(JSON.parse(payload));return true;},invoke:(id,method,json)=>{const params=JSON.parse(json);setTimeout(()=>w.dispatchEvent(new w.CustomEvent('TiviLoomNativeResult',{detail:{id,result:method==='prepareMedia'?{url:params.url}:{returnValue:true}}})),0);}};w.HTMLMediaElement.prototype.load=function(){};w.HTMLMediaElement.prototype.pause=function(){this.dispatchEvent(new w.Event('pause'));};w.HTMLMediaElement.prototype.play=function(){this.dataset.testPlay='true';this.dispatchEvent(new w.Event('playing'));return Promise.resolve();};await new Promise((resolve,reject)=>{const r=w.indexedDB.open('TiviLoom',1);r.onupgradeneeded=()=>r.result.createObjectStore('library');r.onerror=()=>reject(r.error);r.onsuccess=()=>{const tx=r.result.transaction('library','readwrite');const d=demoData();if(nativePlayer||liveFixture)d.channels[0]={...d.channels[0],demo:false,url:'https://media.test/channel.m3u8'};tx.objectStore('library').put(addPlaylist(emptyCatalog(),{...d,channels:[...d.channels,{id:'show',name:'Test Show',type:'series',group:'Series',url:'',xtream:{server:'https://p.test',username:'u',password:'p',seriesId:1}}],name:'Fixture',imported:true},'fixture'),'active');tx.oncomplete=()=>{r.result.close();resolve();};};});if(restore){w.localStorage.setItem('tl-phone-navigation',JSON.stringify(restore));w.localStorage.setItem('tl-prefs',JSON.stringify({autoplay:true}));}w.eval(await readFile(new URL('../app/bundle.js',import.meta.url),'utf8'));await until(()=>w.document.querySelector('#boot').hidden||errors.length);return {w,errors,click:s=>{const n=w.document.querySelector(s);assert.ok(n,'Missing '+s+'; '+errors.join(';'));n.click();return n;},key:async(key,hold=0)=>{const n=w.document.activeElement;n.dispatchEvent(new w.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));if(hold)await wait(hold);n.dispatchEvent(new w.KeyboardEvent('keyup',{key,bubbles:true,cancelable:true}));await wait(20);},close:async()=>{for(const o of observers)o.disconnect();await wait(100);w.close();}};}
 test('compiled movie card detail Play and About version',async()=>{const a=await app();try{a.click('[data-tv="nav-movies"]');const id=a.click('[data-movie]').dataset.movie;assert.equal(a.w.document.querySelector('#movie-detail').dataset.mediaId,id);a.click('[data-tv="movie-play"]');await wait(40);assert.equal(a.w.document.querySelector('#video').dataset.testPlay,'true');assert.equal(a.w.document.querySelector('#player').hidden,false);await a.key('Escape');a.click('[data-tv="settings"]');a.click('[data-tv="about"]');assert.ok(a.w.document.querySelector('#modal-root').textContent.includes(VERSION));assert.deepEqual(a.errors,[]);}finally{await a.close();}});
 test('compiled rail right focuses groups and long OK edits movie group',async()=>{const a=await app();try{a.click('[data-tv="nav-movies"]');await a.key('ArrowLeft');await a.key('ArrowLeft');assert.equal(a.w.document.querySelector('#app').dataset.nav,'2');await a.key('ArrowRight');assert.equal(a.w.document.querySelector('#app').dataset.nav,'1');const group=[...a.w.document.querySelectorAll('#groups [data-group]')].at(-1);group.focus();await a.key('Enter',800);assert.ok(a.w.document.querySelector('#group-rename-form'));assert.deepEqual(a.errors,[]);}finally{await a.close();}});
 test('compiled Xtream show opens season and episode playback',async()=>{const a=await app();try{a.click('[data-tv="nav-series"]');a.click('[data-series]');await wait(60);assert.match(a.w.document.querySelector('#modal-root').textContent,/Season 2/);a.click('[data-tv="series-episode"]');await wait(40);assert.equal(a.w.document.querySelector('#video').getAttribute('src'),'https://p.test/series/u/p/21.mp4');assert.deepEqual(a.errors,[]);}finally{await a.close();}});
@@ -88,3 +88,62 @@ test('patch category diagnostics can stop and exported report excludes source UR
 
 
 test('patch LG paused preview remains paused across Home and fullscreen expansion',async()=>{const a=await app();try{const d=a.w.document,v=d.querySelector('#video');a.click('[data-channel="demo-0"]');await wait(60);v.pause();delete v.dataset.testPlay;Object.defineProperty(d,'hidden',{configurable:true,value:true});d.dispatchEvent(new a.w.Event('visibilitychange'));Object.defineProperty(d,'hidden',{configurable:true,value:false});d.dispatchEvent(new a.w.Event('visibilitychange'));await wait(80);assert.equal(v.dataset.testPlay,undefined);assert.ok(v.getAttribute('src'));a.click('#preview-play');await wait(30);assert.equal(d.querySelector('#player').hidden,false);assert.equal(v.dataset.testPlay,undefined);assert.deepEqual(a.errors,[]);}finally{await a.close();}});
+
+test('live playback survives periodic stalled signals and only reconnects after playback stops advancing',async()=>{
+ const a=await app(false,false,null,true);
+ try{
+  const {w}=a,d=w.document,v=d.querySelector('#video');
+  const realSet=w.setTimeout.bind(w),realClear=w.clearTimeout.bind(w),timers=new Map();
+  let now=0,nextId=-1,plays=0,paused=false;
+  Object.defineProperty(w.performance,'now',{value:()=>now});
+  Object.defineProperty(v,'paused',{get:()=>paused});
+  v.play=()=>{paused=false;plays++;v.dispatchEvent(new w.Event('playing'));return Promise.resolve();};
+  w.setTimeout=(fn,ms,...args)=>{
+    if(![1500,2500,3500,7000].includes(ms))return realSet(fn,ms,...args);
+    const id=nextId--;timers.set(id,{at:now+ms,fn});return id;
+  };
+  w.clearTimeout=id=>{if(id<0)timers.delete(id);else realClear(id);};
+  function advance(ms){
+    const end=now+ms;
+    while(true){
+      const next=[...timers.entries()].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];
+      if(!next)break;
+      timers.delete(next[0]);now=next[1].at;next[1].fn();
+    }
+    now=end;
+  }
+  a.click('[data-channel="demo-0"]');
+  await until(()=>plays===1);
+  v.dispatchEvent(new w.Event('stalled'));
+  for(let i=0;i<72;i++){
+    if(i%8===0)v.dispatchEvent(new w.Event('stalled'));
+    v.currentTime+=2.5;
+    advance(2500);
+  }
+  assert.equal(plays,1,'three minutes of advancing playback should never reload');
+  assert.equal(d.querySelector('#video-error').hidden,true);
+  v.dispatchEvent(new w.Event('waiting'));
+  advance(25000);
+  assert.match(d.querySelector('#video-error').textContent,/Reconnecting 1\/3/);
+  advance(1500);
+  await until(()=>plays===2);
+  for(const [attempt,delay] of [[2,3500],[3,7000]]){
+    v.dispatchEvent(new w.Event('ended'));
+    assert.match(d.querySelector('#video-error').textContent,new RegExp('Reconnecting '+attempt+'/3'));
+    advance(delay);
+    await until(()=>plays===attempt+1);
+  }
+  v.dispatchEvent(new w.Event('ended'));
+  assert.doesNotMatch(d.querySelector('#video-error').textContent,/Reconnecting/);
+  advance(30000);
+  assert.equal(plays,4,'brief recoveries must not reset the retry limit');
+  a.click('[data-channel="demo-0"]');
+  await until(()=>plays===5);
+  v.dispatchEvent(new w.Event('ended'));
+  paused=true;
+  v.dispatchEvent(new w.Event('pause'));
+  advance(30000);
+  assert.equal(plays,5,'pausing must cancel a queued reconnect');
+  assert.deepEqual(a.errors,[]);
+ }finally{await a.close();}
+});

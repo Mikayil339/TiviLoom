@@ -8,7 +8,7 @@ final class CompatibilityPlayer {
  CompatibilityPlayer(Activity owner,JSONObject data,boolean software,java.util.function.Consumer<String> state)throws Exception{
   this.owner=owner;muted=data.optBoolean("muted",false);audio=(AudioManager)owner.getSystemService(Context.AUDIO_SERVICE);
   focus=new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).setAudioAttributes(new android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE).build()).setOnAudioFocusChangeListener(change->{if(closed)return;if(change==AudioManager.AUDIOFOCUS_LOSS||change==AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)mpPause();else if(change==AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)mpVolume(20);else if(change==AudioManager.AUDIOFOCUS_GAIN)mpVolume(muted?0:100);}).build();
-  ArrayList<String> options=new ArrayList<>();options.add("--network-caching=1000");options.add("--no-video-title-show");options.add("--no-audio-time-stretch");
+  ArrayList<String> options=new ArrayList<>();options.add(data.optBoolean("live",false)?"--network-caching=3000":"--network-caching=1000");options.add("--no-video-title-show");options.add("--no-audio-time-stretch");
   library=new LibVLC(owner,options);mp=new org.videolan.libvlc.MediaPlayer(library);view=new VLCVideoLayout(owner);
   mp.attachViews(view,null,true,true);mp.setEventListener(e->{if(closed)return;if(e.type==org.videolan.libvlc.MediaPlayer.Event.Playing)state.accept("playing");else if(e.type==org.videolan.libvlc.MediaPlayer.Event.Paused)state.accept("paused");else if(e.type==org.videolan.libvlc.MediaPlayer.Event.Buffering)state.accept(e.getBuffering()<100?"buffering":"playing");else if(e.type==org.videolan.libvlc.MediaPlayer.Event.EncounteredError)state.accept("error");else if(e.type==org.videolan.libvlc.MediaPlayer.Event.EndReached)state.accept("ended");});
   media=new Media(library,android.net.Uri.parse(data.getString("url")));media.setHWDecoderEnabled(!software,false);String ua=data.optString("userAgent","");if(!ua.isEmpty())media.addOption(":http-user-agent="+ua);String referer=data.optString("referer","");if(!referer.isEmpty())media.addOption(":http-referrer="+referer);
@@ -18,6 +18,7 @@ final class CompatibilityPlayer {
  boolean wantsPlayback(){return wantsPlayback;}
  void mpPause(){wantsPlayback=false;if(!closed)mp.pause();}void mpVolume(int v){if(!closed)mp.setVolume(v);}void setMuted(boolean value){muted=value;mpVolume(value?0:100);}
  void play(){wantsPlayback=true;if(!closed&&audio.requestAudioFocus(focus)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED){if(mp.getPlayerState()==org.videolan.libvlc.interfaces.IMedia.State.Error)mp.setMedia(media);mp.play();}}
+ void restartLive(){if(closed||!wantsPlayback)return;mp.setMedia(media);play();}
  void fit(int value){mp.setVideoScale(new org.videolan.libvlc.MediaPlayer.ScaleType[]{org.videolan.libvlc.MediaPlayer.ScaleType.SURFACE_BEST_FIT,org.videolan.libvlc.MediaPlayer.ScaleType.SURFACE_FIT_SCREEN,org.videolan.libvlc.MediaPlayer.ScaleType.SURFACE_FILL}[value]);}
  boolean hasMediaData(){org.videolan.libvlc.interfaces.IMedia.Stats stats=media.getStats();return stats!=null&&stats.demuxReadBytes>0;}
  boolean frame(){org.videolan.libvlc.interfaces.IMedia.Stats stats=media.getStats();return stats!=null&&stats.displayedPictures>0;}

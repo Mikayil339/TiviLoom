@@ -178,7 +178,7 @@
   var backIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20z"/></svg>';
 
   // src/version.mjs
-  var VERSION = "0.6.15";
+  var VERSION = "0.6.16";
 
   // src/library-store.mjs
   function createLibraryStore({ indexedDB: indexedDB2, storage, timeout = 5e3 } = {}) {
@@ -3601,6 +3601,7 @@
       }
     }
     let reconnectTimer = null, reconnectAttempts = 0, stallTimer = null;
+    let webSource = null, stablePlaybackStart = null;
     let playbackUIReady = false;
     function setPlaybackPhase(phase) {
       state.playbackPhase = state.playing ? phase : "idle";
@@ -3620,6 +3621,10 @@
       save("watchProgress");
     });
     video.addEventListener("ended", () => {
+      if (isLiveChannel(webSource) && state.playing === webSource.id) {
+        showVideoError("Canl\u0131 yay\u0131m ba\u011Flant\u0131s\u0131 ba\u011Fland\u0131.");
+        return;
+      }
       const next = nextEpisode(state.nextEpisodes || [], state.playing);
       if (next) {
         menu("Next episode", [["\u25B6 " + next.name, () => {
@@ -3682,9 +3687,7 @@
     function stopMedia() {
       var _a5, _b4;
       if ($("#mini-player") && !$("#mini-player").hidden) toggleMini(true);
-      clearTimeout(reconnectTimer);
-      clearTimeout(stallTimer);
-      reconnectTimer = null;
+      cancelWebRecovery();
       reconnectAttempts = 0;
       (_b4 = (_a5 = window.TiviLoomNative) == null ? void 0 : _a5.stopNativePlayer) == null ? void 0 : _b4.call(_a5);
       document.documentElement.classList.remove("native-preview");
@@ -3966,7 +3969,7 @@
       if (!valid()) return null;
       let instance = null;
       if (playbackEngine(v, url, { native: platform.native || platform.isPhone, Hls: window.Hls, forceHls }) === "hlsjs") {
-        instance = new Hls({ enableWorker: true, manifestLoadingMaxRetry: 2, levelLoadingMaxRetry: 2, fragLoadingMaxRetry: 2 });
+        instance = new Hls({ enableWorker: true, liveSyncDurationCount: 4 });
         if (!extra) instance.on(Hls.Events.ERROR, (_, d) => {
           if (d.fatal && valid() && state.playing === c.id) showVideoError(playbackError(null, { url: c.url, hls: d }));
         });
@@ -3976,21 +3979,33 @@
       v.loop = !!c.demo;
       return instance;
     }
+    function isLiveChannel(channel) {
+      return (channel == null ? void 0 : channel.type) === "tv" && !channel.archive && !channel.demo;
+    }
+    function cancelWebRecovery() {
+      clearTimeout(reconnectTimer);
+      clearTimeout(stallTimer);
+      reconnectTimer = null;
+      stallTimer = null;
+    }
     function showVideoError(message) {
       setPlaybackPhase("error");
       if (state.full) $("#player-info").textContent = message;
       $("#video-error").textContent = message;
       $("#video-error").hidden = false;
       $("#preview-play").classList.remove("playing");
-      if (state.prefs.autoReconnect === false || document.hidden || !state.playing || reconnectTimer || /401|403|404|kodek|format|OK \/ Play/.test(message)) return;
+      stablePlaybackStart = null;
+      if (state.prefs.autoReconnect === false || document.hidden || !isLiveChannel(webSource) || state.playing !== webSource.id || reconnectTimer || /401|403|404|kodek|format|OK \/ Play/.test(message)) return;
       const delay = reconnectDelay(reconnectAttempts + 1);
       if (delay === null) return;
-      const channel = state.playing;
+      const source = webSource, generation = playGeneration;
       reconnectAttempts++;
       $("#video-error").textContent = message + " \xB7 Reconnecting " + reconnectAttempts + "/3\u2026";
       reconnectTimer = setTimeout(() => {
         reconnectTimer = null;
-        if (state.playing === channel && !document.hidden) play(state.channels.find((c) => c.id === channel), state.full, true);
+        if (playGeneration === generation && webSource === source && state.playing === source.id && !document.hidden && state.prefs.autoReconnect !== false) {
+          play(source, state.full, true);
+        }
       }, delay);
     }
     async function playableStart(promise) {
@@ -4014,7 +4029,7 @@
         try {
           const url = await mediaURL(c);
           if (generation2 !== playGeneration) return;
-          const payload = JSON.stringify({ url, id: c.id, name: c.name, motion: state.prefs.motion !== false, language: state.prefs.language || "en", fullscreen, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/" + VERSION2, referer: c.referer || "", history: [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60) });
+          const payload = JSON.stringify({ url, live: isLiveChannel(c), id: c.id, name: c.name, motion: state.prefs.motion !== false, language: state.prefs.language || "en", fullscreen, muted: !!state.prefs.muted, autoReconnect: state.prefs.autoReconnect !== false, fit: state.prefs.fit || "contain", userAgent: c.userAgent || state.userAgent || "TiviLoom-Android/" + VERSION2, referer: c.referer || "", history: [c.id, ...state.history.filter((id) => id !== c.id)].slice(0, 60) });
           if (!window.TiviLoomNative.openNativePlayer(payload)) throw Error("Native player could not be opened.");
           video.pause();
           if (hls) {
@@ -4056,20 +4071,20 @@
       if (c.type !== "series") state.nextEpisodes = null;
       if (advanced.guardGroup(c.group, () => play(c, fullscreen, automatic))) return;
       if (advanced.guard("channel", () => play(c, fullscreen), c)) return;
-      if (!automatic) {
-        clearTimeout(reconnectTimer);
-        reconnectTimer = null;
-        reconnectAttempts = 0;
-      }
+      cancelWebRecovery();
+      stablePlaybackStart = null;
+      if (!automatic) reconnectAttempts = 0;
+      webSource = c;
       if (state.channel !== c.id) state.selected = null;
       state.channel = c.id;
       const retry = !$("#video-error").hidden || !!video.error;
-      const generation = ++playGeneration;
+      const needsSource = state.playing !== c.id || retry || video.dataset.tiviSource !== c.url;
+      const generation = needsSource ? ++playGeneration : playGeneration;
       const valid = () => generation === playGeneration;
       let failed = false;
       $("#video-error").hidden = true;
       $("#preview-status").textContent = c.demo ? "YERL\u0130 N\xDCMUN\u018F V\u0130DEO" : "YAYIM A\xC7ILIR";
-      if (state.playing !== c.id || retry || video.dataset.tiviSource !== c.url) {
+      if (needsSource) {
         if (hls) {
           hls.destroy();
           hls = null;
@@ -4382,7 +4397,7 @@
       const archive = archiveURL(c, p);
       menu(p.title, [{ heading: p.title }, ...archive ? [["\u25B6 Watch archive", () => {
         closeModal();
-        play({ ...c, url: archive }, true);
+        play({ ...c, url: archive, archive: true }, true);
       }]] : [], ...p.start > Date.now() ? [["Remind", () => reminder(p, c)]] : [], ["Watch channel", () => {
         closeModal();
         play(c, true);
@@ -4890,7 +4905,7 @@
         case "archive-selected": {
           const url = archiveURL(c, state.selected);
           closeModal();
-          if (url) await play({ ...c, url }, true);
+          if (url) await play({ ...c, url, archive: true }, true);
           else toast("Arxiv \xFC\xE7\xFCn \xFCnvan tap\u0131lmad\u0131.");
           break;
         }
@@ -5205,7 +5220,7 @@
     video.addEventListener("error", () => {
       var _a5, _b4;
       if (!state.playing || !video.currentSrc) return;
-      const c = state.channels.find((c2) => c2.id === state.playing), generation = playGeneration;
+      const c = (webSource == null ? void 0 : webSource.id) === state.playing ? webSource : state.channels.find((c2) => c2.id === state.playing), generation = playGeneration;
       if (c && !hls && hlsFallbackGeneration !== generation && ((_a5 = window.Hls) == null ? void 0 : _a5.isSupported()) && ["hls", "unknown"].includes(streamKind(c.url)) && ((_b4 = video.error) == null ? void 0 : _b4.code) === 4) {
         hlsFallbackGeneration = generation;
         $("#preview-status").textContent = "ALTERNAT\u0130V PLAYER YOXLANIR";
@@ -5230,16 +5245,26 @@
     });
     video.addEventListener("playing", () => {
       setPlaybackPhase("playing");
-      clearTimeout(reconnectTimer);
-      clearTimeout(stallTimer);
-      reconnectTimer = null;
-      reconnectAttempts = 0;
+      cancelWebRecovery();
+      stablePlaybackStart = video.currentTime;
       $("#video-error").hidden = true;
       toolLabel("#pause-button", "Pause");
     });
     video.addEventListener("pause", () => {
+      cancelWebRecovery();
+      stablePlaybackStart = null;
       if (state.playbackPhase !== "loading" && state.playbackPhase !== "error") setPlaybackPhase("paused");
       toolLabel("#pause-button", "Play");
+    });
+    video.addEventListener("seeking", () => {
+      clearTimeout(stallTimer);
+      stallTimer = null;
+      stablePlaybackStart = null;
+    });
+    video.addEventListener("timeupdate", () => {
+      if (video.paused || video.seeking || state.playbackPhase !== "playing") return;
+      if (stablePlaybackStart === null) stablePlaybackStart = video.currentTime;
+      if (video.currentTime - stablePlaybackStart >= 20) reconnectAttempts = 0;
     });
     video.addEventListener("timeupdate", () => {
       const clock = (n) => {
@@ -5540,11 +5565,30 @@
       });
     });
     for (const event of ["stalled", "waiting"]) video.addEventListener(event, () => {
-      if (state.playing && !video.paused && state.playbackPhase === "playing") setPlaybackPhase("buffering");
-      clearTimeout(stallTimer);
-      stallTimer = setTimeout(() => {
-        if (state.playing && !video.paused && !document.hidden) showVideoError("Yay\u0131m ba\u011Flant\u0131s\u0131 dayand\u0131.");
-      }, 2e4);
+      if (!state.playing || video.paused || video.seeking || document.hidden || stallTimer !== null) return;
+      if (event === "waiting" && state.playbackPhase === "playing") {
+        stablePlaybackStart = null;
+        setPlaybackPhase("buffering");
+      }
+      const generation = playGeneration, channel = state.playing;
+      let position = video.currentTime;
+      let lastProgress = performance.now();
+      const check = () => {
+        stallTimer = null;
+        if (generation !== playGeneration || channel !== state.playing || video.paused || video.seeking || document.hidden) return;
+        const now = performance.now();
+        if (Math.abs(video.currentTime - position) >= 0.1) {
+          position = video.currentTime;
+          lastProgress = now;
+          if (state.playbackPhase === "buffering") setPlaybackPhase("playing");
+        }
+        if (now - lastProgress >= 25e3) {
+          showVideoError("Yay\u0131m ba\u011Flant\u0131s\u0131 dayand\u0131.");
+          return;
+        }
+        stallTimer = setTimeout(check, 2500);
+      };
+      stallTimer = setTimeout(check, 2500);
     });
     function syncNativeBounds() {
       var _a5;
@@ -5643,17 +5687,14 @@
         persistResume();
         (_c2 = (_b4 = window.TiviLoomNative) == null ? void 0 : _b4.suspendNativePlayer) == null ? void 0 : _c2.call(_b4);
         if (!document.documentElement.classList.contains("native-preview")) video.pause();
-        clearTimeout(reconnectTimer);
-        clearTimeout(stallTimer);
+        cancelWebRecovery();
         return;
       }
       if (suspended) return;
       tvWarm = { playing: state.playing, full: state.full, channel: state.channel, selected: state.selected, wants: !!state.playing && !video.paused, position: Number.isFinite(video.currentTime) ? video.currentTime : 0 };
       if ($("#mini-player") && !$("#mini-player").hidden) toggleMini(true);
       advanced.suspend();
-      clearTimeout(reconnectTimer);
-      clearTimeout(stallTimer);
-      reconnectTimer = null;
+      cancelWebRecovery();
       if (suspended) return;
       suspended = true;
       persistResume();
@@ -5692,6 +5733,7 @@
       if (!allowed || !snapshot.full && state.view !== "guide" || $("#modal-root").children.length) return;
       if (!snapshot.wants) {
         const generation2 = ++playGeneration;
+        webSource = c;
         state.playing = c.id;
         setPlaybackPhase("paused");
         attachVideo(video, c, false, () => generation2 === playGeneration && !suspended).then((instance) => {
